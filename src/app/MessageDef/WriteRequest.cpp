@@ -39,9 +39,7 @@ CHIP_ERROR WriteRequest::Parser::Init(const chip::TLV::TLVReader & aReader)
 
     VerifyOrExit(chip::TLV::kTLVType_Structure == mReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
-    // This is just a dummy, as we're not going to exit this container ever
-    chip::TLV::TLVType OuterContainerType;
-    err = mReader.EnterContainer(OuterContainerType);
+    err = mReader.EnterContainer(mOuterContainerType);
 
 exit:
     ChipLogFunctError(err);
@@ -134,6 +132,8 @@ CHIP_ERROR WriteRequest::Parser::CheckSchemaValidity() const
     {
         err = CHIP_NO_ERROR;
     }
+    SuccessOrExit(err);
+    err = reader.ExitContainer(mOuterContainerType);
 
 exit:
     ChipLogFunctError(err);
@@ -241,6 +241,11 @@ WriteRequest::Builder & WriteRequest::Builder::MoreChunkedMessages(const bool aM
 
 exit:
     return *this;
+}
+
+AttributeDataList::Builder & WriteRequest::Builder::GetAttributeDataListBuilder()
+{
+    return mAttributeDataListBuilder;
 }
 
 WriteRequest::Builder & WriteRequest::Builder::EndOfWriteRequest()

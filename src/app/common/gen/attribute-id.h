@@ -584,12 +584,6 @@
 // Server attributes
 #define ZCL_FABRICS_ATTRIBUTE_ID (0x0001)
 
-// Attribute ids for cluster: Trusted Root Certificates
-
-// Client attributes
-
-// Server attributes
-
 // Attribute ids for cluster: Fixed Label
 
 // Client attributes
@@ -1356,7 +1350,7 @@
 
 // Server attributes
 
-// Attribute ids for cluster: Content Launch
+// Attribute ids for cluster: Content Launcher
 
 // Client attributes
 
@@ -1424,6 +1418,8 @@
 #define ZCL_LIST_ATTRIBUTE_ID (0x001A)
 #define ZCL_LIST_OCTET_STRING_ATTRIBUTE_ID (0x001B)
 #define ZCL_LIST_STRUCT_OCTET_STRING_ATTRIBUTE_ID (0x001C)
+#define ZCL_LONG_OCTET_STRING_ATTRIBUTE_ID (0x001D)
+#define ZCL_UNSUPPORTED_ATTRIBUTE_ID (0x00FF)
 
 // Attribute ids for cluster: Generic Tunnel
 

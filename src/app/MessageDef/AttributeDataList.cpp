@@ -78,6 +78,8 @@ CHIP_ERROR AttributeDataList::Parser::CheckSchemaValidity() const
             err = CHIP_NO_ERROR;
         }
     }
+    SuccessOrExit(err);
+    err = reader.ExitContainer(mOuterContainerType);
 
 exit:
     ChipLogFunctError(err);
@@ -97,6 +99,11 @@ AttributeDataElement::Builder & AttributeDataList::Builder::CreateAttributeDataE
 exit:
 
     // on error, mAttributeDataElementBuilder would be un-/partial initialized and cannot be used to write anything
+    return mAttributeDataElementBuilder;
+}
+
+AttributeDataElement::Builder & AttributeDataList::Builder::GetAttributeDataElementBuilder()
+{
     return mAttributeDataElementBuilder;
 }
 
