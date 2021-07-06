@@ -69,7 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeProductIdWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeApplicationIdWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeCatalogVendorIdWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)readAttributeApplicationSatusWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeApplicationStatusWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -506,6 +506,27 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Electrical Measurement
+ *
+ */
+@interface CHIPElectricalMeasurement : CHIPCluster
+
+- (void)readAttributeMeasurementTypeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeTotalActivePowerWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRmsVoltageWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRmsVoltageMinWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRmsVoltageMaxWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRmsCurrentWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRmsCurrentMinWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRmsCurrentMaxWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeActivePowerWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeActivePowerMinWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeActivePowerMaxWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Ethernet Network Diagnostics
  *
  */
@@ -722,9 +743,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)mediaPlay:(ResponseHandler)responseHandler;
 - (void)mediaPrevious:(ResponseHandler)responseHandler;
 - (void)mediaRewind:(ResponseHandler)responseHandler;
+- (void)mediaSeek:(uint64_t)position responseHandler:(ResponseHandler)responseHandler;
 - (void)mediaSkipBackward:(uint64_t)deltaPositionMilliseconds responseHandler:(ResponseHandler)responseHandler;
 - (void)mediaSkipForward:(uint64_t)deltaPositionMilliseconds responseHandler:(ResponseHandler)responseHandler;
-- (void)mediaSkipSeek:(uint64_t)position responseHandler:(ResponseHandler)responseHandler;
 - (void)mediaStartOver:(ResponseHandler)responseHandler;
 - (void)mediaStop:(ResponseHandler)responseHandler;
 

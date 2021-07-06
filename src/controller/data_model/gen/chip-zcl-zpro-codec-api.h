@@ -42,6 +42,7 @@
 | Descriptor                                                          | 0x001D |
 | DiagnosticLogs                                                      | 0x0032 |
 | DoorLock                                                            | 0x0101 |
+| ElectricalMeasurement                                               | 0x0B04 |
 | EthernetNetworkDiagnostics                                          | 0x0037 |
 | FixedLabel                                                          | 0x0040 |
 | FlowMeasurement                                                     | 0x0404 |
@@ -113,7 +114,7 @@ chip::System::PacketBufferHandle encodeAccountLoginClusterReadClusterRevisionAtt
 | * ProductId                                                         | 0x0003 |
 | * ApplicationId                                                     | 0x0005 |
 | * CatalogVendorId                                                   | 0x0006 |
-| * ApplicationSatus                                                  | 0x0007 |
+| * ApplicationStatus                                                 | 0x0007 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -168,10 +169,10 @@ chip::System::PacketBufferHandle encodeApplicationBasicClusterReadCatalogVendorI
 
 /**
  * @brief
- *    Encode a Application Basic server read command for the application satus attribute into buffer including the APS frame
+ *    Encode a Application Basic server read command for the application status attribute into buffer including the APS frame
  */
-chip::System::PacketBufferHandle encodeApplicationBasicClusterReadApplicationSatusAttribute(uint8_t seqNum,
-                                                                                            chip::EndpointId destinationEndpoint);
+chip::System::PacketBufferHandle encodeApplicationBasicClusterReadApplicationStatusAttribute(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
@@ -1496,6 +1497,117 @@ chip::System::PacketBufferHandle encodeDoorLockClusterReadClusterRevisionAttribu
                                                                                    chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
+| Cluster ElectricalMeasurement                                       | 0x0B04 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasurementType                                                   | 0x0000 |
+| * TotalActivePower                                                  | 0x0304 |
+| * RmsVoltage                                                        | 0x0505 |
+| * RmsVoltageMin                                                     | 0x0506 |
+| * RmsVoltageMax                                                     | 0x0507 |
+| * RmsCurrent                                                        | 0x0508 |
+| * RmsCurrentMin                                                     | 0x0509 |
+| * RmsCurrentMax                                                     | 0x050A |
+| * ActivePower                                                       | 0x050B |
+| * ActivePowerMin                                                    | 0x050C |
+| * ActivePowerMax                                                    | 0x050D |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Electrical Measurement server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeElectricalMeasurementClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Electrical Measurement server read command for the measurement type attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeElectricalMeasurementClusterReadMeasurementTypeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Electrical Measurement server read command for the total active power attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeElectricalMeasurementClusterReadTotalActivePowerAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Electrical Measurement server read command for the rms voltage attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeElectricalMeasurementClusterReadRmsVoltageAttribute(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Electrical Measurement server read command for the rms voltage min attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeElectricalMeasurementClusterReadRmsVoltageMinAttribute(uint8_t seqNum,
+                                                                                              chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Electrical Measurement server read command for the rms voltage max attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeElectricalMeasurementClusterReadRmsVoltageMaxAttribute(uint8_t seqNum,
+                                                                                              chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Electrical Measurement server read command for the rms current attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeElectricalMeasurementClusterReadRmsCurrentAttribute(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Electrical Measurement server read command for the rms current min attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeElectricalMeasurementClusterReadRmsCurrentMinAttribute(uint8_t seqNum,
+                                                                                              chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Electrical Measurement server read command for the rms current max attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeElectricalMeasurementClusterReadRmsCurrentMaxAttribute(uint8_t seqNum,
+                                                                                              chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Electrical Measurement server read command for the active power attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeElectricalMeasurementClusterReadActivePowerAttribute(uint8_t seqNum,
+                                                                                            chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Electrical Measurement server read command for the active power min attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeElectricalMeasurementClusterReadActivePowerMinAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Electrical Measurement server read command for the active power max attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeElectricalMeasurementClusterReadActivePowerMaxAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Electrical Measurement server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeElectricalMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
 | Cluster EthernetNetworkDiagnostics                                  | 0x0037 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -1976,9 +2088,9 @@ chip::System::PacketBufferHandle encodeMediaInputClusterReadClusterRevisionAttri
 | * MediaPlay                                                         |   0x00 |
 | * MediaPrevious                                                     |   0x04 |
 | * MediaRewind                                                       |   0x06 |
+| * MediaSeek                                                         |   0x0A |
 | * MediaSkipBackward                                                 |   0x09 |
 | * MediaSkipForward                                                  |   0x08 |
-| * MediaSkipSeek                                                     |   0x0A |
 | * MediaStartOver                                                    |   0x03 |
 | * MediaStop                                                         |   0x02 |
 |------------------------------------------------------------------------------|

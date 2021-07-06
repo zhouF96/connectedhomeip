@@ -41,6 +41,7 @@ constexpr ClusterId kContentLauncherClusterId             = 0x050A;
 constexpr ClusterId kDescriptorClusterId                  = 0x001D;
 constexpr ClusterId kDiagnosticLogsClusterId              = 0x0032;
 constexpr ClusterId kDoorLockClusterId                    = 0x0101;
+constexpr ClusterId kElectricalMeasurementClusterId       = 0x0B04;
 constexpr ClusterId kEthernetNetworkDiagnosticsClusterId  = 0x0037;
 constexpr ClusterId kFixedLabelClusterId                  = 0x0040;
 constexpr ClusterId kFlowMeasurementClusterId             = 0x0404;
@@ -112,7 +113,7 @@ public:
     CHIP_ERROR ReadAttributeProductId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeApplicationId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeCatalogVendorId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeApplicationSatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeApplicationStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
@@ -601,6 +602,28 @@ private:
     static constexpr CommandId kUnlockWithTimeoutCommandId    = 0x03;
 };
 
+class DLL_EXPORT ElectricalMeasurementCluster : public ClusterBase
+{
+public:
+    ElectricalMeasurementCluster() : ClusterBase(kElectricalMeasurementClusterId) {}
+    ~ElectricalMeasurementCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMeasurementType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTotalActivePower(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRmsVoltage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRmsVoltageMin(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRmsVoltageMax(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRmsCurrent(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRmsCurrentMin(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRmsCurrentMax(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeActivePower(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeActivePowerMin(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeActivePowerMax(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+};
+
 class DLL_EXPORT EthernetNetworkDiagnosticsCluster : public ClusterBase
 {
 public:
@@ -869,11 +892,11 @@ public:
     CHIP_ERROR MediaPlay(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR MediaPrevious(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR MediaRewind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR MediaSeek(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint64_t position);
     CHIP_ERROR MediaSkipBackward(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                  uint64_t deltaPositionMilliseconds);
     CHIP_ERROR MediaSkipForward(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                 uint64_t deltaPositionMilliseconds);
-    CHIP_ERROR MediaSkipSeek(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint64_t position);
     CHIP_ERROR MediaStartOver(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR MediaStop(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
@@ -888,9 +911,9 @@ private:
     static constexpr CommandId kMediaPlayCommandId         = 0x00;
     static constexpr CommandId kMediaPreviousCommandId     = 0x04;
     static constexpr CommandId kMediaRewindCommandId       = 0x06;
+    static constexpr CommandId kMediaSeekCommandId         = 0x0A;
     static constexpr CommandId kMediaSkipBackwardCommandId = 0x09;
     static constexpr CommandId kMediaSkipForwardCommandId  = 0x08;
-    static constexpr CommandId kMediaSkipSeekCommandId     = 0x0A;
     static constexpr CommandId kMediaStartOverCommandId    = 0x03;
     static constexpr CommandId kMediaStopCommandId         = 0x02;
 };
