@@ -351,7 +351,10 @@ CHIP_ERROR CASESession::SendSigmaR1()
     // Fill in the random value
     ReturnErrorOnFailure(DRBG_get_bytes(initiatorRandom, kSigmaParamRandomNumberSize));
 
-    // Step 4
+// Step 4
+#ifdef ENABLE_HSM_CASE_EPHERMAL_KEY
+    mEphemeralKey.SetKeyId(CASE_EPHEMERAL_KEY);
+#endif
     ReturnErrorOnFailure(mEphemeralKey.Initialize());
 
     // Start writing TLV
@@ -498,6 +501,9 @@ CHIP_ERROR CASESession::SendSigmaR2()
 
     // Step 3
     // hardcoded to use a p256keypair
+#ifdef ENABLE_HSM_CASE_EPHERMAL_KEY
+    mEphemeralKey.SetKeyId(CASE_EPHEMERAL_KEY);
+#endif
     err = mEphemeralKey.Initialize();
     SuccessOrExit(err);
 
@@ -929,8 +935,8 @@ CHIP_ERROR CASESession::SendSigmaR3()
 
     mPairingComplete = true;
 
-    // Close the exchange, as no additional messages are expected from the peer
-    CloseExchange();
+    // Forget our exchange, as no additional messages are expected from the peer
+    mExchangeCtxt = nullptr;
 
     // Call delegate to indicate pairing completion
     mDelegate->OnSessionEstablished();
@@ -1073,8 +1079,8 @@ CHIP_ERROR CASESession::HandleSigmaR3(System::PacketBufferHandle & msg)
 
     mPairingComplete = true;
 
-    // Close the exchange, as no additional messages are expected from the peer
-    CloseExchange();
+    // Forget our exchange, as no additional messages are expected from the peer
+    mExchangeCtxt = nullptr;
 
     // Call delegate to indicate pairing completion
     mDelegate->OnSessionEstablished();
@@ -1326,8 +1332,6 @@ CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const Pack
     {
         if (mExchangeCtxt != ec)
         {
-            // Close the incoming exchange explicitly, as the cleanup code only closes mExchangeCtxt
-            ec->Close();
             ReturnErrorOnFailure(CHIP_ERROR_INVALID_ARGUMENT);
         }
     }
@@ -1395,6 +1399,9 @@ exit:
     // Call delegate to indicate session establishment failure.
     if (err != CHIP_NO_ERROR)
     {
+        // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
+        // exchange will handle that.
+        mExchangeCtxt = nullptr;
         Clear();
         mDelegate->OnSessionEstablishmentError(err);
     }
