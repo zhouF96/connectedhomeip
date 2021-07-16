@@ -35,6 +35,7 @@
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>
 #include <support/ScopedBuffer.h>
+#include <support/TypeTraits.h>
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {
@@ -300,8 +301,11 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
     VerifyOrReturn(mExchangeCtxt == ec, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout exchange doesn't match"));
     ChipLogError(SecureChannel,
                  "CASESession timed out while waiting for a response from the peer. Expected message type was %" PRIu8,
-                 static_cast<std::underlying_type_t<decltype(mNextExpectedMsg)>>(mNextExpectedMsg));
+                 to_underlying(mNextExpectedMsg));
     mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
+    // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
+    // exchange will handle that.
+    mExchangeCtxt = nullptr;
     Clear();
 }
 
@@ -1215,6 +1219,12 @@ CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const uint8_t * respond
         const CertificateKeyId & subjectKeyId = certSet.GetCertSet()[0].mSubjectKeyId;
 
         ReturnErrorOnFailure(mOpCredSet->FindValidCert(mTrustedRootId, subjectDN, subjectKeyId, mValidContext, resultCert));
+
+        // Now that we have verified that this is a valid cert, try to get the
+        // peer's operational identity from it.
+        PeerId peerId;
+        ReturnErrorOnFailure(ExtractPeerIdFromOpCert(certSet.GetCertSet()[0], &peerId));
+        mConnectionState.SetPeerNodeId(peerId.GetNodeId());
     }
 
     return CHIP_NO_ERROR;

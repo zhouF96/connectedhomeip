@@ -222,7 +222,7 @@ CHIP_ERROR DeviceController::GenerateOperationalCertificates(const ByteSpan & no
 
     ChipLogProgress(Controller, "Getting intermediate CA certificate from the issuer");
     CHIP_ERROR err = mOperationalCredentialsDelegate->GetIntermediateCACertificate(0, icaCertSpan);
-    ChipLogProgress(Controller, "GetIntermediateCACertificate returned %" CHIP_ERROR_FORMAT, err);
+    ChipLogProgress(Controller, "GetIntermediateCACertificate returned %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
     if (err == CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED)
     {
         // This implies that the commissioner application uses root CA to sign the operational
@@ -345,8 +345,8 @@ CHIP_ERROR DeviceController::Shutdown()
     //
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().Shutdown());
 #else
-    VerifyOrReturnError(mInetLayer->Shutdown() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(mSystemLayer->Shutdown() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+    ReturnErrorOnFailure(mInetLayer->Shutdown());
+    ReturnErrorOnFailure(mSystemLayer->Shutdown());
     chip::Platform::Delete(mInetLayer);
     chip::Platform::Delete(mSystemLayer);
 #endif // CONFIG_DEVICE_LAYER
@@ -722,7 +722,8 @@ exit:
     }
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to initialize the device list with error: %" CHIP_ERROR_FORMAT, err);
+        ChipLogError(Controller, "Failed to initialize the device list with error: %" CHIP_ERROR_FORMAT,
+                     ChipError::FormatError(err));
     }
 
     return err;
@@ -894,13 +895,13 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     // If the CSRNonce is passed in, using that else using a random one..
     if (params.HasCSRNonce())
     {
-        VerifyOrReturnError(device->SetCSRNonce(params.GetCSRNonce().Value()) == CHIP_NO_ERROR, CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(device->SetCSRNonce(params.GetCSRNonce().Value()));
     }
     else
     {
         uint8_t mCSRNonce[kOpCSRNonceLength];
         Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce));
-        VerifyOrReturnError(device->SetCSRNonce(ByteSpan(mCSRNonce)) == CHIP_NO_ERROR, CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(device->SetCSRNonce(ByteSpan(mCSRNonce)));
     }
 
     mIsIPRendezvous = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);

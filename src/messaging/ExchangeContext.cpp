@@ -35,6 +35,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPKeyIds.h>
+#include <lib/support/TypeTraits.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
@@ -79,8 +80,13 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
 CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle && msgBuf,
                                         const SendFlags & sendFlags)
 {
-    // If we were waiting for a message send, this is it.
-    mFlags.Clear(Flags::kFlagWillSendMessage);
+    if (protocolId != Protocols::SecureChannel::Id || msgType != to_underlying(Protocols::SecureChannel::MsgType::StandaloneAck))
+    {
+        // If we were waiting for a message send, this is it.  Standalone acks
+        // are not application-level sends, which is why we don't allow those to
+        // clear the WillSendMessage flag.
+        mFlags.Clear(Flags::kFlagWillSendMessage);
+    }
 
     CHIP_ERROR err                         = CHIP_NO_ERROR;
     Transport::PeerConnectionState * state = nullptr;
@@ -357,14 +363,13 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
     if (ec == nullptr)
         return;
 
-    // NOTE: we don't set mResponseExpected to false here because the response could still arrive. If the user
-    // wants to never receive the response, they must close the exchange context.
-
     ec->NotifyResponseTimeout();
 }
 
 void ExchangeContext::NotifyResponseTimeout()
 {
+    SetResponseExpected(false);
+
     ExchangeDelegate * delegate = GetDelegate();
 
     // Call the user's timeout handler.
@@ -372,6 +377,8 @@ void ExchangeContext::NotifyResponseTimeout()
     {
         delegate->OnResponseTimeout(this);
     }
+
+    MessageHandled();
 }
 
 CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
@@ -435,23 +442,21 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     }
 
 exit:
-    // Don't close ourselves if we're already closed.
+    // Duplicates and standalone acks are not application-level messages, so
+    // they should generally not lead to any state changes.  The one exception
+    // to that is that if we have a null mDelegate then our lifetime is not
+    // application-defined, since we don't interact with the application at that
+    // point.  That can happen when we are already closed (in which case
+    // MessageHandled is a no-op) or if we were just created to send a
+    // standalone ack for this incoming message, in which case we should treat
+    // it as an app-level message for purposes of our state.
     //
-    // Don't close ourselves if this message is a standalone ack. We're still
-    // not closed and getting an ack should not affect that.  In particular,
-    // since the standalone ack was not passed to the delegate, the delegate
-    // never got a chance to say "stay open". The one exception here is if
-    // mDelegate is null: in that case this is an unsolicited message and we
-    // were just created to ack it and close after that.
-    //
-    // Don't close for duplicates for similar reasons, with the same exception.
-    //
-    // Also don't close if there's an outer HandleMessage invocation.  It'll
-    // deal with the closing.
-    if (!mFlags.Has(Flags::kFlagClosed) && !mFlags.Has(Flags::kFlagWillSendMessage) && !IsResponseExpected() &&
-        (!isStandaloneAck || (mDelegate == nullptr)) && (!isDuplicate || (mDelegate == nullptr)) && !alreadyHandlingMessage)
+    // The alreadyHandlingMessage check is effectively a workaround for the fact that
+    // SendMessage() is not calling MessageHandled() yet and will go away when
+    // we fix that.
+    if (((!isStandaloneAck && !isDuplicate) || (mDelegate == nullptr)) && !alreadyHandlingMessage)
     {
-        Close();
+        MessageHandled();
     }
 
     if (!alreadyHandlingMessage)
@@ -467,6 +472,16 @@ exit:
     Release();
 
     return err;
+}
+
+void ExchangeContext::MessageHandled()
+{
+    if (mFlags.Has(Flags::kFlagClosed) || IsResponseExpected() || IsSendExpected())
+    {
+        return;
+    }
+
+    Close();
 }
 
 } // namespace Messaging
