@@ -21,18 +21,18 @@
 #include "Parser.h"
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace app {
 namespace SubscribeResponse {
 enum
 {
-    kCsTag_SubscriptionId    = 0,
-    kCsTag_FinalSyncInterval = 1,
+    kCsTag_SubscriptionId           = 0,
+    kCsTag_FinalSyncIntervalSeconds = 1,
 };
 
 class Parser : public chip::app::Parser
@@ -66,7 +66,7 @@ public:
     CHIP_ERROR GetSubscriptionId(uint64_t * const apSubscriptionId) const;
 
     /**
-     *  @brief Get FinalSyncInterval. Next() must be called before accessing them.
+     *  @brief Get FinalSyncIntervalSeconds. Next() must be called before accessing them.
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element

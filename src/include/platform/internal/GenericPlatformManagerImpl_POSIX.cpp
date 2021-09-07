@@ -116,9 +116,7 @@ bool GenericPlatformManagerImpl_POSIX<ImplClass>::_IsChipStackLockedByCurrentThr
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartChipTimer(int64_t aMilliseconds)
 {
-    // TODO(#5556): Integrate timer platform details with WatchableEventManager.
-
-    // Let SystemLayer.PrepareSelect() handle timers.
+    // Let WatchableEventManager.PrepareEvents() handle timers.
     return CHIP_NO_ERROR;
 }
 
@@ -127,9 +125,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_PostEvent(const ChipDeviceEve
 {
     mChipEventQueue.Push(*event);
 
-#if CHIP_SYSTEM_CONFIG_USE_IO_THREAD
-    SystemLayer.WakeIOThread(); // Trigger wake select on CHIP thread
-#endif                          // CHIP_SYSTEM_CONFIG_USE_IO_THREAD
+    SystemLayer.WatchableEventsManager().Signal(); // Trigger wake select on CHIP thread
 }
 
 template <class ImplClass>
@@ -164,7 +160,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop()
 
     Impl()->LockChipStack();
 
-    System::WatchableEventManager & watchState = SystemLayer.WatchableEvents();
+    System::WatchableEventManager & watchState = SystemLayer.WatchableEventsManager();
     watchState.EventLoopBegins();
     do
     {
@@ -259,7 +255,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StopEventLoopTask()
         // SystemLayer.
         //
         Impl()->LockChipStack();
-        SystemLayer.WakeIOThread();
+        SystemLayer.WatchableEventsManager().Signal();
         Impl()->UnlockChipStack();
 
         pthread_mutex_lock(&mStateLock);

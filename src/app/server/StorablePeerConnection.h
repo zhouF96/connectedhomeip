@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <protocols/secure_channel/PASESession.h>
 
 namespace chip {
@@ -32,7 +32,7 @@ class DLL_EXPORT StorablePeerConnection
 public:
     StorablePeerConnection() {}
 
-    StorablePeerConnection(PASESession & session, Transport::AdminId admin);
+    StorablePeerConnection(PASESession & session, FabricIndex fabric);
 
     virtual ~StorablePeerConnection() {}
 
@@ -44,17 +44,20 @@ public:
 
     void GetPASESession(PASESession * session) { session->FromSerializable(mSession.mOpCreds); }
 
-    Transport::AdminId GetAdminId() { return mSession.mAdmin; }
+    FabricIndex GetFabricIndex() { return mSession.mFabric; }
 
 private:
-    static constexpr size_t KeySize();
+    // KeySize is defined in the header so we always see its definition before
+    // its uses, which is necessary for a constexpr function to actually be
+    // treated as constexpr.
+    static constexpr size_t KeySize() { return sizeof(kStorablePeerConnectionKeyPrefix) + 2 * sizeof(uint16_t); }
 
     static CHIP_ERROR GenerateKey(uint16_t id, char * key, size_t len);
 
     struct StorableSession
     {
         PASESessionSerializable mOpCreds;
-        Transport::AdminId mAdmin; /* This field is serialized in LittleEndian byte order */
+        FabricIndex mFabric;
     };
 
     StorableSession mSession;

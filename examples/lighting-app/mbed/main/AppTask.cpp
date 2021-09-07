@@ -30,13 +30,16 @@
 #include <platform/CHIPDeviceLayer.h>
 #undef sleep
 
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 // ZAP -- ZCL Advanced Platform
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/util/attribute-storage.h>
+
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 
 // mbed-os headers
 #include "drivers/InterruptIn.h"
@@ -68,6 +71,7 @@ static mbed::Timeout sFunctionTimer;
 // TODO: change EventQueue default event size
 static events::EventQueue sAppEventQueue;
 
+using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
@@ -113,6 +117,9 @@ int AppTask::Init()
 
     // Init ZCL Data Model and start server
     InitServer();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     ConfigurationMgr().LogDeviceConfig();
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));

@@ -111,14 +111,6 @@
 
 // clang-format off
 
-#ifndef CHIP_SYSTEM_CONFIG_USE_IO_THREAD
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-#define CHIP_SYSTEM_CONFIG_USE_IO_THREAD 1
-#else
-#define CHIP_SYSTEM_CONFIG_USE_IO_THREAD 0
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-#endif // CHIP_SYSTEM_CONFIG_USE_IO_THREAD
-
 /**
  *  @def CHIP_SYSTEM_CONFIG_TRANSFER_INETLAYER_PROJECT_CONFIGURATION
  *
@@ -222,6 +214,15 @@
 #define CHIP_SYSTEM_CONFIG_MBED_LOCKING 0
 #endif /* CHIP_SYSTEM_CONFIG_MBED_LOCKING */
 
+/**
+ *  @def CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+ *
+ *  @brief
+ *      Allocate Pool from Heap for large systems (e.g. Linux).
+ */
+#ifndef CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+#define CHIP_SYSTEM_CONFIG_POOL_USE_HEAP 0
+#endif /* CHIP_SYSTEM_CONFIG_POOL_USE_HEAP */
 
 /**
  *  @def CHIP_SYSTEM_CONFIG_NO_LOCKING
@@ -432,11 +433,25 @@ struct LwIPEvent;
  *  @def CHIP_SYSTEM_CONFIG_NUM_TIMERS
  *
  *  @brief
- *      This is the total number of available timers.
+ *      This is the total number of available timers, for configurations that use a fixed timer pool.
  */
 #ifndef CHIP_SYSTEM_CONFIG_NUM_TIMERS
 #define CHIP_SYSTEM_CONFIG_NUM_TIMERS 32
 #endif /* CHIP_SYSTEM_CONFIG_NUM_TIMERS */
+
+/**
+ *  @def CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
+ *
+ *  @brief
+ *      This defines whether (1) or not (0) the implementation uses the System::Timer pool.
+ */
+#ifndef CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
+#if CHIP_SYSTEM_CONFIG_NUM_TIMERS > 0
+#define CHIP_SYSTEM_CONFIG_USE_TIMER_POOL 1
+#else
+#define CHIP_SYSTEM_CONFIG_USE_TIMER_POOL 0
+#endif
+#endif /* CHIP_SYSTEM_CONFIG_USE_TIMER_POOL */
 
 /**
  *  @def CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS

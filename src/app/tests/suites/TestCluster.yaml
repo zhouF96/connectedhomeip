@@ -34,6 +34,30 @@ tests:
               - name: "returnValue"
                 value: 7
 
+    - label: "Send Test Add Arguments Command"
+      command: "testAddArguments"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 3
+              - name: "arg2"
+                value: 17
+      response:
+          values:
+              - name: "returnValue"
+                value: 20
+
+    - label: "Send failing Test Add Arguments Command"
+      command: "testAddArguments"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 250
+              - name: "arg2"
+                value: 6
+      response:
+          error: 1
+
     # Tests for Boolean attribute
 
     - label: "Read attribute BOOLEAN Default Value"
@@ -587,6 +611,8 @@ tests:
       attribute: "octet_string"
       arguments:
           value: "TestValueLongerThan10"
+      response:
+          error: true
 
     - label: "Read attribute OCTET_STRING"
       command: "readAttribute"
@@ -638,20 +664,22 @@ tests:
       command: "writeAttribute"
       attribute: "char_string"
       arguments:
-          value: "☉Test☉"
+          value: "☉T☉"
 
     - label: "Read attribute CHAR_STRING"
       command: "readAttribute"
       attribute: "char_string"
       disabled: true
       response:
-          value: "☉Test☉"
+          value: "☉T☉"
 
-    - label: "Write attribute CHAR_STRING"
+    - label: "Write attribute CHAR_STRING - Value too long"
       command: "writeAttribute"
       attribute: "char_string"
       arguments:
           value: "☉TestValueLongerThan10☉"
+      response:
+          error: true
 
     - label: "Read attribute CHAR_STRING"
       command: "readAttribute"
@@ -660,7 +688,7 @@ tests:
       response:
           value: "☉TestVal"
 
-    - label: "Write attribute CHAR_STRING"
+    - label: "Write attribute CHAR_STRING - Empty"
       command: "writeAttribute"
       attribute: "char_string"
       arguments:

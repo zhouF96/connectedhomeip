@@ -40,11 +40,11 @@
 
 #include "scenes.h"
 #include "app/util/common.h"
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/command-id.h>
 #include <app/CommandHandler.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
 #include <app/util/af.h>
 
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
@@ -216,19 +216,20 @@ void emAfPluginScenesServerPrintInfo(void)
     }
 }
 
-bool emberAfScenesClusterAddSceneCallback(chip::app::CommandHandler * commandObj, GroupId groupId, uint8_t sceneId,
+bool emberAfScenesClusterAddSceneCallback(EndpointId endpoint, app::CommandHandler * commandObj, GroupId groupId, uint8_t sceneId,
                                           uint16_t transitionTime, uint8_t * sceneName, uint8_t * extensionFieldSets)
 {
     return emberAfPluginScenesServerParseAddScene(commandObj, emberAfCurrentCommand(), groupId, sceneId, transitionTime, sceneName,
                                                   extensionFieldSets);
 }
 
-bool emberAfScenesClusterViewSceneCallback(chip::app::CommandHandler * commandObj, GroupId groupId, uint8_t sceneId)
+bool emberAfScenesClusterViewSceneCallback(EndpointId endpoint, app::CommandHandler * commandObj, GroupId groupId, uint8_t sceneId)
 {
     return emberAfPluginScenesServerParseViewScene(commandObj, emberAfCurrentCommand(), groupId, sceneId);
 }
 
-bool emberAfScenesClusterRemoveSceneCallback(chip::app::CommandHandler * commandObj, GroupId groupId, uint8_t sceneId)
+bool emberAfScenesClusterRemoveSceneCallback(EndpointId endpoint, app::CommandHandler * commandObj, GroupId groupId,
+                                             uint8_t sceneId)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_NOT_FOUND;
     CHIP_ERROR err       = CHIP_NO_ERROR;
@@ -264,8 +265,7 @@ bool emberAfScenesClusterRemoveSceneCallback(chip::app::CommandHandler * command
     {
         {
             app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_SCENES_CLUSTER_ID,
-                                                 ZCL_REMOVE_SCENE_RESPONSE_COMMAND_ID,
-                                                 (chip::app::CommandPathFlags::kEndpointIdValid) };
+                                                 ZCL_REMOVE_SCENE_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
             TLV::TLVWriter * writer          = nullptr;
             SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
             VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -283,7 +283,7 @@ exit:
     return true;
 }
 
-bool emberAfScenesClusterRemoveAllScenesCallback(chip::app::CommandHandler * commandObj, GroupId groupId)
+bool emberAfScenesClusterRemoveAllScenesCallback(EndpointId endpoint, app::CommandHandler * commandObj, GroupId groupId)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_INVALID_FIELD;
     CHIP_ERROR err       = CHIP_NO_ERROR;
@@ -315,7 +315,7 @@ bool emberAfScenesClusterRemoveAllScenesCallback(chip::app::CommandHandler * com
         {
             app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_SCENES_CLUSTER_ID,
                                                  ZCL_REMOVE_ALL_SCENES_RESPONSE_COMMAND_ID,
-                                                 (chip::app::CommandPathFlags::kEndpointIdValid) };
+                                                 (app::CommandPathFlags::kEndpointIdValid) };
             TLV::TLVWriter * writer          = nullptr;
             SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
             VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -332,7 +332,7 @@ exit:
     return true;
 }
 
-bool emberAfScenesClusterStoreSceneCallback(chip::app::CommandHandler * commandObj, GroupId groupId, uint8_t sceneId)
+bool emberAfScenesClusterStoreSceneCallback(EndpointId endpoint, app::CommandHandler * commandObj, GroupId groupId, uint8_t sceneId)
 {
     EmberAfStatus status;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -345,8 +345,7 @@ bool emberAfScenesClusterStoreSceneCallback(chip::app::CommandHandler * commandO
     {
         {
             app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_SCENES_CLUSTER_ID,
-                                                 ZCL_STORE_SCENE_RESPONSE_COMMAND_ID,
-                                                 (chip::app::CommandPathFlags::kEndpointIdValid) };
+                                                 ZCL_STORE_SCENE_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
             TLV::TLVWriter * writer          = nullptr;
             SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
             VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -364,8 +363,8 @@ exit:
     return true;
 }
 
-bool emberAfScenesClusterRecallSceneCallback(chip::app::CommandHandler * commandObj, GroupId groupId, uint8_t sceneId,
-                                             uint16_t transitionTime)
+bool emberAfScenesClusterRecallSceneCallback(EndpointId endpoint, app::CommandHandler * commandObj, GroupId groupId,
+                                             uint8_t sceneId, uint16_t transitionTime)
 {
     // NOTE: TransitionTime field in the RecallScene command is currently
     // ignored. Per Zigbee Alliance ZCL 7 (07-5123-07):
@@ -398,7 +397,7 @@ bool emberAfScenesClusterRecallSceneCallback(chip::app::CommandHandler * command
     return true;
 }
 
-bool emberAfScenesClusterGetSceneMembershipCallback(chip::app::CommandHandler * commandObj, GroupId groupId)
+bool emberAfScenesClusterGetSceneMembershipCallback(EndpointId endpoint, app::CommandHandler * commandObj, GroupId groupId)
 {
     CHIP_ERROR err       = CHIP_NO_ERROR;
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
@@ -435,7 +434,7 @@ bool emberAfScenesClusterGetSceneMembershipCallback(chip::app::CommandHandler * 
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_SCENES_CLUSTER_ID,
                                              ZCL_GET_SCENE_MEMBERSHIP_RESPONSE_COMMAND_ID,
-                                             (chip::app::CommandPathFlags::kEndpointIdValid) };
+                                             (app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
         SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -445,7 +444,7 @@ bool emberAfScenesClusterGetSceneMembershipCallback(chip::app::CommandHandler * 
                                                              emberAfPluginScenesServerNumSceneEntriesInUse())));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(2), groupId));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(3), sceneCount));
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(4), chip::ByteSpan(sceneList, sceneCount)));
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(4), ByteSpan(sceneList, sceneCount)));
         SuccessOrExit(err = commandObj->FinishCommand());
     }
 
@@ -718,8 +717,8 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(EndpointId endpoint, 
     return EMBER_ZCL_STATUS_NOT_FOUND;
 }
 
-bool emberAfPluginScenesServerParseAddScene(chip::app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd,
-                                            GroupId groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
+bool emberAfPluginScenesServerParseAddScene(app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd, GroupId groupId,
+                                            uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
                                             uint8_t * extensionFieldSets)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1055,7 +1054,7 @@ kickout:
     }
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_SCENES_CLUSTER_ID,
-                                             ZCL_ADD_SCENE_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
+                                             ZCL_ADD_SCENE_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
         if (enhanced)
         {
             cmdParams.mCommandId = ZCL_ENHANCED_ADD_SCENE_RESPONSE_COMMAND_ID;
@@ -1077,8 +1076,8 @@ exit:
     return true;
 }
 
-bool emberAfPluginScenesServerParseViewScene(chip::app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd,
-                                             GroupId groupId, uint8_t sceneId)
+bool emberAfPluginScenesServerParseViewScene(app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd, GroupId groupId,
+                                             uint8_t sceneId)
 {
     CHIP_ERROR err               = CHIP_NO_ERROR;
     EmberAfSceneTableEntry entry = {};
@@ -1111,7 +1110,7 @@ bool emberAfPluginScenesServerParseViewScene(chip::app::CommandHandler * command
     // the transition time, name, and extension fields are only included if the
     // scene was found.
     app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_SCENES_CLUSTER_ID,
-                                         ZCL_VIEW_SCENE_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
+                                         ZCL_VIEW_SCENE_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
     if (enhanced)
     {
         cmdParams.mCommandId = ZCL_ENHANCED_VIEW_SCENE_RESPONSE_COMMAND_ID;
@@ -1131,7 +1130,7 @@ bool emberAfPluginScenesServerParseViewScene(chip::app::CommandHandler * command
     SuccessOrExit(err = writer->PutString(TLV::ContextTag(4), ""));
 #endif
     // #6620: Need the build the array for response.
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(5), chip::ByteSpan(nullptr, 0)));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(5), ByteSpan(nullptr, 0)));
     SuccessOrExit(err = commandObj->FinishCommand());
 
     /*

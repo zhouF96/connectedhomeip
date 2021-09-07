@@ -30,8 +30,8 @@
 #include <inttypes.h>
 #include <stdio.h>
 
-#include <core/CHIPCore.h>
-#include <support/CodeUtils.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 
@@ -56,23 +56,49 @@ static ErrorFormatter * sErrorFormatterList = nullptr;
  */
 DLL_EXPORT const char * ErrorStr(CHIP_ERROR err)
 {
+    char * formattedError   = sErrorStr;
+    uint16_t formattedSpace = sizeof(sErrorStr);
+
+#if CHIP_CONFIG_ERROR_SOURCE && !CHIP_CONFIG_SHORT_ERROR_STR
+
+    const char * const file = err.GetFile();
+    if (file != nullptr)
+    {
+        int n = snprintf(formattedError, formattedSpace, "%s:%u: ", file, err.GetLine());
+        if (n > formattedSpace)
+        {
+            n = formattedSpace;
+        }
+        formattedError += n;
+        formattedSpace = static_cast<uint16_t>(formattedSpace - n);
+    }
     if (err == CHIP_NO_ERROR)
     {
-        return "No Error";
+        (void) snprintf(formattedError, formattedSpace, CHIP_NO_ERROR_STRING);
+        return sErrorStr;
     }
+
+#else // CHIP_CONFIG_ERROR_SOURCE && !CHIP_CONFIG_SHORT_ERROR_STR
+
+    if (err == CHIP_NO_ERROR)
+    {
+        return CHIP_NO_ERROR_STRING;
+    }
+
+#endif // CHIP_CONFIG_ERROR_SOURCE && !CHIP_CONFIG_SHORT_ERROR_STR
 
     // Search the registered error formatter for one that will format the given
     // error code.
     for (const ErrorFormatter * errFormatter = sErrorFormatterList; errFormatter != nullptr; errFormatter = errFormatter->Next)
     {
-        if (errFormatter->FormatError(sErrorStr, sizeof(sErrorStr), err))
+        if (errFormatter->FormatError(formattedError, formattedSpace, err))
         {
             return sErrorStr;
         }
     }
 
     // Use a default formatting if no formatter found.
-    FormatError(sErrorStr, sizeof(sErrorStr), nullptr, err, nullptr);
+    FormatError(formattedError, formattedSpace, nullptr, err, nullptr);
     return sErrorStr;
 }
 
@@ -143,11 +169,11 @@ DLL_EXPORT void FormatError(char * buf, uint16_t bufSize, const char * subsys, C
 
     if (subsys == NULL)
     {
-        (void) snprintf(buf, bufSize, "Error " CHIP_CONFIG_SHORT_FORM_ERROR_VALUE_FORMAT, err);
+        (void) snprintf(buf, bufSize, "Error " CHIP_CONFIG_SHORT_FORM_ERROR_VALUE_FORMAT, err.AsInteger());
     }
     else
     {
-        (void) snprintf(buf, bufSize, "Error %s:" CHIP_CONFIG_SHORT_FORM_ERROR_VALUE_FORMAT, subsys, err);
+        (void) snprintf(buf, bufSize, "Error %s:" CHIP_CONFIG_SHORT_FORM_ERROR_VALUE_FORMAT, subsys, err.AsInteger());
     }
 
 #else // CHIP_CONFIG_SHORT_ERROR_STR
@@ -166,7 +192,7 @@ DLL_EXPORT void FormatError(char * buf, uint16_t bufSize, const char * subsys, C
         descSep = "";
     }
 
-    (void) snprintf(buf, bufSize, "%s%sError 0x%08" PRIX32 "%s%s", subsys, subsysSep, ChipError::AsInteger(err), descSep, desc);
+    (void) snprintf(buf, bufSize, "%s%sError 0x%08" PRIX32 "%s%s", subsys, subsysSep, err.AsInteger(), descSep, desc);
 
 #endif // CHIP_CONFIG_SHORT_ERROR_STR
 }
