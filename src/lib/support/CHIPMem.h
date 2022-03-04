@@ -27,6 +27,7 @@
 #include <lib/core/CHIPError.h>
 #include <stdlib.h>
 
+#include <memory>
 #include <new>
 #include <utility>
 
@@ -161,6 +162,30 @@ inline void Delete(T * p)
 {
     p->~T();
     MemoryFree(p);
+}
+
+template <typename T>
+struct Deleter
+{
+    void operator()(T * p) { Delete(p); }
+};
+
+template <typename T>
+using UniquePtr = std::unique_ptr<T, Deleter<T>>;
+
+template <typename T, typename... Args>
+inline UniquePtr<T> MakeUnique(Args &&... args)
+{
+    return UniquePtr<T>(New<T>(std::forward<Args>(args)...));
+}
+
+template <typename T>
+using SharedPtr = std::shared_ptr<T>;
+
+template <typename T, typename... Args>
+inline SharedPtr<T> MakeShared(Args &&... args)
+{
+    return SharedPtr<T>(New<T>(std::forward<Args>(args)...), Deleter<T>());
 }
 
 // See MemoryDebugCheckPointer().

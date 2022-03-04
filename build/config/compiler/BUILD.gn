@@ -16,10 +16,20 @@ import("//build_overrides/build.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/compiler/compiler.gni")
+import("${build_root}/config/sysroot.gni")
 import("${build_root}/config/target.gni")
 
 if (current_os == "mac") {
   import("${build_root}/config/mac/mac_sdk.gni")
+}
+
+if (current_os == "webos") {
+  import("${build_root}/config/webos/webos_sdk.gni")
+  target_defines += []
+  target_cflags += [ "--sysroot=" + sysroot_webos ]
+  target_cflags_cc += []
+  target_cflags_c += []
+  target_ldflags += [ "--sysroot=" + sysroot_webos ]
 }
 
 declare_args() {
@@ -190,7 +200,7 @@ config("warnings_common") {
   }
 
   if (current_os != "mac" && current_os != "ios" && current_os != "linux" &&
-      current_os != "win") {
+      current_os != "win" && current_os != "tizen" && current_os != "webos") {
     cflags += [ "-Wstack-usage=8192" ]
   }
 }
@@ -201,7 +211,17 @@ config("strict_warnings") {
     "-Wshadow",
     "-Wunreachable-code",
     "-Wvla",
+    "-Wformat",
+    "-Wformat-nonliteral",
+    "-Wformat-security",
   ]
+
+  if (current_os == "webos") {
+    cflags -= [
+      "-Wshadow",
+      "-Wvla",
+    ]
+  }
 
   cflags_cc = [ "-Wnon-virtual-dtor" ]
 
@@ -267,12 +287,16 @@ config("runtime_default") {
       "$dir_pw_toolchain/host_clang:xcode_sysroot",
     ]
   }
-  if (current_os == "linux") {
+  if (current_os == "linux" || current_os == "tizen" || current_os == "webos") {
     libs = [
       "dl",
       "pthread",
       "rt",
     ]
+  }
+  if (sysroot != "") {
+    cflags = [ "--sysroot=${sysroot}" ]
+    ldflags = [ "--sysroot=${sysroot}" ]
   }
 }
 
@@ -369,7 +393,16 @@ config("sanitize_default") {
   }
 }
 
+config("libfuzzer_fuzzing") {
+  cflags = [ "-fsanitize=fuzzer" ]
+  ldflags = cflags
+}
+
 config("fuzzing_default") {
+  configs = []
+  if (is_libfuzzer) {
+    configs += [ ":libfuzzer_fuzzing" ]
+  }
 }
 
 declare_args() {
@@ -430,6 +463,11 @@ config("size_default") {
     "-ffunction-sections",
     "-fdata-sections",
   ]
+
+  # do not export functions in jni, or --gc-sections will not work and will be some undefined issues
+  if (current_os == "android") {
+    cflags += [ "-fvisibility=hidden" ]
+  }
 }
 
 config("stack_protector_default") {

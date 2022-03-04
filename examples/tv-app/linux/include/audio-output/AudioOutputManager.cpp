@@ -18,53 +18,72 @@
 
 #include "AudioOutputManager.h"
 
-#include <app/util/af.h>
-#include <app/util/basic-types.h>
-#include <lib/core/CHIPSafeCasts.h>
-#include <lib/support/CodeUtils.h>
-
-#include <map>
-#include <string>
-
 using namespace std;
+using namespace chip::app;
+using namespace chip::app::Clusters::AudioOutput;
 
-CHIP_ERROR AudioOutputManager::Init()
+AudioOutputManager::AudioOutputManager()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    mCurrentOutput = 1;
 
-    // TODO: Store feature map once it is supported
-    map<string, bool> featureMap;
-    featureMap["NU"] = true;
-
-    return err;
+    for (int i = 1; i < 4; ++i)
+    {
+        OutputInfoType outputInfo;
+        outputInfo.outputType = chip::app::Clusters::AudioOutput::OutputTypeEnum::kHdmi;
+        // note: safe only because of use of string literal
+        outputInfo.name  = chip::CharSpan::fromCharString("HDMI");
+        outputInfo.index = static_cast<uint8_t>(i);
+        mOutputs.push_back(outputInfo);
+    }
 }
 
-vector<AudioOutputInfo> AudioOutputManager::proxyGetListOfAudioOutputInfo()
+uint8_t AudioOutputManager::HandleGetCurrentOutput()
+{
+    return mCurrentOutput;
+}
+
+CHIP_ERROR AudioOutputManager::HandleGetOutputList(AttributeValueEncoder & aEncoder)
 {
     // TODO: Insert code here
-    vector<AudioOutputInfo> audioOutputInfos;
-    int maximumVectorSize = 3;
-    char name[]           = "exampleName";
+    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        for (auto const & outputInfo : this->mOutputs)
+        {
+            ReturnErrorOnFailure(encoder.Encode(outputInfo));
+        }
+        return CHIP_NO_ERROR;
+    });
+}
 
-    for (int i = 0; i < maximumVectorSize; ++i)
+bool AudioOutputManager::HandleRenameOutput(const uint8_t & index, const chip::CharSpan & name)
+{
+    // TODO: Insert code here
+    bool audioOutputRenamed = false;
+
+    for (OutputInfoType & output : mOutputs)
     {
-        AudioOutputInfo audioOutputInfo;
-        audioOutputInfo.outputType = EMBER_ZCL_AUDIO_OUTPUT_TYPE_HDMI;
-        audioOutputInfo.name       = chip::ByteSpan(chip::Uint8::from_char(name), sizeof(name));
-        audioOutputInfo.index      = static_cast<uint8_t>(1 + i);
-        audioOutputInfos.push_back(audioOutputInfo);
+        if (output.index == index)
+        {
+            audioOutputRenamed = true;
+            memcpy(this->Data(index), name.data(), name.size());
+            output.name = chip::CharSpan(this->Data(index), name.size());
+        }
     }
 
-    return audioOutputInfos;
+    return audioOutputRenamed;
 }
 
-bool audioOutputClusterSelectOutput(uint8_t index)
+bool AudioOutputManager::HandleSelectOutput(const uint8_t & index)
 {
     // TODO: Insert code here
-    return true;
-}
-bool audioOutputClusterRenameOutput(uint8_t index, uint8_t * name)
-{
-    // TODO: Insert code here
-    return true;
+    bool audioOutputSelected = false;
+    for (OutputInfoType & output : mOutputs)
+    {
+        if (output.index == index)
+        {
+            audioOutputSelected = true;
+            mCurrentOutput      = index;
+        }
+    }
+
+    return audioOutputSelected;
 }

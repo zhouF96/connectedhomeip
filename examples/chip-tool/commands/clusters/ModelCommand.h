@@ -19,37 +19,43 @@
 #pragma once
 
 #include "../../config/PersistentStorage.h"
-#include "../common/Command.h"
-#include <app/chip-zcl-zpro-codec.h>
-#include <controller/ExampleOperationalCredentialsIssuer.h>
+#include "../common/CHIPCommand.h"
 #include <lib/core/CHIPEncoding.h>
 
-// Limits on endpoint values.
-#define CHIP_ZCL_ENDPOINT_MIN 0x00
-#define CHIP_ZCL_ENDPOINT_MAX 0xF0
-
-class ModelCommand : public Command
+class ModelCommand : public CHIPCommand
 {
 public:
-    ModelCommand(const char * commandName) :
-        Command(commandName), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
+    using ChipDevice = ::chip::OperationalDeviceProxy;
+
+    ModelCommand(const char * commandName, CredentialIssuerCommands * credsIssuerConfig) :
+        CHIPCommand(commandName, credsIssuerConfig), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
         mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
     {}
 
-    void AddArguments() { AddArgument("endpoint-id", CHIP_ZCL_ENDPOINT_MIN, CHIP_ZCL_ENDPOINT_MAX, &mEndPointId); }
+    void AddArguments()
+    {
+        AddArgument("node-id/group-id", 0, UINT64_MAX, &mNodeId);
+        AddArgument("endpoint-id-ignored-for-group-commands", 0, UINT16_MAX, &mEndPointId);
+    }
 
-    /////////// Command Interface /////////
-    CHIP_ERROR Run() override;
-    uint16_t GetWaitDurationInSeconds() const override { return 10; }
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override;
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(10); }
 
-    virtual CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endPointId) = 0;
+    virtual CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endPointIds) = 0;
+
+    virtual CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::NodeId senderNodeId)
+    {
+        return CHIP_ERROR_BAD_REQUEST;
+    };
 
 private:
-    uint8_t mEndPointId;
+    chip::NodeId mNodeId;
+    std::vector<chip::EndpointId> mEndPointId;
 
-    static void OnDeviceConnectedFn(void * context, chip::Controller::Device * device);
-    static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
+    static void OnDeviceConnectedFn(void * context, ChipDevice * device);
+    static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
 
-    chip::Callback::Callback<chip::Controller::OnDeviceConnected> mOnDeviceConnectedCallback;
-    chip::Callback::Callback<chip::Controller::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+    chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
+    chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 };

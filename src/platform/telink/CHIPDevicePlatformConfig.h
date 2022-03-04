@@ -31,21 +31,20 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 0
 
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD CONFIG_NET_L2_OPENTHREAD
-#define CHIP_DEVICE_CONFIG_THREAD_FTD CONFIG_OPENTHREAD_FTD
 
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE CONFIG_BT
 
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
 
-#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_CRIT_EIDC_KEY 2
-#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_PROD_EIDC_KEY 3
-#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_INFO_EIDC_KEY 4
-#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_DEBUG_EIDC_KEY 5
-
 // ========== Platform-specific Configuration =========
 
 // These are configuration options that are unique to Zephyr platforms.
 // These can be overridden by the application as needed.
+
+#ifndef CHIP_DEVICE_CONFIG_SETTINGS_KEY
+/// Key for all Matter persistent data stored using the Zephyr Settings API
+#define CHIP_DEVICE_CONFIG_SETTINGS_KEY "mt"
+#endif // CHIP_DEVICE_CONFIG_SETTINGS_KEY
 
 // ========== Platform-specific Configuration Overrides =========
 

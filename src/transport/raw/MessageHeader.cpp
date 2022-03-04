@@ -37,19 +37,19 @@
  * Header format (little endian):
  *
  * -------- Unencrypted header -----------------------------------------------------
- *  16 bit: | VERSION: 4 bit | FLAGS: 4 bit | ENCRYPTTYPE: 4 bit | RESERVED: 4 bit |
- *  32 bit: | MESSAGE_ID                                                           |
+ *  8 bit:  | Message Flags: VERSION: 4 bit | S: 1 bit | RESERVED: 1 bit | DSIZ: 2 bit |
+ *  8 bit:  | Security Flags: P: 1 bit | C: 1 bit | MX: 1 bit | RESERVED: 3 bit | Session Type: 2 bit |
+ *  16 bit: | Session ID                                                           |
+ *  32 bit: | Message Counter                                                      |
  *  64 bit: | SOURCE_NODE_ID (iff source node flag is set)                         |
  *  64 bit: | DEST_NODE_ID (iff destination node flag is set)                      |
- *  16 bit: | Encryption Key ID                                                    |
- *  16 bit: | Payload Length                                                       |
  * -------- Encrypted header -------------------------------------------------------
- *  8 bit:  | Exchange Header                                                      |
- *  8 bit:  | Message Type                                                         |
- *  16 bit: | Exchange ID                                                          |
- *  16 bit: | Optional Vendor ID                                                   |
- *  16 bit: | Protocol ID                                                          |
- *  32 bit: | Acknowledged Message Counter (if A flag in the Header is set)        |
+ *  8 bit:  | Exchange Flags: RESERVED: 3 bit | V: 1 bit | SX: 1 bit | R: 1 bit | A: 1 bit | I: 1 bit |
+ *  8 bit:  | Protocol Opcode                                                      |
+ * 16 bit:  | Exchange ID                                                          |
+ * 16 bit:  | Protocol ID                                                          |
+ * 16 bit:  | Optional Vendor ID                                                   |
+ * 32 bit:  | Acknowledged Message Counter (if A flag in the Header is set)        |
  * -------- Encrypted Application Data Start ---------------------------------------
  *  <var>:  | Encrypted Data                                                       |
  * -------- Encrypted Application Data End -----------------------------------------
@@ -71,21 +71,21 @@ constexpr size_t kEncryptedHeaderSizeBytes = 6;
 /// size of a serialized node id inside a header
 constexpr size_t kNodeIdSizeBytes = 8;
 
+/// size of a serialized group id inside a header
+constexpr size_t kGroupIdSizeBytes = 2;
+
 /// size of a serialized vendor id inside a header
 constexpr size_t kVendorIdSizeBytes = 2;
 
-/// size of a serialized ack id inside a header
-constexpr size_t kAckIdSizeBytes = 4;
+/// size of a serialized ack message counter inside a header
+constexpr size_t kAckMessageCounterSizeBytes = 4;
 
-/// Mask to extract just the version part from a 16bit header prefix.
-constexpr uint16_t kVersionMask = 0x00F0;
-/// Shift to convert to/from a masked version 16bit value to a 4bit version.
+/// Mask to extract just the version part from a 8bits header prefix.
+constexpr uint8_t kVersionMask = 0xF0;
+
+constexpr uint8_t kMsgFlagsMask = 0x07;
+/// Shift to convert to/from a masked version 8bit value to a 4bit version.
 constexpr int kVersionShift = 4;
-
-/// Mask to extract just the encryption type part from a 16bit header prefix.
-constexpr uint16_t kEncryptionTypeMask = 0x3000;
-/// Shift to convert to/from a masked encryption type 16bit value to a 2bit encryption type.
-constexpr int kEncryptionTypeShift = 12;
 
 } // namespace
 
@@ -102,6 +102,10 @@ uint16_t PacketHeader::EncodeSizeBytes() const
     {
         size += kNodeIdSizeBytes;
     }
+    else if (mDestinationGroupId.HasValue())
+    {
+        size += kGroupIdSizeBytes;
+    }
 
     static_assert(kFixedUnencryptedHeaderSizeBytes + kNodeIdSizeBytes + kNodeIdSizeBytes <= UINT16_MAX,
                   "Header size does not fit in uint16_t");
@@ -117,26 +121,14 @@ uint16_t PayloadHeader::EncodeSizeBytes() const
         size += kVendorIdSizeBytes;
     }
 
-    if (mAckId.HasValue())
+    if (mAckMessageCounter.HasValue())
     {
-        size += kAckIdSizeBytes;
+        size += kAckMessageCounterSizeBytes;
     }
 
-    static_assert(kEncryptedHeaderSizeBytes + kVendorIdSizeBytes + kAckIdSizeBytes <= UINT16_MAX,
+    static_assert(kEncryptedHeaderSizeBytes + kVendorIdSizeBytes + kAckMessageCounterSizeBytes <= UINT16_MAX,
                   "Header size does not fit in uint16_t");
     return static_cast<uint16_t>(size);
-}
-
-uint16_t MessageAuthenticationCode::TagLenForEncryptionType(Header::EncryptionType encType)
-{
-    switch (encType)
-    {
-    case Header::EncryptionType::kAESCCMTagLen16:
-        return 16;
-
-    default:
-        return 0;
-    }
 }
 
 CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint16_t * decode_len)
@@ -147,23 +139,24 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     // TODO: De-uint16-ify everything related to this library
     uint16_t octets_read;
 
-    uint16_t header;
-    err = reader.Read16(&header).StatusCode();
-    SuccessOrExit(err);
-    version = ((header & kVersionMask) >> kVersionShift);
-    VerifyOrExit(version == kHeaderVersion, err = CHIP_ERROR_VERSION_MISMATCH);
+    uint8_t msgFlags;
+    SuccessOrExit(err = reader.Read8(&msgFlags).StatusCode());
+    version = ((msgFlags & kVersionMask) >> kVersionShift);
+    VerifyOrExit(version == kMsgHeaderVersion, err = CHIP_ERROR_VERSION_MISMATCH);
+    SetMessageFlags(msgFlags);
 
-    mFlags.SetRaw(header);
-    mEncryptionType = static_cast<Header::EncryptionType>((header & kEncryptionTypeMask) >> kEncryptionTypeShift);
+    SuccessOrExit(err = reader.Read16(&mSessionId).StatusCode());
 
-    err = reader.Read32(&mMessageId).StatusCode();
-    SuccessOrExit(err);
+    uint8_t securityFlags;
+    SuccessOrExit(err = reader.Read8(&securityFlags).StatusCode());
+    SetSecurityFlags(securityFlags);
 
-    if (mFlags.Has(Header::FlagValues::kSourceNodeIdPresent))
+    SuccessOrExit(err = reader.Read32(&mMessageCounter).StatusCode());
+
+    if (mMsgFlags.Has(Header::MsgFlagValues::kSourceNodeIdPresent))
     {
         uint64_t sourceNodeId;
-        err = reader.Read64(&sourceNodeId).StatusCode();
-        SuccessOrExit(err);
+        SuccessOrExit(err = reader.Read64(&sourceNodeId).StatusCode());
         mSourceNodeId.SetValue(sourceNodeId);
     }
     else
@@ -171,20 +164,43 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
         mSourceNodeId.ClearValue();
     }
 
-    if (mFlags.Has(Header::FlagValues::kDestinationNodeIdPresent))
+    if (!IsSessionTypeValid())
     {
+        // Reserved.
+        SuccessOrExit(err = CHIP_ERROR_INTERNAL);
+    }
+
+    if (mMsgFlags.HasAll(Header::MsgFlagValues::kDestinationNodeIdPresent, Header::MsgFlagValues::kDestinationGroupIdPresent))
+    {
+        // Reserved.
+        SuccessOrExit(err = CHIP_ERROR_INTERNAL);
+    }
+    else if (mMsgFlags.Has(Header::MsgFlagValues::kDestinationNodeIdPresent))
+    {
+        // No need to check if session is Unicast because for MCSP
+        // a destination node ID is present with a group session ID.
+        // Spec 4.9.2.4
         uint64_t destinationNodeId;
-        err = reader.Read64(&destinationNodeId).StatusCode();
-        SuccessOrExit(err);
+        SuccessOrExit(err = reader.Read64(&destinationNodeId).StatusCode());
         mDestinationNodeId.SetValue(destinationNodeId);
+        mDestinationGroupId.ClearValue();
+    }
+    else if (mMsgFlags.Has(Header::MsgFlagValues::kDestinationGroupIdPresent))
+    {
+        if (mSessionType != Header::SessionType::kGroupSession)
+        {
+            SuccessOrExit(err = CHIP_ERROR_INTERNAL);
+        }
+        uint16_t destinationGroupId;
+        SuccessOrExit(err = reader.Read16(&destinationGroupId).StatusCode());
+        mDestinationGroupId.SetValue(destinationGroupId);
+        mDestinationNodeId.ClearValue();
     }
     else
     {
         mDestinationNodeId.ClearValue();
+        mDestinationGroupId.ClearValue();
     }
-
-    err = reader.Read16(&mEncryptionKeyID).StatusCode();
-    SuccessOrExit(err);
 
     octets_read = static_cast<uint16_t>(reader.OctetsRead());
     VerifyOrExit(octets_read == EncodeSizeBytes(), err = CHIP_ERROR_INTERNAL);
@@ -210,8 +226,7 @@ CHIP_ERROR PayloadHeader::Decode(const uint8_t * const data, uint16_t size, uint
     uint8_t header;
     uint16_t octets_read;
 
-    err = reader.Read8(&header).Read8(&mMessageType).Read16(&mExchangeID).StatusCode();
-    SuccessOrExit(err);
+    SuccessOrExit(err = reader.Read8(&header).Read8(&mMessageType).Read16(&mExchangeID).StatusCode());
 
     mExchangeFlags.SetRaw(header);
 
@@ -219,8 +234,7 @@ CHIP_ERROR PayloadHeader::Decode(const uint8_t * const data, uint16_t size, uint
     if (HaveVendorId())
     {
         uint16_t vendor_id_raw;
-        err = reader.Read16(&vendor_id_raw).StatusCode();
-        SuccessOrExit(err);
+        SuccessOrExit(err = reader.Read16(&vendor_id_raw).StatusCode());
         vendor_id = static_cast<VendorId>(vendor_id_raw);
     }
     else
@@ -229,21 +243,19 @@ CHIP_ERROR PayloadHeader::Decode(const uint8_t * const data, uint16_t size, uint
     }
 
     uint16_t protocol_id;
-    err = reader.Read16(&protocol_id).StatusCode();
-    SuccessOrExit(err);
+    SuccessOrExit(err = reader.Read16(&protocol_id).StatusCode());
 
     mProtocolID = Protocols::Id(vendor_id, protocol_id);
 
     if (mExchangeFlags.Has(Header::ExFlagValues::kExchangeFlag_AckMsg))
     {
-        uint32_t ack_id;
-        err = reader.Read32(&ack_id).StatusCode();
-        SuccessOrExit(err);
-        mAckId.SetValue(ack_id);
+        uint32_t ack_message_counter;
+        SuccessOrExit(err = reader.Read32(&ack_message_counter).StatusCode());
+        mAckMessageCounter.SetValue(ack_message_counter);
     }
     else
     {
-        mAckId.ClearValue();
+        mAckMessageCounter.ClearValue();
     }
 
     octets_read = static_cast<uint16_t>(reader.OctetsRead());
@@ -266,17 +278,22 @@ CHIP_ERROR PayloadHeader::DecodeAndConsume(const System::PacketBufferHandle & bu
 CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode_size) const
 {
     VerifyOrReturnError(size >= EncodeSizeBytes(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!(mDestinationNodeId.HasValue() && mDestinationGroupId.HasValue()), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(encode_size != nullptr, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(IsSessionTypeValid(), CHIP_ERROR_INTERNAL);
 
-    Header::Flags encodeFlags = mFlags;
-    encodeFlags.Set(Header::FlagValues::kSourceNodeIdPresent, mSourceNodeId.HasValue())
-        .Set(Header::FlagValues::kDestinationNodeIdPresent, mDestinationNodeId.HasValue());
+    Header::MsgFlags messageFlags = mMsgFlags;
+    messageFlags.Set(Header::MsgFlagValues::kSourceNodeIdPresent, mSourceNodeId.HasValue())
+        .Set(Header::MsgFlagValues::kDestinationNodeIdPresent, mDestinationNodeId.HasValue())
+        .Set(Header::MsgFlagValues::kDestinationGroupIdPresent, mDestinationGroupId.HasValue());
 
-    uint16_t header = (kHeaderVersion << kVersionShift) | encodeFlags.Raw();
-    header |= (static_cast<uint16_t>(static_cast<uint16_t>(mEncryptionType) << kEncryptionTypeShift) & kEncryptionTypeMask);
+    uint8_t msgFlags = (kMsgHeaderVersion << kVersionShift) | (messageFlags.Raw() & kMsgFlagsMask);
 
     uint8_t * p = data;
-    LittleEndian::Write16(p, header);
-    LittleEndian::Write32(p, mMessageId);
+    Write8(p, msgFlags);
+    LittleEndian::Write16(p, mSessionId);
+    Write8(p, mSecFlags.Raw());
+    LittleEndian::Write32(p, mMessageCounter);
     if (mSourceNodeId.HasValue())
     {
         LittleEndian::Write64(p, mSourceNodeId.Value());
@@ -285,8 +302,10 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode
     {
         LittleEndian::Write64(p, mDestinationNodeId.Value());
     }
-
-    LittleEndian::Write16(p, mEncryptionKeyID);
+    else if (mDestinationGroupId.HasValue())
+    {
+        LittleEndian::Write16(p, mDestinationGroupId.Value());
+    }
 
     // Written data size provided to caller on success
     VerifyOrReturnError(p - data == EncodeSizeBytes(), CHIP_ERROR_INTERNAL);
@@ -323,9 +342,9 @@ CHIP_ERROR PayloadHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encod
         LittleEndian::Write16(p, to_underlying(mProtocolID.GetVendorId()));
     }
     LittleEndian::Write16(p, mProtocolID.GetProtocolId());
-    if (mAckId.HasValue())
+    if (mAckMessageCounter.HasValue())
     {
-        LittleEndian::Write32(p, mAckId.Value());
+        LittleEndian::Write32(p, mAckMessageCounter.Value());
     }
 
     // Written data size provided to caller on success
@@ -351,7 +370,7 @@ CHIP_ERROR PayloadHeader::EncodeBeforeData(const System::PacketBufferHandle & bu
 CHIP_ERROR MessageAuthenticationCode::Decode(const PacketHeader & packetHeader, const uint8_t * const data, uint16_t size,
                                              uint16_t * decode_len)
 {
-    const uint16_t taglen = TagLenForEncryptionType(packetHeader.GetEncryptionType());
+    const uint16_t taglen = packetHeader.MICTagLength();
 
     VerifyOrReturnError(taglen != 0, CHIP_ERROR_WRONG_ENCRYPTION_TYPE_FROM_PEER);
     VerifyOrReturnError(size >= taglen, CHIP_ERROR_INVALID_ARGUMENT);
@@ -367,7 +386,7 @@ CHIP_ERROR MessageAuthenticationCode::Encode(const PacketHeader & packetHeader, 
                                              uint16_t * encode_size) const
 {
     uint8_t * p           = data;
-    const uint16_t taglen = TagLenForEncryptionType(packetHeader.GetEncryptionType());
+    const uint16_t taglen = packetHeader.MICTagLength();
 
     VerifyOrReturnError(taglen != 0, CHIP_ERROR_WRONG_ENCRYPTION_TYPE);
     VerifyOrReturnError(size >= taglen, CHIP_ERROR_INVALID_ARGUMENT);

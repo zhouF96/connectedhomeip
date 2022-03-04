@@ -89,7 +89,7 @@ Silicon Labs platform.
           $ cd ~/connectedhomeip
           $ rm -rf ./out/
 
-OR use GN/Ninja directly
+    OR use GN/Ninja directly
 
           $ cd ~/connectedhomeip/examples/window-app/efr32
           $ git submodule update --init
@@ -103,7 +103,19 @@ OR use GN/Ninja directly
           $ cd ~/connectedhomeip/examples/window-app/efr32
           $ rm -rf out/
 
-*   Build the example with pigweed RCP use GN/Ninja Directly
+*   Build the example as Sleepy End Device (SED)
+
+          $ ./scripts/examples/gn_efr32_example.sh ./examples/window-app/efr32/ ./out/window-app_SED BRD4161A --sed
+
+    or use gn as previously mentioned but adding the following arguments:
+
+          $ gn gen out/debug '--args=efr32_board="BRD4161A" enable_sleepy_device=true chip_openthread_ftd=false'
+
+*   Build the example with pigweed RCP
+
+          $ ./scripts/examples/gn_efr32_example.sh examples/window-app/efr32/ out/window_app_rpc BRD4161A 'import("//with_pw_rpc.gni")'
+
+    or use GN/Ninja Directly
 
           $ cd ~/connectedhomeip/examples/window-app/efr32
           $ git submodule update --init
@@ -113,6 +125,11 @@ OR use GN/Ninja directly
           $ ninja -C out/debug
 
     [Running Pigweed RPC console](#running-pigweed-rpc-console)
+
+For more build options, help is provided when running the build script without
+arguments
+
+         ./scripts/examples/gn_efr32_example.sh
 
 <a name="flashing"></a>
 
@@ -223,7 +240,7 @@ combination with JLinkRTTClient as follows:
         -   _Blinking slowly_ ; The window cover is half-open, either by tilt, or lift
         -   _Blinking quickly_ ; The window cover is being automatically open or closed
 
-    **Push Button 0** Increase seither tilt or lift, and factory reset
+    **Push Button 0** Increase either tilt or lift, and factory reset
 
         -   Pressed and release: The lift/tilt increases by 10%
 
@@ -240,9 +257,9 @@ combination with JLinkRTTClient as follows:
 
     **Push Button0 and Button1** Switch between lift and tilt
 
-        - Pressing and release both buttons at the same time: switches between lift and tilt modes. Most window covering types support either lift only, or tilt only, but type 0x08 suport both (default)
+        - Pressing and release both buttons at the same time: switches between lift and tilt modes. Most window covering types support either lift only, or tilt only, but type 0x08 support both (default)
 
-        - Pressing and hold both buttons at the same time: Cycles betwen window covering 1, and window covering 2.
+        - Pressing and hold both buttons at the same time: Cycles between window covering 1, and window covering 2.
 
 *   Once the device is provisioned, it will join the Thread network is
     established, look for the RTT log
@@ -272,21 +289,23 @@ combination with JLinkRTTClient as follows:
     through CLI commands on your OT BR
 
     The
-    [Python Controller](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/README.md)
+    [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
     can now be used to send ZCL commands to the window covering device. For
-    instance, to set the window covering lift by percentantage:
+    instance, to set the window covering lift by percentage:
 
-        $ sudo chip-device-ctrl
+    ```
+    chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
 
-        chip-device-ctrl > set-pairing-thread-credential 16 0x1234 00112233445566778899aabbccddeeff
+    chip-tool onoff on 1 1
 
-        chip-device-ctrl > connect -ble 3840 12345678 12344321
-
-        chip-device-ctrl > zcl WindowCovering WindowCoveringGoToLiftPercentage 12344321 1 1 percentageLiftValue=50
+    chip-tool windowcovering go-to-tilt-percentage 50 0 1 1
+    ```
 
     To see the supported window covering cluster commands, use:
 
-        chip-device-ctrl > zcl ? WindowCovering
+    ```
+    chip-tool windowcovering
+    ```
 
 ### Notes
 

@@ -17,81 +17,37 @@
 #    limitations under the License.
 #
 
-from IPython import embed
+import IPython
 import chip
 import chip.logging
 import coloredlogs
 import logging
+from traitlets.config import Config
+from rich import print
+from rich import pretty
+from rich import inspect
+import builtins
+import argparse
+import sys
 
 
 def main():
-    # The chip imports at the top level will be visible in the ipython REPL.
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-p", "--storagepath", help="Path to persistent storage configuration file (default: /tmp/repl-storage.json)",
+                        action="store", default="/tmp/repl-storage.json")
 
-    coloredlogs.install(level='DEBUG')
-    chip.logging.RedirectToPythonLogging()
+    args = parser.parse_args()
 
-    # trace/debug logging is not friendly to an interactive console. Only keep errors.
-    logging.getLogger().setLevel(logging.ERROR)
+    c = Config()
+    c.InteractiveShellApp.exec_lines = [
+        "import pkgutil",
+        "module = pkgutil.get_loader('chip.ChipReplStartup')",
+        "%run {module.path} --storagepath " + f"{args.storagepath}"
+    ]
 
-    embed(header='''
-Welcome to the CHIP python REPL utilty.
+    sys.argv = [sys.argv[0]]
 
-Usage examples:
-
-######## Enable detailed logging if needed #########
-
-import logging
-logging.getLogger().setLevel(logging.DEBUG)
-
-######## List available BLE adapters #########
-import chip.ble
-print(chip.ble.GetAdapters())
-
-######## Discover chip devices #########
-import chip.ble
-
-chip.ble.DiscoverAsync(2000, lambda *x: print('Discovered: %r' % (x,)), lambda: print('Done'))
-
-for device in chip.ble.DiscoverSync(2000):
-    print(device)
-
-####### Commision a BLE device #########
-
-import chip.ble.commissioning
-
-device = chip.ble.commissioning.Connect(discriminator=3840, pin=20202021)
-if device.needsNetworkCredentials:
-  device.ConnectToWifi("ssid", "password")
-
-######## Thread provisioning ########
-
-import chip.ble.commissioning
-device = chip.ble.commissioning.Connect(discriminator=3840, pin=20202021)
-
-# Thread data is an opaque blob, but it can be build with internal constructs
-# starting from a memset(0) equivalent
-from chip.internal.thread import ThreadNetworkInfo
-
-data = ThreadNetworkInfo.parse(b'\\x00'*ThreadNetworkInfo.sizeof())
-data.NetworkName = "OpenThread"
-data.ExtendedPANId = b"\\xde\\xad\\x00\\xbe\\xef\\x00\\xca\\xfe"
-data.MasterKey = b"\\x00\\x11\\x22\\x33\\x44\\x55\\x66\\x77\\x88\\x99\\xAA\\xBB\\xCC\\xDD\\xEE\\xFF"
-data.PANId = 0xabcd
-data.Channel = 15
-
-
-if device.needsNetworkCredentials:
-  device.ConnectToThread(ThreadNetworkInfo.build(data))
-
-######## Node discovery ########
-
-import chip.discovery
-
-chip.discovery.FindAddressAsync(123, 456, lambda x: print("%r", x))
-
-print(chip.discovery.FindAddress(123, 456)
-
-    '''.strip())
+    IPython.start_ipython(config=c)
 
 
 if __name__ == "__main__":

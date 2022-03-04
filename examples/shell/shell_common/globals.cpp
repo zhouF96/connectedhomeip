@@ -19,8 +19,10 @@
 
 chip::secure_channel::MessageCounterManager gMessageCounterManager;
 chip::Messaging::ExchangeManager gExchangeManager;
-chip::SecureSessionMgr gSessionManager;
+chip::SessionManager gSessionManager;
 chip::Inet::IPAddress gDestAddr;
+chip::SessionHolder gSession;
+chip::TestPersistentStorageDelegate gStorage;
 
 chip::FabricIndex gFabricIndex = 0;
 

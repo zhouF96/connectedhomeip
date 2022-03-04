@@ -19,6 +19,14 @@
 
 #include "AppTask.h"
 
+#ifdef CAPSENSE_ENABLED
+#include "capsense.h"
+#endif
+
+#ifdef CHIP_PW_RPC
+#include "Rpc.h"
+#endif
+
 #include "mbedtls/platform.h"
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -37,35 +45,59 @@ int main()
 
     mbed_logging_init();
 
+#ifdef CAPSENSE_ENABLED
+    Capsense::getInstance().init();
+#endif
+
+#if CHIP_PW_RPC
+    auto rpcThread = chip::rpc::Init();
+    if (rpcThread == NULL)
+    {
+        ChipLogError(NotSpecified, "RPC service initialization and run failed");
+        ret = EXIT_FAILURE;
+        goto exit;
+    }
+#endif
+
+    ChipLogProgress(NotSpecified, "Mbed lock-app example application start");
+
     ret = mbedtls_platform_setup(NULL);
     if (ret)
     {
-        ChipLogError(NotSpecified, "Mbed TLS platform initialization failed with error %d", ret);
+        ChipLogError(NotSpecified, "Mbed TLS platform initialization failed [%d]", ret);
         goto exit;
     }
 
     err = chip::Platform::MemoryInit();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "Platform::MemoryInit() failed");
+        ChipLogError(NotSpecified, "Memory initialization failed: %s", err.AsString());
         ret = EXIT_FAILURE;
         goto exit;
     }
 
-    ChipLogProgress(NotSpecified, "Init CHIP Stack\r\n");
     err = PlatformMgr().InitChipStack();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "PlatformMgr().InitChipStack() failed");
+        ChipLogError(NotSpecified, "Chip stack initialization failed: %s", err.AsString());
         ret = EXIT_FAILURE;
         goto exit;
     }
 
-    ChipLogProgress(NotSpecified, "Starting CHIP task");
+#ifdef MBED_CONF_APP_BLE_DEVICE_NAME
+    err = ConnectivityMgr().SetBLEDeviceName(MBED_CONF_APP_BLE_DEVICE_NAME);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Set BLE device name failed: %s", err.AsString());
+        ret = EXIT_FAILURE;
+        goto exit;
+    }
+#endif
+
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "PlatformMgr().StartEventLoopTask() failed");
+        ChipLogError(NotSpecified, "Chip stack start failed: %s", err.AsString());
         ret = EXIT_FAILURE;
         goto exit;
     }

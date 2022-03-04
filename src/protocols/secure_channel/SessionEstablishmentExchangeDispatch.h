@@ -25,50 +25,24 @@
 #pragma once
 
 #include <messaging/ExchangeMessageDispatch.h>
-#include <transport/TransportMgr.h>
 
 namespace chip {
 
 class SessionEstablishmentExchangeDispatch : public Messaging::ExchangeMessageDispatch
 {
 public:
-    SessionEstablishmentExchangeDispatch() {}
-
-    virtual ~SessionEstablishmentExchangeDispatch() {}
-
-    CHIP_ERROR Init(TransportMgrBase * transportMgr)
+    static ExchangeMessageDispatch & Instance()
     {
-        ReturnErrorCodeIf(transportMgr == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        mTransportMgr = transportMgr;
-        return ExchangeMessageDispatch::Init();
+        static SessionEstablishmentExchangeDispatch instance;
+        return instance;
     }
 
-    CHIP_ERROR PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,
-                              EncryptedPacketBufferHandle & out) override;
-    CHIP_ERROR SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & preparedMessage) const override;
-
-    CHIP_ERROR OnMessageReceived(const Header::Flags & headerFlags, const PayloadHeader & payloadHeader, uint32_t messageId,
-                                 const Transport::PeerAddress & peerAddress, Messaging::MessageFlags msgFlags,
-                                 Messaging::ReliableMessageContext * reliableMessageContext) override;
-
-    const Transport::PeerAddress & GetPeerAddress() const { return mPeerAddress; }
-
-    void SetPeerAddress(const Transport::PeerAddress & address) { mPeerAddress = address; }
+    SessionEstablishmentExchangeDispatch() {}
+    virtual ~SessionEstablishmentExchangeDispatch() {}
 
 protected:
     bool MessagePermitted(uint16_t protocol, uint8_t type) override;
-
-    bool IsReliableTransmissionAllowed() const override
-    {
-        // If the underlying transport is UDP.
-        return (mPeerAddress.GetTransportType() == Transport::Type::kUdp);
-    }
-
     bool IsEncryptionRequired() const override { return false; }
-
-private:
-    TransportMgrBase * mTransportMgr = nullptr;
-    Transport::PeerAddress mPeerAddress;
 };
 
 } // namespace chip

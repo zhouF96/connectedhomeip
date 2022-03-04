@@ -22,82 +22,37 @@
 
 #include <AppConfig.h>
 #include <WindowApp.h>
-#include <app-common/zap-generated/attribute-id.h>
+
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/clusters/window-covering-server/window-covering-server.h>
-#include <app/util/af-types.h>
 #include <app/util/af.h>
 
-using namespace chip::app::Clusters::WindowCovering;
+using namespace ::chip;
+using namespace ::chip::app::Clusters::WindowCovering;
 
-void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                        uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type, uint16_t size,
+                                       uint8_t * value)
 {
-    if (ZCL_WINDOW_COVERING_CLUSTER_ID == clusterId)
+    switch (attributePath.mClusterId)
     {
-        WindowApp & app = WindowApp::Instance();
-        uint16_t current;
-        uint16_t target;
-
-        switch (attributeId)
-        {
-        case ZCL_WC_TYPE_ATTRIBUTE_ID:
-            app.PostEvent(WindowApp::Event(WindowApp::EventId::CoverTypeChange, endpoint));
-            break;
-
-        case ZCL_WC_CURRENT_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID:
-            app.PostEvent(WindowApp::Event(WindowApp::EventId::LiftChanged, endpoint));
-            break;
-
-        case ZCL_WC_CURRENT_POSITION_TILT_PERCENT100_THS_ATTRIBUTE_ID:
-            app.PostEvent(WindowApp::Event(WindowApp::EventId::TiltChanged, endpoint));
-            break;
-
-        case ZCL_WC_TARGET_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID:
-            Attributes::GetTargetPositionLiftPercent100ths(endpoint, &target);
-            Attributes::GetCurrentPositionLiftPercent100ths(endpoint, &current);
-            if (current > target)
-            {
-                app.PostEvent(WindowApp::Event(WindowApp::EventId::LiftDown, endpoint));
-            }
-            else if (current < target)
-            {
-                app.PostEvent(WindowApp::Event(WindowApp::EventId::LiftUp, endpoint));
-            }
-            break;
-
-        case ZCL_WC_TARGET_POSITION_TILT_PERCENT100_THS_ATTRIBUTE_ID:
-            Attributes::GetTargetPositionTiltPercent100ths(endpoint, &target);
-            Attributes::GetCurrentPositionTiltPercent100ths(endpoint, &current);
-            if (current > target)
-            {
-                app.PostEvent(WindowApp::Event(WindowApp::EventId::TiltDown, endpoint));
-            }
-            else if (current < target)
-            {
-                app.PostEvent(WindowApp::Event(WindowApp::EventId::TiltUp, endpoint));
-            }
-            break;
-
-        default:
-            break;
-        }
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "Unknown cluster ID: %ld", clusterId);
+    case app::Clusters::Identify::Id:
+        ChipLogProgress(Zcl, "Identify cluster ID: " ChipLogFormatMEI " Type: %u Value: %" PRIu16 ", length %" PRIu16,
+                        ChipLogValueMEI(attributePath.mAttributeId), type, *value, size);
+        break;
+    default:
+        break;
     }
 }
 
-/**
- * @brief  Cluster StopMotion Command callback (from client)
- */
-bool emberAfWindowCoveringClusterStopMotionCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj)
+/* Forwards all attributes changes */
+void MatterWindowCoveringClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
-    ChipLogProgress(Zcl, "StopMotion command received");
-    WindowApp::Instance().PostEvent(WindowApp::Event(WindowApp::EventId::StopMotion, endpoint));
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-    return true;
+    WindowApp::Instance().PostAttributeChange(attributePath.mEndpointId, attributePath.mAttributeId);
 }

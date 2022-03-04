@@ -30,17 +30,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
-
-namespace chip {
-namespace Mdns {
-void GetMdnsTimeout(timeval & timeout);
-void HandleMdnsTimeout();
-} // namespace Mdns
-} // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
-
 #ifndef CHIP_CONFIG_LIBEVENT_DEBUG_CHECKS
 #define CHIP_CONFIG_LIBEVENT_DEBUG_CHECKS 1
 #endif
@@ -66,7 +55,7 @@ System::SocketEvents SocketEventsFromLibeventFlags(short eventFlags)
 
 CHIP_ERROR LayerImplLibevent::Init(System::Layer & systemLayer)
 {
-    VerifyOrReturnError(!mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
 
     RegisterPOSIXErrorFormatter();
 
@@ -83,10 +72,10 @@ CHIP_ERROR LayerImplLibevent::Init(System::Layer & systemLayer)
     mEventBase   = event_base_new();
     VerifyOrReturnError(mEventBase != nullptr, CHIP_ERROR_NO_MEMORY);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+#if !__ZEPHYR__
     mMdnsTimeoutEvent = evtimer_new(mEventBase, MdnsTimeoutCallbackHandler, this);
     VerifyOrReturnError(mMdnsTimeoutEvent != nullptr, CHIP_ERROR_NO_MEMORY);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+#endif // !__ZEPHYR__
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     mHandleSelectThread = PTHREAD_NULL;
@@ -94,11 +83,11 @@ CHIP_ERROR LayerImplLibevent::Init(System::Layer & systemLayer)
 
     Mutex::Init(mTimerListMutex);
 
-    VerifyOrReturnError(mLayerState.Init(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.SetInitialized(), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+#if !__ZEPHYR__
 
 // static
 void LayerImplLibevent::MdnsTimeoutCallbackHandler(evutil_socket_t fd, short eventFlags, void * data)
@@ -112,27 +101,27 @@ void LayerImplLibevent::MdnsTimeoutCallbackHandler()
     mHandleSelectThread = pthread_self();
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
-    chip::Mdns::HandleMdnsTimeout();
+    chip::Dnssd::HandleMdnsTimeout();
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     mHandleSelectThread = PTHREAD_NULL;
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+#endif // !__ZEPHYR__
 
 CHIP_ERROR LayerImplLibevent::Shutdown()
 {
-    VerifyOrReturnError(mLayerState.Shutdown(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.SetShuttingDown(), CHIP_ERROR_INCORRECT_STATE);
 
     event_base_loopbreak(mEventBase);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+#if !__ZEPHYR__
     if (mMdnsTimeoutEvent != nullptr)
     {
         event_free(mMdnsTimeoutEvent);
         mMdnsTimeoutEvent = nullptr;
     }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+#endif // !__ZEPHYR__
 
     mTimerListMutex.Lock();
     mTimers.clear();
@@ -144,7 +133,7 @@ CHIP_ERROR LayerImplLibevent::Shutdown()
     mEventBase   = nullptr;
     mSystemLayer = nullptr;
 
-    mLayerState.Reset(); // Return to uninitialized state to permit re-initialization.
+    mLayerState.ResetFromShuttingDown(); // Return to uninitialized state to permit re-initialization.
     return CHIP_NO_ERROR;
 }
 
@@ -174,7 +163,7 @@ void LayerImplLibevent::Signal()
     }
 }
 
-CHIP_ERROR LayerImplLibevent::StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState)
+CHIP_ERROR LayerImplLibevent::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
 {
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -191,9 +180,9 @@ CHIP_ERROR LayerImplLibevent::StartTimer(uint32_t delayMilliseconds, TimerComple
     VerifyOrReturnError(e != nullptr, CHIP_ERROR_NO_MEMORY);
     timer->mEvent = e;
 
-    timeval delay;
-    MillisecondsToTimeval(delayMilliseconds, delay);
-    int status = evtimer_add(e, &delay);
+    timeval tv;
+    Clock::ToTimeval(delay, tv);
+    int status = evtimer_add(e, &tv);
     VerifyOrReturnError(status == 0, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -220,7 +209,7 @@ CHIP_ERROR LayerImplLibevent::ScheduleWork(TimerCompleteCallback onComplete, voi
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    return StartTimer(0, onComplete, appState);
+    return StartTimer(Clock::kZero, onComplete, appState);
 }
 
 // static
@@ -356,7 +345,7 @@ CHIP_ERROR LayerImplLibevent::UpdateWatch(SocketWatch * watch, short eventFlags)
         if ((flags & O_NONBLOCK) == 0)
         {
             int status = ::fcntl(watch->mFD, F_SETFL, flags | O_NONBLOCK);
-            VerifyOrReturnError(status == 0, chip::System::MapErrorPOSIX(errno));
+            VerifyOrReturnError(status == 0, CHIP_ERROR_POSIX(errno));
         }
         watch->mEvent = event_new(mEventBase, watch->mFD, eventFlags, SocketCallbackHandler, watch);
         VerifyOrReturnError(watch->mEvent != nullptr, CHIP_ERROR_NO_MEMORY);
@@ -397,14 +386,14 @@ LayerImplLibevent::SocketWatch::~SocketWatch()
 
 void LayerImplLibevent::PrepareEvents()
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__ && !__MBED__
+#if !__ZEPHYR__ && !__MBED__
     timeval mdnsTimeout = { 0, 0 };
-    chip::Mdns::GetMdnsTimeout(mdnsTimeout);
+    chip::Dnssd::GetMdnsTimeout(mdnsTimeout);
     if (mdnsTimeout.tv_sec || mdnsTimeout.tv_usec)
     {
         evtimer_add(mMdnsTimeoutEvent, &mdnsTimeout);
     }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+#endif // !__ZEPHYR__ && !__MBED__
 }
 
 void LayerImplLibevent::WaitForEvents()

@@ -111,7 +111,7 @@ def generateBloatReport(outputFileName,
                         baselineDir,
                         buildOutputDir,
                         title='BLOAT REPORT'):
-    """Generates a bloat report fo files betwen two diferent directories."""
+    """Generates a bloat report fo files between two diferent directories."""
     logging.info('Generating bloat diff report between %s and %s', baselineDir,
                  buildOutputDir)
     with open(outputFileName, 'wt') as f:
@@ -268,6 +268,10 @@ def main():
     pull_artifact_re = re.compile('^(.*)-pull-(\\d+)$')
     binary_count = 0
     for a in artifacts:
+        # Ignore size reports; they are handled by a separate script.
+        if a.name.startswith('Size,'):
+            continue
+
         # logs cleanup after 3 days
         is_log = a.name.endswith('-logs')
 

@@ -31,13 +31,6 @@ idf_component_register(INCLUDE_DIRS
                      "${CMAKE_SOURCE_DIR}/../../common/pigweed/esp32"
                       PRIV_REQUIRES bt chip)
 
-idf_component_get_property(chip_lib chip COMPONENT_LIB)
-
-set(WRAP_FUNCTIONS esp_log_write)
-target_link_libraries(${chip_lib} INTERFACE "-Wl,--wrap=${WRAP_FUNCTIONS}")
-
-set_property(TARGET ${chip_lib} APPEND PROPERTY LINK_LIBRARIES ${COMPONENT_LIB})
-
 get_filename_component(CHIP_ROOT ../third_party/connectedhomeip REALPATH)
 get_filename_component(IPV6_EXAMPLE_ROOT ../.. REALPATH)
 set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
@@ -47,15 +40,15 @@ set(dir_pw_third_party_nanopb "${CHIP_ROOT}/third_party/nanopb/repo" CACHE STRIN
 
 pw_proto_library(wifi_service
   SOURCES
-    ${IPV6_EXAMPLE_ROOT}/common/wifi_service/wifi_service.proto
+    ${CHIP_ROOT}/examples/common/pigweed/protos/wifi_service.proto
   INPUTS
-    ${IPV6_EXAMPLE_ROOT}/common/wifi_service/wifi_service.options
+    ${CHIP_ROOT}/examples/common/pigweed/protos/wifi_service.options
   PREFIX
     wifi_service
   DEPS
     pw_protobuf.common_protos
   STRIP_PREFIX
-    ${IPV6_EXAMPLE_ROOT}/common/wifi_service
+    ${CHIP_ROOT}/examples/common/pigweed/protos
 )
 
 target_link_libraries(${COMPONENT_LIB} PUBLIC

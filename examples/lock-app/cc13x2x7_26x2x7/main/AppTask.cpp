@@ -27,9 +27,14 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
+#include <platform/CHIPDeviceLayer.h>
+
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/OTARequestor.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <platform/GenericOTARequestorDriver.h>
+#include <platform/cc13x2_26x2/OTAImageProcessorImpl.h>
 
 #include <app/server/OnboardingCodesUtil.h>
 
@@ -43,6 +48,7 @@
 #define APP_TASK_PRIORITY 4
 #define APP_EVENT_QUEUE_SIZE 10
 
+using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
@@ -55,6 +61,22 @@ static Button_Handle sAppLeftHandle;
 static Button_Handle sAppRightHandle;
 
 AppTask AppTask::sAppTask;
+
+static OTARequestor sRequestorCore;
+static GenericOTARequestorDriver sRequestorUser;
+static BDXDownloader sDownloader;
+static OTAImageProcessorImpl sImageProcessor;
+
+void InitializeOTARequestor(void)
+{
+    // Initialize and interconnect the Requestor and Image Processor objects
+    SetRequestorInstance(&sRequestorCore);
+
+    sRequestorCore.Init(&Server::GetInstance(), &sRequestorUser, &sDownloader);
+    sImageProcessor.SetOTADownloader(&sDownloader);
+    sDownloader.SetImageProcessorDelegate(&sImageProcessor);
+    sRequestorUser.Init(&sRequestorCore, &sImageProcessor);
+}
 
 int AppTask::StartAppTask()
 {
@@ -82,13 +104,12 @@ int AppTask::StartAppTask()
 int AppTask::Init()
 {
     LED_Params ledParams;
-    Button_Params buttionParams;
-    ConnectivityManager::ThreadPollingConfig pollingConfig;
+    Button_Params buttonParams;
 
     cc13x2_26x2LogInit();
 
     // Init Chip memory management before the stack
-    chip::Platform::MemoryInit();
+    Platform::MemoryInit();
 
     CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
@@ -114,18 +135,6 @@ int AppTask::Init()
             ;
     }
 
-    pollingConfig.Clear();
-    pollingConfig.ActivePollingIntervalMS   = 5000; // ms
-    pollingConfig.InactivePollingIntervalMS = 5000; // ms
-
-    ret = ConnectivityMgr().SetThreadPollingConfig(pollingConfig);
-    if (ret != CHIP_NO_ERROR)
-    {
-        PLAT_LOG("ConnectivityMgr().SetThreadPollingConfig() failed");
-        while (1)
-            ;
-    }
-
     ret = PlatformMgr().StartEventLoopTask();
     if (ret != CHIP_NO_ERROR)
     {
@@ -144,7 +153,7 @@ int AppTask::Init()
 
     // Init ZCL Data Model and start server
     PLAT_LOG("Initialize Server");
-    InitServer();
+    Server::GetInstance().Init();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -165,15 +174,17 @@ int AppTask::Init()
     PLAT_LOG("Initialize buttons");
     Button_init();
 
-    Button_Params_init(&buttionParams);
-    buttionParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
-    buttionParams.longPressDuration = 1000U; // ms
-    sAppLeftHandle                  = Button_open(CONFIG_BTN_LEFT, ButtonLeftEventHandler, &buttionParams);
+    Button_Params_init(&buttonParams);
+    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
+    buttonParams.longPressDuration = 1000U; // ms
+    sAppLeftHandle                 = Button_open(CONFIG_BTN_LEFT, &buttonParams);
+    Button_setCallback(sAppLeftHandle, ButtonLeftEventHandler);
 
-    Button_Params_init(&buttionParams);
-    buttionParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
-    buttionParams.longPressDuration = 1000U; // ms
-    sAppRightHandle                 = Button_open(CONFIG_BTN_RIGHT, ButtonRightEventHandler, &buttionParams);
+    Button_Params_init(&buttonParams);
+    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
+    buttonParams.longPressDuration = 1000U; // ms
+    sAppRightHandle                = Button_open(CONFIG_BTN_RIGHT, &buttonParams);
+    Button_setCallback(sAppRightHandle, ButtonRightEventHandler);
 
     // Initialize BoltLock module
     PLAT_LOG("Initialize BoltLock");
@@ -183,8 +194,10 @@ int AppTask::Init()
 
     ConfigurationMgr().LogDeviceConfig();
 
+    InitializeOTARequestor();
+
     // QR code will be used with CHIP Tool
-    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+    PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
 
     return 0;
 }
@@ -333,7 +346,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
             // Enable BLE advertisements
             if (!ConnectivityMgr().IsBLEAdvertisingEnabled())
             {
-                if (OpenBasicCommissioningWindow(chip::ResetFabrics::kNo) == CHIP_NO_ERROR)
+                if (Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
                 {
                     PLAT_LOG("Enabled BLE Advertisement");
                 }

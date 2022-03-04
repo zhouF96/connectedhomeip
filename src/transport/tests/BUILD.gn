@@ -23,11 +23,12 @@ chip_test_suite("tests") {
   output_name = "libTransportLayerTests"
 
   test_sources = [
-    "TestFabricTable.cpp",
+    "TestGroupMessageCounter.cpp",
+    "TestPairingSession.cpp",
     "TestPeerConnections.cpp",
+    "TestPeerMessageCounter.cpp",
     "TestSecureSession.cpp",
-    "TestSecureSessionMgr.cpp",
-    "TestSessionHandle.cpp",
+    "TestSessionManager.cpp",
   ]
 
   cflags = [ "-Wconversion" ]

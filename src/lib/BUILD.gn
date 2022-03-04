@@ -24,7 +24,7 @@ static_library("lib") {
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/asn1",
     "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/mdns",
+    "${chip_root}/src/lib/dnssd",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
     "${chip_root}/src/platform",
@@ -33,8 +33,18 @@ static_library("lib") {
     "${chip_root}/src/transport",
   ]
 
+  # Only include the shell if it is being used. The shell is
+  # a debug feature mostly useful for embedded examples.
+  # See src/lib/lib.gni for declaration of this build arg.
   if (chip_build_libshell) {
     public_deps += [ "${chip_root}/src/lib/shell" ]
+  }
+
+  # Only include the DefaultAttestationVerifier if needed in the build.
+  # See src/lib/lib.gni for declaration of this build arg.
+  if (chip_build_default_attestation_verifier) {
+    public_deps +=
+        [ "${chip_root}/src/credentials:default_attestation_verifier" ]
   }
 
   cflags = [ "-Wconversion" ]

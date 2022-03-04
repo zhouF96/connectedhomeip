@@ -20,36 +20,32 @@
 
 #include "../../config/PersistentStorage.h"
 #include "Command.h"
-#include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <map>
 
 class Commands
 {
 public:
-    using NodeId         = ::chip::NodeId;
     using CommandsVector = ::std::vector<std::unique_ptr<Command>>;
 
     void Register(const char * clusterName, commands_list commandsList);
     int Run(int argc, char ** argv);
 
 private:
-    // *ranCommand will be set to the command we ran if we get as far as running
-    // it.  If it's not null, we need to call Shutdown() on the command after we
-    // shut down the event loop.
-    CHIP_ERROR RunCommand(NodeId localId, NodeId remoteId, int argc, char ** argv, Command ** ranCommand);
-    static void RunQueuedCommand(intptr_t commandArg);
+    CHIP_ERROR RunCommand(int argc, char ** argv);
+
     std::map<std::string, CommandsVector>::iterator GetCluster(std::string clusterName);
     Command * GetCommand(CommandsVector & commands, std::string commandName);
     Command * GetGlobalCommand(CommandsVector & commands, std::string commandName, std::string attributeName);
+    bool IsAttributeCommand(std::string commandName) const;
+    bool IsEventCommand(std::string commandName) const;
     bool IsGlobalCommand(std::string commandName) const;
 
     void ShowClusters(std::string executable);
     void ShowCluster(std::string executable, std::string clusterName, CommandsVector & commands);
     void ShowClusterAttributes(std::string executable, std::string clusterName, std::string commandName, CommandsVector & commands);
+    void ShowClusterEvents(std::string executable, std::string clusterName, std::string commandName, CommandsVector & commands);
     void ShowCommand(std::string executable, std::string clusterName, Command * command);
 
     std::map<std::string, CommandsVector> mClusters;
-    chip::Controller::DeviceCommissioner mController;
-    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
     PersistentStorage mStorage;
 };

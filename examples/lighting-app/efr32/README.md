@@ -85,7 +85,7 @@ Silicon Labs platform.
           $ cd ~/connectedhomeip
           $ rm -rf ./out/
 
-OR use GN/Ninja directly
+    OR use GN/Ninja directly
 
           $ cd ~/connectedhomeip/examples/lighting-app/efr32
           $ git submodule update --init
@@ -99,7 +99,19 @@ OR use GN/Ninja directly
           $ cd ~/connectedhomeip/examples/lighting-app/efr32
           $ rm -rf out/
 
-*   Build the example with pigweed RCP use GN/Ninja Directly
+*   Build the example as Sleepy End Device (SED)
+
+          $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32/ ./out/lighting-app_SED BRD4161A --sed
+
+    or use gn as previously mentioned but adding the following arguments:
+
+          $ gn gen out/debug '--args=efr32_board="BRD4161A" enable_sleepy_device=true chip_openthread_ftd=false'
+
+*   Build the example with pigweed RCP
+
+          $ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/lighting_app_rpc BRD4161A 'import("//with_pw_rpc.gni")'
+
+    or use GN/Ninja Directly
 
           $ cd ~/connectedhomeip/examples/lighting-app/efr32
           $ git submodule update --init
@@ -109,6 +121,11 @@ OR use GN/Ninja directly
           $ ninja -C out/debug
 
     [Running Pigweed RPC console](#running-pigweed-rpc-console)
+
+For more build options, help is provided when running the build script without
+arguments
+
+         ./scripts/examples/gn_efr32_example.sh
 
 <a name="flashing"></a>
 
@@ -221,7 +238,7 @@ combination with JLinkRTTClient as follows:
 
         -   _Press and Release_ : Start, or restart, BLE advertisement in fast mode. It will advertise in this mode
             for 30 seconds. The device will then switch to a slower interval advertisement.
-            After 15 minutes, the adverstiment stops.
+            After 15 minutes, the advertisement stops.
 
         -   _Pressed and hold for 6 s_ : Initiates the factory reset of the device.
             Releasing the button within the 6-second window cancels the factory reset
@@ -233,24 +250,17 @@ combination with JLinkRTTClient as follows:
 *   You can provision and control the Chip device using the python controller,
     Chip tool standalone, Android or iOS app
 
-    [Python Controller](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/README.md)
+*   You can provision and control the Chip device using the python controller,
+    Chip tool standalone, Android or iOS app
 
-    Here is an example with the Python controller:
+    [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
+
+    Here is an example with the CHIPTool:
 
     ```
-      chip-device-ctrl
+    chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
 
-      connect -ble 3840 73141520 1234
-
-      zcl NetworkCommissioning AddThreadNetwork 1234 0 0 operationalDataset=hex:0e080000000000000000000300000b35060004001fffe00208dead00beef00cafe0708fddead00beef000005108e11d8ea8ffaa875713699f59e8807e0030a4f70656e5468726561640102c2980410edc641eb63b100b87e90a9980959befc0c0402a0fff8 breadcrumb=0 timeoutMs=1000
-
-      zcl NetworkCommissioning EnableNetwork 1234 0 0 networkID=hex:dead00beef00cafe breadcrumb=0 timeoutMs=1000
-
-      close-ble
-
-      resolve 0 1234
-
-      zcl OnOff Toggle 1234 1 0
+    chip-tool onoff on 1 1
     ```
 
 ### Notes
@@ -280,7 +290,7 @@ via 2002::2
 -   To use the chip-rpc console after it has been installed run:
     `python3 -m chip_rpc.console --device /dev/tty.<SERIALDEVICE> -b 115200 -o /<YourFolder>/pw_log.out`
 
--   Then you can simulate a button press or realease using the following command
+-   Then you can simulate a button press or release using the following command
     where : idx = 0 or 1 for Button PB0 or PB1 action = 0 for PRESSED, 1 for
     RELEASE Test toggling the LED with
     `rpcs.chip.rpc.Button.Event(idx=1, pushed=True)`
@@ -288,7 +298,7 @@ via 2002::2
 -   You can also Get and Set the light directly using the RPCs:
     `rpcs.chip.rpc.Lighting.Get()`
 
-    `rpcs.chip.rpc.Lighting.Set(on=True)`
+    `rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))`
 
 ## Memory settings
 

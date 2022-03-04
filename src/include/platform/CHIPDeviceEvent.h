@@ -25,6 +25,8 @@
 #pragma once
 #include <stdint.h>
 
+#include <lib/core/DataModelTypes.h>
+
 namespace chip {
 namespace DeviceLayer {
 namespace DeviceEventType {
@@ -159,6 +161,13 @@ enum PublicEventTypes
     kTimeSyncChange,
 
     /**
+     * SED Polling Interval Change
+     *
+     * Signals a change to the sleepy end device polling interval.
+     */
+    kSEDPollingIntervalChange,
+
+    /**
      * Security Session Established
      *
      * Signals that an external entity has established a new security session with the device.
@@ -215,6 +224,11 @@ enum PublicEventTypes
      *
      */
     kOperationalNetworkEnabled,
+
+    /**
+     * Signals that DNS-SD platform layer was initialized and is ready to operate.
+     */
+    kDnssdPlatformInitialized,
 };
 
 /**
@@ -228,6 +242,7 @@ enum InternalEventTypes
     kEventTypeNotSet = kRange_Internal,
     kNoOp,
     kCallWorkFunct,
+    kChipLambdaEvent,
     kChipSystemLayerEvent,
     kCHIPoBLESubscribe,
     kCHIPoBLEUnsubscribe,
@@ -300,9 +315,10 @@ typedef void (*AsyncWorkFunct)(intptr_t arg);
 #endif // defined(CHIP_DEVICE_LAYER_TARGET)
 
 #include <ble/BleConfig.h>
-#include <inet/InetLayer.h>
+#include <inet/InetInterface.h>
+#include <lib/support/LambdaBridge.h>
 #include <system/SystemEvent.h>
-#include <system/SystemObject.h>
+#include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -318,12 +334,7 @@ struct ChipDeviceEvent final
     union
     {
         ChipDevicePlatformEvent Platform;
-        struct
-        {
-            ::chip::System::EventType Type;
-            ::chip::System::Object * Target;
-            uintptr_t Argument;
-        } ChipSystemLayerEvent;
+        LambdaBridge LambdaEvent;
         struct
         {
             AsyncWorkFunct WorkFunct;
@@ -379,7 +390,7 @@ struct ChipDeviceEvent final
         {
             uint64_t PeerNodeId;
             uint16_t SessionKeyId;
-            uint8_t EncType;
+            uint8_t SessionType;
             bool IsCommissioner;
         } SessionEstablished;
         struct
@@ -430,7 +441,9 @@ struct ChipDeviceEvent final
 
         struct
         {
-            CHIP_ERROR status;
+            CHIP_ERROR Status;
+            uint64_t PeerNodeId;
+            FabricIndex PeerFabricIndex;
         } CommissioningComplete;
 
         struct

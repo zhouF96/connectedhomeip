@@ -17,88 +17,204 @@
 
 #pragma once
 
+#include <access/AccessControl.h>
+#include <app/CASEClientPool.h>
+#include <app/CASESessionManager.h>
+#include <app/DefaultAttributePersistenceProvider.h>
+#include <app/OperationalDeviceProxyPool.h>
 #include <app/server/AppDelegate.h>
+#include <app/server/CommissioningWindowManager.h>
+#include <credentials/FabricTable.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <inet/InetConfig.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/support/SafeInt.h>
 #include <messaging/ExchangeMgr.h>
+#include <platform/KeyValueStoreManager.h>
+#include <protocols/secure_channel/CASEServer.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <transport/FabricTable.h>
-#include <transport/SecureSessionMgr.h>
+#include <protocols/secure_channel/RendezvousParameters.h>
+#include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
+#include <transport/TransportMgrBase.h>
 #include <transport/raw/BLE.h>
 #include <transport/raw/UDP.h>
 
-struct ServerConfigParams
-{
-    uint16_t securedServicePort   = CHIP_PORT;
-    uint16_t unsecuredServicePort = CHIP_UDC_PORT;
-};
+namespace chip {
 
 constexpr size_t kMaxBlePendingPackets = 1;
 
-using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP
+using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #if INET_CONFIG_ENABLE_IPV4
-                                            ,
-                                            chip::Transport::UDP
+                                              ,
+                                              chip::Transport::UDP
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
-                                            ,
-                                            chip::Transport::BLE<kMaxBlePendingPackets>
+                                              ,
+                                              chip::Transport::BLE<kMaxBlePendingPackets>
 #endif
-                                            >;
-/**
- * Currently, this method must be called BEFORE InitServer.
- * In the future, it would be nice to be able to call it
- * at any time but that requires handling for changes to every
- * field on ServerConfigParams (restarting port listener, etc).
- *
- */
-void SetServerConfig(ServerConfigParams params);
+                                              >;
 
-/**
- * Initialize DataModelHandler and start CHIP datamodel server, the server
- * assumes the platform's networking has been setup already.
- *
- * @param [in] delegate   An optional AppDelegate
- */
-void InitServer(AppDelegate * delegate = nullptr);
+class Server
+{
+public:
+    CHIP_ERROR Init(AppDelegate * delegate = nullptr, uint16_t secureServicePort = CHIP_PORT,
+                    uint16_t unsecureServicePort = CHIP_UDC_PORT, Inet::InterfaceId interfaceId = Inet::InterfaceId::Null());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner);
+    CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
-CHIP_ERROR AddTestCommissioning();
+    CHIP_ERROR AddTestCommissioning();
 
-chip::Transport::FabricTable & GetGlobalFabricTable();
+    /**
+     * @brief Call this function to rejoin existing groups found in the GroupDataProvider
+     */
+    void RejoinExistingMulticastGroups();
 
-namespace chip {
+    FabricTable & GetFabricTable() { return mFabrics; }
 
-enum class ResetFabrics
-{
-    kYes,
-    kNo,
-};
+    CASESessionManager * GetCASESessionManager() { return &mCASESessionManager; }
 
-enum class PairingWindowAdvertisement
-{
-    kBle,
-    kMdns,
+    Messaging::ExchangeManager & GetExchangeManager() { return mExchangeMgr; }
+
+    SessionIDAllocator & GetSessionIDAllocator() { return mSessionIDAllocator; }
+
+    SessionManager & GetSecureSessionManager() { return mSessions; }
+
+    TransportMgrBase & GetTransportManager() { return mTransports; }
+
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer * GetBleLayerObject() { return mBleLayer; }
+#endif
+
+    CommissioningWindowManager & GetCommissioningWindowManager() { return mCommissioningWindowManager; }
+
+    /**
+     * This function send the ShutDown event before stopping
+     * the event loop.
+     */
+    void DispatchShutDownAndStopEventLoop();
+
+    void Shutdown();
+
+    void ScheduleFactoryReset();
+
+    static void FactoryReset(intptr_t arg);
+
+    static Server & GetInstance() { return sServer; }
+
+private:
+    Server();
+
+    static Server sServer;
+
+    class DeviceStorageDelegate : public PersistentStorageDelegate, public FabricStorage
+    {
+        CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
+        {
+            size_t bytesRead = 0;
+            CHIP_ERROR err   = DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead);
+
+            if (err == CHIP_NO_ERROR)
+            {
+                ChipLogProgress(AppServer, "Retrieved from server storage: %s", key);
+            }
+            size = static_cast<uint16_t>(bytesRead);
+            return err;
+        }
+
+        CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
+        {
+            return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
+        }
+
+        CHIP_ERROR SyncDeleteKeyValue(const char * key) override
+        {
+            return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
+        }
+
+        CHIP_ERROR SyncStore(FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size) override
+        {
+            return SyncSetKeyValue(key, buffer, size);
+        };
+
+        CHIP_ERROR SyncLoad(FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size) override
+        {
+            return SyncGetKeyValue(key, buffer, size);
+        };
+
+        CHIP_ERROR SyncDelete(FabricIndex fabricIndex, const char * key) override { return SyncDeleteKeyValue(key); };
+    };
+
+    class GroupDataProviderListener final : public Credentials::GroupDataProvider::GroupListener
+    {
+    public:
+        GroupDataProviderListener() {}
+
+        CHIP_ERROR Init(ServerTransportMgr * transports)
+        {
+            VerifyOrReturnError(transports != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+            mTransports = transports;
+            return CHIP_NO_ERROR;
+        };
+
+        void OnGroupAdded(chip::FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & new_group) override
+        {
+            if (mTransports->MulticastGroupJoinLeave(Transport::PeerAddress::Multicast(fabric_index, new_group.group_id), true) !=
+                CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "Unable to listen to group");
+            }
+        };
+
+        void OnGroupRemoved(chip::FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & old_group) override
+        {
+            mTransports->MulticastGroupJoinLeave(Transport::PeerAddress::Multicast(fabric_index, old_group.group_id), false);
+        };
+
+    private:
+        ServerTransportMgr * mTransports;
+    };
+
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer * mBleLayer = nullptr;
+#endif
+
+    ServerTransportMgr mTransports;
+    SessionManager mSessions;
+    CASEServer mCASEServer;
+
+    CASESessionManager mCASESessionManager;
+    CASEClientPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS> mCASEClientPool;
+    OperationalDeviceProxyPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES> mDevicePool;
+
+    Messaging::ExchangeManager mExchangeMgr;
+    FabricTable mFabrics;
+    SessionIDAllocator mSessionIDAllocator;
+    secure_channel::MessageCounterManager mMessageCounterManager;
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient gUDCClient;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    SecurePairingUsingTestSecret mTestPairing;
+    CommissioningWindowManager mCommissioningWindowManager;
+
+    // Both PersistentStorageDelegate, and GroupDataProvider should be injected by the applications
+    // See: https://github.com/project-chip/connectedhomeip/issues/12276
+    DeviceStorageDelegate mDeviceStorage;
+    Credentials::GroupDataProviderImpl mGroupsProvider;
+    app::DefaultAttributePersistenceProvider mAttributePersister;
+    GroupDataProviderListener mListener;
+
+    Access::AccessControl mAccessControl;
+
+    // TODO @ceille: Maybe use OperationalServicePort and CommissionableServicePort
+    uint16_t mSecuredServicePort;
+    uint16_t mUnsecuredServicePort;
+    Inet::InterfaceId mInterfaceId;
 };
 
 } // namespace chip
-
-constexpr uint16_t kNoCommissioningTimeout = UINT16_MAX;
-
-/**
- * Open the pairing window using default configured parameters.
- */
-CHIP_ERROR
-OpenBasicCommissioningWindow(chip::ResetFabrics resetFabrics, uint16_t commissioningTimeoutSeconds = kNoCommissioningTimeout,
-                             chip::PairingWindowAdvertisement advertisementMode = chip::PairingWindowAdvertisement::kBle);
-
-CHIP_ERROR OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds, uint16_t discriminator,
-                                           chip::PASEVerifier & verifier, uint32_t iterations, chip::ByteSpan salt,
-                                           uint16_t passcodeID);
-
-void ClosePairingWindow();
-
-bool IsPairingWindowOpen();

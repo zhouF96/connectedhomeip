@@ -26,12 +26,17 @@ const path              = require('path');
 // Import helpers from zap core
 const templateUtil = require(zapPath + 'dist/src-electron/generator/template-util.js')
 
-const { DelayCommands }                 = require('./simulated-clusters/TestDelayCommands.js');
-const { Clusters, asBlocks, asPromise } = require('./ClustersHelper.js');
+const { getClusters, getCommands, getAttributes, getEvents, isTestOnlyCluster }
+= require('./simulated-clusters/SimulatedClusters.js');
+const { asBlocks, ensureClusters } = require('./ClustersHelper.js');
+const { Variables }                = require('./variables/Variables.js');
 
+const kIdentityName      = 'identity';
 const kClusterName       = 'cluster';
 const kEndpointName      = 'endpoint';
+const kGroupId           = 'groupId';
 const kCommandName       = 'command';
+const kWaitCommandName   = 'wait';
 const kIndexName         = 'index';
 const kValuesName        = 'values';
 const kConstraintsName   = 'constraints';
@@ -39,6 +44,16 @@ const kArgumentsName     = 'arguments';
 const kResponseName      = 'response';
 const kDisabledName      = 'disabled';
 const kResponseErrorName = 'error';
+const kPICSName          = 'PICS';
+const kSaveAsName        = 'saveAs';
+const kFabricFiltered    = 'fabricFiltered';
+
+class NullObject {
+  toString()
+  {
+    return "YOU SHOULD HAVE CHECKED (isLiteralNull definedValue)"
+  }
+};
 
 function throwError(test, errorStr)
 {
@@ -61,22 +76,136 @@ function setDefault(test, name, defaultValue)
 
 function setDefaultType(test)
 {
-  const type = test[kCommandName];
+  if (kWaitCommandName in test) {
+    setDefaultTypeForWaitCommand(test);
+  } else {
+    setDefaultTypeForCommand(test);
+  }
+}
+
+function setDefaultTypeForWaitCommand(test)
+{
+  const type = test[kWaitCommandName];
   switch (type) {
+  case 'readEvent':
+    test.isEvent     = true;
+    test.isReadEvent = true;
+    break;
+  case 'subscribeEvent':
+    test.isEvent          = true;
+    test.isSubscribe      = true;
+    test.isSubscribeEvent = true;
+    break;
   case 'readAttribute':
     test.isAttribute     = true;
     test.isReadAttribute = true;
     break;
-
   case 'writeAttribute':
     test.isAttribute      = true;
     test.isWriteAttribute = true;
     break;
-
+  case 'subscribeAttribute':
+    test.isAttribute          = true;
+    test.isSubscribe          = true;
+    test.isSubscribeAttribute = true;
+    break;
   default:
     test.isCommand = true;
+    test.command   = test.wait
     break;
   }
+
+  test.isWait = true;
+}
+
+function setDefaultTypeForCommand(test)
+{
+  const type = test[kCommandName];
+  switch (type) {
+  case 'readEvent':
+    test.commandName = 'Read';
+    test.isEvent     = true;
+    test.isReadEvent = true;
+    break;
+
+  case 'subscribeEvent':
+    test.commandName      = 'Subscribe';
+    test.isEvent          = true;
+    test.isSubscribe      = true;
+    test.isSubscribeEvent = true;
+    break;
+
+  case 'readAttribute':
+    test.commandName     = 'Read';
+    test.isAttribute     = true;
+    test.isReadAttribute = true;
+    if (!(kFabricFiltered in test)) {
+      test[kFabricFiltered] = true;
+    }
+    break;
+
+  case 'writeAttribute':
+    test.commandName      = 'Write';
+    test.isAttribute      = true;
+    test.isWriteAttribute = true;
+    if ((kGroupId in test)) {
+      test.isGroupCommand = true;
+      test.groupId        = parseInt(test[kGroupId], 10);
+    }
+    break;
+
+  case 'subscribeAttribute':
+    test.commandName          = 'Subscribe';
+    test.isAttribute          = true;
+    test.isSubscribe          = true;
+    test.isSubscribeAttribute = true;
+    if (!(kFabricFiltered in test)) {
+      test[kFabricFiltered] = true;
+    }
+    break;
+
+  case 'waitForReport':
+    test.commandName     = 'Report';
+    test.isAttribute     = true;
+    test.isWaitForReport = true;
+    break;
+
+  default:
+    test.commandName = test.command;
+    test.isCommand   = true;
+    if ((kGroupId in test)) {
+      test.isGroupCommand = true;
+      test.groupId        = parseInt(test[kGroupId], 10);
+    }
+    break;
+  }
+
+  // Sanity Check for GroupId usage
+  // Only two types of actions can be send to Group : Write attribute, and Commands
+  // Spec : Action 8.2.4
+  if ((kGroupId in test) && !test.isGroupCommand) {
+    printErrorAndExit(this, 'Wrong Yaml configuration. Action : ' + test.commandName + " can't be sent to group " + test[kGroupId]);
+  }
+
+  test.isWait = false;
+}
+
+function setDefaultPICS(test)
+{
+  const defaultPICS = '';
+  setDefault(test, kPICSName, defaultPICS);
+
+  if (test[kPICSName] == '') {
+    return;
+  }
+
+  const items = test[kPICSName].split(/[&|() !]+/g).filter(item => item.length);
+  items.forEach(key => {
+    if (!PICS.has(key)) {
+      const errorStr = 'PICS database does not contains any defined value for: ' + key;
+      throwError(test, errorStr);
+    }
+  })
 }
 
 function setDefaultArguments(test)
@@ -100,10 +229,19 @@ function setDefaultArguments(test)
   delete test[kArgumentsName].value;
 }
 
+function ensureValidError(response, errorName)
+{
+  if (isNaN(response[errorName])) {
+    response[errorName] = "EMBER_ZCL_STATUS_" + response[errorName];
+  }
+}
+
 function setDefaultResponse(test)
 {
   const defaultResponse = {};
   setDefault(test, kResponseName, defaultResponse);
+
+  const hasResponseError = (kResponseErrorName in test[kResponseName]);
 
   const defaultResponseError = 0;
   setDefault(test[kResponseName], kResponseErrorName, defaultResponseError);
@@ -113,6 +251,9 @@ function setDefaultResponse(test)
 
   const defaultResponseConstraints = {};
   setDefault(test[kResponseName], kConstraintsName, defaultResponseConstraints);
+
+  const defaultResponseSaveAs = '';
+  setDefault(test[kResponseName], kSaveAsName, defaultResponseSaveAs);
 
   const hasResponseValue              = 'value' in test[kResponseName];
   const hasResponseConstraints        = 'constraints' in test[kResponseName] && Object.keys(test[kResponseName].constraints).length;
@@ -131,27 +272,40 @@ function setDefaultResponse(test)
     throwError(test, errorStr);
   }
 
-  if (test.isWriteAttribute && hasResponseValueOrConstraints) {
-    const errorStr = 'Attribute write test has a "value" or a "constraints" defined.';
-    throwError(test, errorStr);
-  }
+  ensureValidError(test[kResponseName], kResponseErrorName);
 
-  if (!test.isReadAttribute) {
+  // Step that waits for a particular event does not requires constraints nor expected values.
+  if (test.isWait) {
     return;
   }
 
-  if (!hasResponseValueOrConstraints) {
+  if (!test.isAttribute && !test.isEvent) {
+    return;
+  }
+
+  if (test.isWriteAttribute || test.isSubscribe) {
+    if (hasResponseValueOrConstraints) {
+      const errorStr = 'Test has a "value" or a "constraints" defined.';
+      throwError(test, errorStr);
+    }
+
+    return;
+  }
+
+  if (!hasResponseValueOrConstraints && !hasResponseError) {
+    console.log(test);
     console.log(test[kResponseName]);
-    const errorStr = 'Test does not have a "value" or a "constraints" defined.';
+    const errorStr = 'Test does not have a "value" or a "constraints" defined and is not expecting an error.';
     throwError(test, errorStr);
   }
 
-  if (hasResponseValue) {
-    test[kResponseName].values.push({ name : test.attribute, value : test[kResponseName].value });
-  }
+  if (hasResponseValueOrConstraints) {
+    const name             = test.isAttribute ? test.attribute : test.event;
+    const response         = test[kResponseName];
+    const responseValue    = hasResponseValue ? { value : response.value } : null;
+    const constraintsValue = hasResponseConstraints ? { constraints : response.constraints } : null;
 
-  if (hasResponseConstraints) {
-    test[kResponseName].values.push({ name : test.attribute, constraints : test[kResponseName].constraints });
+    response.values.push({ name, saveAs : response.saveAs, ...responseValue, ...constraintsValue });
   }
 
   delete test[kResponseName].value;
@@ -159,14 +313,17 @@ function setDefaultResponse(test)
 
 function setDefaults(test, defaultConfig)
 {
-  const defaultClusterName = defaultConfig[kClusterName] || null;
-  const defaultEndpointId  = kEndpointName in defaultConfig ? defaultConfig[kEndpointName] : null;
-  const defaultDisabled    = false;
+  const defaultIdentityName = kIdentityName in defaultConfig ? defaultConfig[kIdentityName] : "alpha";
+  const defaultClusterName  = defaultConfig[kClusterName] || null;
+  const defaultEndpointId   = kEndpointName in defaultConfig ? defaultConfig[kEndpointName] : null;
+  const defaultDisabled     = false;
 
   setDefaultType(test);
+  setDefault(test, kIdentityName, defaultIdentityName);
   setDefault(test, kClusterName, defaultClusterName);
   setDefault(test, kEndpointName, defaultEndpointId);
   setDefault(test, kDisabledName, defaultDisabled);
+  setDefaultPICS(test);
   setDefaultArguments(test);
   setDefaultResponse(test);
 }
@@ -184,6 +341,36 @@ function parse(filename)
   const data = fs.readFileSync(filepath, { encoding : 'utf8', flag : 'r' });
   const yaml = YAML.parse(data);
 
+  // "subscribeAttribute" command expects a report to be acked before
+  // it got a success response.
+  // In order to validate that the report has been received with the proper value
+  // a "subscribeAttribute" command can have a response configured into the test step
+  // definition. In this case, a new async "waitForReport" test step will be synthesized
+  // and added to the list of tests.
+  yaml.tests.forEach((test, index) => {
+    if (test.command == "subscribeAttribute" && test.response) {
+      // Create a new report test where the expected response is the response argument
+      // for the "subscribeAttributeTest"
+      const reportTest = {
+        label : "Report: " + test.label,
+        command : "waitForReport",
+        attribute : test.attribute,
+        response : test.response,
+        async : true,
+        allocateSubscribeDataCallback : true,
+      };
+      delete test.response;
+
+      // insert the new report test into the tests list
+      yaml.tests.splice(index, 0, reportTest);
+
+      // Associate the "subscribeAttribute" test with the synthesized report test
+      test.hasWaitForReport              = true;
+      test.waitForReport                 = reportTest;
+      test.allocateSubscribeDataCallback = !test.hasWaitForReport;
+    }
+  });
+
   const defaultConfig = yaml.config || [];
   yaml.tests.forEach(test => {
     test.filename = filename;
@@ -193,11 +380,13 @@ function parse(filename)
 
   // Filter disabled tests
   yaml.tests = yaml.tests.filter(test => !test.disabled);
+
   yaml.tests.forEach((test, index) => {
     setDefault(test, kIndexName, index);
   });
 
   yaml.filename   = filename;
+  yaml.timeout    = yaml.config.timeout;
   yaml.totalTests = yaml.tests.length;
 
   return yaml;
@@ -205,33 +394,15 @@ function parse(filename)
 
 function printErrorAndExit(context, msg)
 {
-  console.log(context.testName, ': ', context.label);
+  console.log("\nERROR:\n", context.testName, ': ', context.label);
   console.log(msg);
   process.exit(1);
 }
 
-function getClusters()
-{
-  // Create a new array to merge the configured clusters list and test
-  // simulated clusters.
-  return Clusters.getClusters().then(clusters => clusters.concat(DelayCommands));
-}
-
-function getCommands(clusterName)
-{
-  return (clusterName == DelayCommands.name) ? Promise.resolve(DelayCommands.commands) : Clusters.getClientCommands(clusterName);
-}
-
-function getAttributes(clusterName)
-{
-  return (clusterName == DelayCommands.name) ? Promise.resolve(DelayCommands.attributes)
-                                             : Clusters.getServerAttributes(clusterName);
-}
-
-function assertCommandOrAttribute(context)
+function assertCommandOrAttributeOrEvent(context)
 {
   const clusterName = context.cluster;
-  return getClusters().then(clusters => {
+  return getClusters(context).then(clusters => {
     if (!clusters.find(cluster => cluster.name == clusterName)) {
       const names = clusters.map(item => item.name);
       printErrorAndExit(context, 'Missing cluster "' + clusterName + '" in: \n\t* ' + names.join('\n\t* '));
@@ -242,10 +413,13 @@ function assertCommandOrAttribute(context)
 
     if (context.isCommand) {
       filterName = context.command;
-      items      = getCommands(clusterName);
+      items      = getCommands(context, clusterName);
     } else if (context.isAttribute) {
       filterName = context.attribute;
-      items      = getAttributes(clusterName);
+      items      = getAttributes(context, clusterName);
+    } else if (context.isEvent) {
+      filterName = context.event;
+      items      = getEvents(context, clusterName);
     } else {
       printErrorAndExit(context, 'Unsupported command type: ', context);
     }
@@ -253,17 +427,17 @@ function assertCommandOrAttribute(context)
     return items.then(items => {
       const filter = item => item.name.toLowerCase() == filterName.toLowerCase();
       const item          = items.find(filter);
-      const itemType      = (context.isCommand ? 'Command' : 'Attribute');
+      const itemType      = (context.isCommand ? 'Command' : context.isAttribute ? 'Attribute' : 'Event');
 
-      // If the command or attribute is not found, it could be because of a typo in the test
-      // description, or an attribute name not matching the spec, or a wrongly configured zap
+      // If the command/attribute/event is not found, it could be because of a typo in the test
+      // description, or an attribute/event name not matching the spec, or a wrongly configured zap
       // file.
       if (!item) {
         const names = items.map(item => item.name);
         printErrorAndExit(context, 'Missing ' + itemType + ' "' + filterName + '" in: \n\t* ' + names.join('\n\t* '));
       }
 
-      // If the command or attribute has been found but the response can not be found, it could be
+      // If the command/attribute/event has been found but the response can not be found, it could be
       // because of a wrongly configured cluster definition.
       if (!item.response) {
         printErrorAndExit(context, 'Missing ' + itemType + ' "' + filterName + '" response');
@@ -274,13 +448,63 @@ function assertCommandOrAttribute(context)
   });
 }
 
+const PICS = (() => {
+  let filepath = path.resolve(__dirname, basePath + certificationPath + 'PICS.yaml');
+  const data   = fs.readFileSync(filepath, { encoding : 'utf8', flag : 'r' });
+  const yaml   = YAML.parse(data);
+
+  const getAll = () => yaml.PICS;
+  const get = (id) => has(id) ? yaml.PICS.filter(pics => pics.id == id)[0] : null;
+  const has = (id) => !!(yaml.PICS.filter(pics => pics.id == id)).length;
+
+  const PICS = {
+    getAll : getAll,
+    get : get,
+    has : has,
+  };
+  return PICS;
+})();
+
 //
 // Templates
 //
-function chip_tests(items, options)
+function chip_tests_pics(options)
 {
-  const names = items.split(',').map(name => name.trim());
-  const tests = names.map(item => parse(item));
+  return templateUtil.collectBlocks(PICS.getAll(), options, this);
+}
+
+async function chip_tests(list, options)
+{
+  // Set a global on our items so assertCommandOrAttributeOrEvent can work.
+  let global  = this.global;
+  const items = Array.isArray(list) ? list : list.split(',');
+  const names = items.map(name => name.trim());
+  let tests   = names.map(item => parse(item));
+
+  const context = this;
+  tests         = await Promise.all(tests.map(async function(test) {
+    test.tests = await Promise.all(test.tests.map(async function(item) {
+      item.global = global;
+      if (item.isCommand) {
+        let command        = await assertCommandOrAttributeOrEvent(item);
+        item.commandObject = command;
+      } else if (item.isAttribute) {
+        let attr             = await assertCommandOrAttributeOrEvent(item);
+        item.attributeObject = attr;
+      } else if (item.isEvent) {
+        let evt          = await assertCommandOrAttributeOrEvent(item);
+        item.eventObject = evt;
+      }
+      return item;
+    }));
+
+    const variables = await Variables(context, test);
+    test.variables  = {
+      config : variables.config,
+      tests : variables.tests,
+    };
+    return test;
+  }));
   return templateUtil.collectBlocks(tests, options, this);
 }
 
@@ -289,32 +513,163 @@ function chip_tests_items(options)
   return templateUtil.collectBlocks(this.tests, options, this);
 }
 
-function isTestOnlyCluster(name)
+function getVariable(context, key, name)
 {
-  return name == DelayCommands.name;
+  if (!(typeof name == "string" || (typeof name == "object" && (name instanceof String)))) {
+    // Non-string key; don't try to look it up.  Could end up looking like a
+    // variable name by accident when stringified.
+    return null;
+  }
+
+  while (!('variables' in context) && context.parent) {
+    context = context.parent;
+  }
+
+  if (typeof context === 'undefined' || !('variables' in context)) {
+    return null;
+  }
+
+  return context.variables[key].find(variable => variable.name == name);
+}
+
+function getVariableOrThrow(context, key, name)
+{
+  const variable = getVariable(context, key, name);
+  if (variable == null) {
+    throw new Error(`Variable ${name} can not be found`);
+  }
+  return variable;
+}
+
+function chip_tests_variables(options)
+{
+  return templateUtil.collectBlocks(this.variables.tests, options, this);
+}
+
+function chip_tests_variables_has(name, options)
+{
+  const variable = getVariable(this, 'tests', name);
+  return !!variable;
+}
+
+function chip_tests_variables_get_type(name, options)
+{
+  const variable = getVariableOrThrow(this, 'tests', name);
+  return variable.type;
+}
+
+function chip_tests_config(options)
+{
+  return templateUtil.collectBlocks(this.variables.config, options, this);
+}
+
+function chip_tests_config_has(name, options)
+{
+  const variable = getVariable(this, 'config', name);
+  return !!variable;
+}
+
+function chip_tests_config_get_default_value(name, options)
+{
+  const variable = getVariableOrThrow(this, 'config', name);
+  return variable.defaultValue;
+}
+
+function chip_tests_config_get_type(name, options)
+{
+  const variable = getVariableOrThrow(this, 'config', name);
+  return variable.type;
+}
+
+// test_cluster_command_value and test_cluster_value-equals are recursive partials using #each. At some point the |global|
+// context is lost and it fails. Make sure to attach the global context as a property of the | value |
+// that is evaluated.
+//
+// errorContext should have "thisVal" and "name" properties that will be used
+// for error reporting via printErrorAndExit.
+function attachGlobal(global, value, errorContext)
+{
+  if (Array.isArray(value)) {
+    value = value.map(v => attachGlobal(global, v, errorContext));
+  } else if (value instanceof Object) {
+    for (key in value) {
+      if (key == "global") {
+        continue;
+      }
+      value[key] = attachGlobal(global, value[key], errorContext);
+    }
+  } else if (value === null) {
+    value = new NullObject();
+  } else {
+    switch (typeof value) {
+    case 'number':
+      checkNumberSanity(value, errorContext);
+      value = new Number(value);
+      break;
+    case 'string':
+      value = new String(value);
+      break;
+    case 'boolean':
+      value = new Boolean(value);
+      break;
+    default:
+      throw new Error('Unsupported value: ' + JSON.stringify(value));
+    }
+  }
+
+  value.global = global;
+  return value;
+}
+
+/**
+ * Ensure the given value is not a possibly-corrupted-by-going-through-double
+ * integer.  If it is, tell the user (using that errorContext.name to describe
+ * it) and die.
+ */
+function checkNumberSanity(value, errorContext)
+{
+  // Number.isInteger is false for non-Numbers.
+  if (Number.isInteger(value) && !Number.isSafeInteger(value)) {
+    printErrorAndExit(errorContext.thisVal,
+        `${errorContext.name} value ${
+            value} is too large to represent exactly as an integer in YAML.  Put quotes around it to treat it as a string.\n\n`);
+  }
 }
 
 function chip_tests_item_parameters(options)
 {
   const commandValues = this.arguments.values;
 
-  const promise = assertCommandOrAttribute(this).then(item => {
+  const promise = assertCommandOrAttributeOrEvent(this).then(item => {
+    if ((this.isAttribute || this.isEvent) && !this.isWriteAttribute) {
+      if (this.isSubscribe) {
+        const minInterval = { name : 'minInterval', type : 'int16u', chipType : 'uint16_t', definedValue : this.minInterval };
+        const maxInterval = { name : 'maxInterval', type : 'int16u', chipType : 'uint16_t', definedValue : this.maxInterval };
+        return [ minInterval, maxInterval ];
+      }
+      return [];
+    }
+
     const commandArgs = item.arguments;
     const commands    = commandArgs.map(commandArg => {
       commandArg = JSON.parse(JSON.stringify(commandArg));
 
       const expected = commandValues.find(value => value.name.toLowerCase() == commandArg.name.toLowerCase());
       if (!expected) {
+        if (commandArg.isOptional) {
+          return undefined;
+        }
         printErrorAndExit(this,
             'Missing "' + commandArg.name + '" in arguments list: \n\t* '
                 + commandValues.map(command => command.name).join('\n\t* '));
       }
-      commandArg.definedValue = expected.value;
+
+      commandArg.definedValue = attachGlobal(this.global, expected.value, { thisVal : this, name : commandArg.name });
 
       return commandArg;
     });
 
-    return commands;
+    return commands.filter(item => item !== undefined);
   });
 
   return asBlocks.call(this, promise, options);
@@ -324,7 +679,10 @@ function chip_tests_item_response_parameters(options)
 {
   const responseValues = this.response.values.slice();
 
-  const promise = assertCommandOrAttribute(this).then(item => {
+  const promise = assertCommandOrAttributeOrEvent(this).then(item => {
+    if (this.isWriteAttribute) {
+      return [];
+    }
     const responseArgs = item.response.arguments;
 
     const responses = responseArgs.map(responseArg => {
@@ -335,23 +693,28 @@ function chip_tests_item_response_parameters(options)
         const expected = responseValues.splice(expectedIndex, 1)[0];
         if ('value' in expected) {
           responseArg.hasExpectedValue = true;
-          responseArg.expectedValue    = expected.value;
+          responseArg.expectedValue    = attachGlobal(this.global, expected.value, { thisVal : this, name : responseArg.name });
         }
 
         if ('constraints' in expected) {
           responseArg.hasExpectedConstraints = true;
-          responseArg.expectedConstraints    = expected.constraints;
+          responseArg.expectedConstraints
+              = attachGlobal(this.global, expected.constraints, { thisVal : this, name : responseArg.name });
+        }
+
+        if ('saveAs' in expected) {
+          responseArg.saveAs = expected.saveAs;
         }
       }
 
-      const unusedResponseValues = responseValues.filter(response => 'value' in response);
-      unusedResponseValues.forEach(unusedResponseValue => {
-        printErrorAndExit(this,
-            'Missing "' + unusedResponseValue.name + '" in response arguments list:\n\t* '
-                + responseArgs.map(response => response.name).join('\n\t* '));
-      });
-
       return responseArg;
+    });
+
+    const unusedResponseValues = responseValues.filter(response => 'value' in response);
+    unusedResponseValues.forEach(unusedResponseValue => {
+      printErrorAndExit(this,
+          'Missing "' + unusedResponseValue.name + '" in response arguments list:\n\t* '
+              + responseArgs.map(response => response.name).join('\n\t* '));
     });
 
     return responses;
@@ -360,11 +723,95 @@ function chip_tests_item_response_parameters(options)
   return asBlocks.call(this, promise, options);
 }
 
+function isLiteralNull(value, options)
+{
+  // Literal null might look different depending on whether it went through
+  // attachGlobal or not.
+  return (value === null) || (value instanceof NullObject);
+}
+
+function octetStringEscapedForCLiteral(value)
+{
+  // Escape control characters, things outside the ASCII range, and single
+  // quotes (because that's our string terminator).
+  return value.replace(/\p{Control}|\P{ASCII}|"/gu, ch => {
+    let code = ch.charCodeAt(0);
+    code     = code.toString(16);
+    if (code.length == 1) {
+      code = "0" + code;
+    }
+    return "\\x" + code;
+  });
+}
+
+// Structs may not always provide values for optional members.
+function if_include_struct_item_value(structValue, name, options)
+{
+  let hasValue = (name in structValue);
+  if (hasValue) {
+    return options.fn(this);
+  }
+
+  if (!this.isOptional) {
+    throw new Error(`Value not provided for ${name} where one is expected`);
+  }
+
+  return options.inverse(this);
+}
+
+// To be used to verify that things are actually arrays before trying to use
+// #each with them, since that silently treats non-arrays as empty arrays.
+function ensureIsArray(value, options)
+{
+  if (!(value instanceof Array)) {
+    printErrorAndExit(this, `Expected array but instead got ${typeof value}: ${JSON.stringify(value)}\n`);
+  }
+}
+
+function chip_tests_item_has_list(options)
+{
+  function hasList(args)
+  {
+    for (let i = 0; i < args.length; i++) {
+      if (args[i].isArray) {
+        return true;
+      }
+
+      if (args[i].isStruct && hasList(args[i].items)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  return assertCommandOrAttributeOrEvent(this).then(item => {
+    if (this.isWriteAttribute || this.isCommand) {
+      return hasList(item.arguments);
+    }
+
+    return false;
+  });
+}
+
 //
 // Module exports
 //
 exports.chip_tests                          = chip_tests;
 exports.chip_tests_items                    = chip_tests_items;
+exports.chip_tests_item_has_list            = chip_tests_item_has_list;
 exports.chip_tests_item_parameters          = chip_tests_item_parameters;
 exports.chip_tests_item_response_parameters = chip_tests_item_response_parameters;
+exports.chip_tests_pics                     = chip_tests_pics;
+exports.chip_tests_config                   = chip_tests_config;
+exports.chip_tests_config_has               = chip_tests_config_has;
+exports.chip_tests_config_get_default_value = chip_tests_config_get_default_value;
+exports.chip_tests_config_get_type          = chip_tests_config_get_type;
+exports.chip_tests_variables                = chip_tests_variables;
+exports.chip_tests_variables_has            = chip_tests_variables_has;
+exports.chip_tests_variables_get_type       = chip_tests_variables_get_type;
 exports.isTestOnlyCluster                   = isTestOnlyCluster;
+exports.isLiteralNull                       = isLiteralNull;
+exports.octetStringEscapedForCLiteral       = octetStringEscapedForCLiteral;
+exports.if_include_struct_item_value        = if_include_struct_item_value;
+exports.ensureIsArray                       = ensureIsArray;

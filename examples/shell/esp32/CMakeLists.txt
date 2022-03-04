@@ -28,5 +28,14 @@ project(chip-shell)
 idf_build_set_property(CXX_COMPILE_OPTIONS "-std=gnu++14;-Os;-DLWIP_IPV6_SCOPES=0;-DCHIP_HAVE_CONFIG_H" APPEND)
 idf_build_set_property(C_COMPILE_OPTIONS "-Os;-DLWIP_IPV6_SCOPES=0" APPEND)
 
-flashing_script()
+# For the C3, project_include.cmake sets -Wno-format, but does not clear various
+# flags that depend on -Wformat
+idf_build_set_property(COMPILE_OPTIONS "-Wno-format-nonliteral;-Wno-format-security" APPEND)
 
+# -Wmaybe-uninitialized has too many false positives, including on std::optional
+# and chip::Optional.  Make it nonfatal.
+#
+# See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80635
+idf_build_set_property(COMPILE_OPTIONS "-Wno-error=maybe-uninitialized" APPEND)
+
+flashing_script()

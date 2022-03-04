@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -51,6 +51,7 @@
 
 #include <CHIPVersion.h>
 #include <credentials/CHIPCert.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/asn1/ASN1.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
@@ -117,16 +118,19 @@ public:
     void PrintDN(FILE * file, const char * name) const;
 };
 
+extern bool Cmd_GenCD(int argc, char * argv[]);
 extern bool Cmd_GenCert(int argc, char * argv[]);
 extern bool Cmd_ConvertCert(int argc, char * argv[]);
 extern bool Cmd_ConvertKey(int argc, char * argv[]);
 extern bool Cmd_ResignCert(int argc, char * argv[]);
+extern bool Cmd_ValidateAttCert(int argc, char * argv[]);
 extern bool Cmd_ValidateCert(int argc, char * argv[]);
 extern bool Cmd_PrintCert(int argc, char * argv[]);
 extern bool Cmd_GenAttCert(int argc, char * argv[]);
 
 extern bool ReadCert(const char * fileName, X509 * cert);
 extern bool ReadCert(const char * fileName, X509 * cert, CertFormat & origCertFmt);
+extern bool ReadCertDERRaw(const char * fileName, chip::MutableByteSpan & cert);
 extern bool LoadChipCert(const char * fileName, bool isTrused, chip::Credentials::ChipCertificateSet & certSet,
                          chip::MutableByteSpan & chipCert);
 
@@ -143,6 +147,7 @@ extern bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_
 extern bool GenerateKeyPair(EVP_PKEY * key);
 extern bool ReadKey(const char * fileName, EVP_PKEY * key);
 extern bool WritePrivateKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt);
+extern bool SerializeKeyPair(EVP_PKEY * key, chip::Crypto::P256SerializedKeypair & serializedKeypair);
 
 extern bool X509ToChipCert(X509 * cert, chip::MutableByteSpan & chipCert);
 
@@ -151,7 +156,6 @@ extern bool Base64Encode(const uint8_t * inData, uint32_t inDataLen, uint8_t * o
 extern bool Base64Decode(const uint8_t * inData, uint32_t inDataLen, uint8_t * outBuf, uint32_t outBufSize, uint32_t & outDataLen);
 extern bool IsBase64String(const char * str, uint32_t strLen);
 extern bool ContainsPEMMarker(const char * marker, const uint8_t * data, uint32_t dataLen);
-extern bool ParseChip64bitAttr(const char * str, uint64_t & val);
 extern bool ParseDateTime(const char * str, struct tm & date);
 extern bool ReadFileIntoMem(const char * fileName, uint8_t * data, uint32_t & dataLen);
 extern bool OpenFile(const char * fileName, FILE *& file, bool toWrite = false);
@@ -162,8 +166,7 @@ extern int gNIDChipFirmwareSigningId;
 extern int gNIDChipICAId;
 extern int gNIDChipRootId;
 extern int gNIDChipFabricId;
-extern int gNIDChipAuthTag1;
-extern int gNIDChipAuthTag2;
+extern int gNIDChipCASEAuthenticatedTag;
 extern int gNIDChipCurveP256;
 extern int gNIDChipAttAttrVID;
 extern int gNIDChipAttAttrPID;

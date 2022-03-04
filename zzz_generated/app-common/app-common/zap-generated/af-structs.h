@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,91 +24,193 @@
 
 #include <app/util/basic-types.h>
 #include <lib/support/Span.h>
+#include <protocols/interaction_model/Constants.h>
 
 #include "enums.h"
 
-// Struct for ApplicationLauncherApp
-typedef struct _ApplicationLauncherApp
+// Struct for Dimension
+typedef struct _Dimension
+{
+    double width;
+    double height;
+    uint8_t metric;
+} Dimension;
+
+// Struct for AdditionalInfo
+typedef struct _AdditionalInfo
+{
+    chip::CharSpan name;
+    chip::CharSpan value;
+} AdditionalInfo;
+
+// Struct for SimpleStruct
+typedef struct _SimpleStruct
+{
+    uint8_t a;
+    bool b;
+    uint8_t c;
+    chip::ByteSpan d;
+    chip::CharSpan e;
+    uint8_t f;
+    float g;
+    double h;
+} SimpleStruct;
+
+// Struct for NullablesAndOptionalsStruct
+typedef struct _NullablesAndOptionalsStruct
+{
+    uint16_t NullableInt;
+    uint16_t OptionalInt;
+    uint16_t NullableOptionalInt;
+    chip::CharSpan NullableString;
+    chip::CharSpan OptionalString;
+    chip::CharSpan NullableOptionalString;
+    SimpleStruct NullableStruct;
+    SimpleStruct OptionalStruct;
+    SimpleStruct NullableOptionalStruct;
+    /* TYPE WARNING: array array defaults to */ uint8_t * NullableList;
+    /* TYPE WARNING: array array defaults to */ uint8_t * OptionalList;
+    /* TYPE WARNING: array array defaults to */ uint8_t * NullableOptionalList;
+} NullablesAndOptionalsStruct;
+
+// Struct for NestedStruct
+typedef struct _NestedStruct
+{
+    uint8_t a;
+    bool b;
+    SimpleStruct c;
+} NestedStruct;
+
+// Struct for NestedStructList
+typedef struct _NestedStructList
+{
+    uint8_t a;
+    bool b;
+    SimpleStruct c;
+    /* TYPE WARNING: array array defaults to */ uint8_t * d;
+    /* TYPE WARNING: array array defaults to */ uint8_t * e;
+    /* TYPE WARNING: array array defaults to */ uint8_t * f;
+    /* TYPE WARNING: array array defaults to */ uint8_t * g;
+} NestedStructList;
+
+// Struct for DoubleNestedStructList
+typedef struct _DoubleNestedStructList
+{
+    /* TYPE WARNING: array array defaults to */ uint8_t * a;
+} DoubleNestedStructList;
+
+// Struct for Parameter
+typedef struct _Parameter
+{
+    uint8_t type;
+    chip::CharSpan value;
+    /* TYPE WARNING: array array defaults to */ uint8_t * externalIDList;
+} Parameter;
+
+// Struct for ContentSearch
+typedef struct _ContentSearch
+{
+    /* TYPE WARNING: array array defaults to */ uint8_t * parameterList;
+} ContentSearch;
+
+// Struct for StyleInformation
+typedef struct _StyleInformation
+{
+    chip::CharSpan imageUrl;
+    chip::CharSpan color;
+    Dimension size;
+} StyleInformation;
+
+// Struct for BrandingInformation
+typedef struct _BrandingInformation
+{
+    chip::CharSpan providerName;
+    StyleInformation background;
+    StyleInformation logo;
+    StyleInformation progressBar;
+    StyleInformation splash;
+    StyleInformation waterMark;
+} BrandingInformation;
+
+// Struct for Application
+typedef struct _Application
 {
     uint16_t catalogVendorId;
-    uint8_t * applicationId;
-} ApplicationLauncherApp;
+    chip::CharSpan applicationId;
+} Application;
 
-// Struct for AudioOutputInfo
-typedef struct _AudioOutputInfo
+// Struct for ApplicationEP
+typedef struct _ApplicationEP
 {
-    uint8_t index;
-    uint8_t outputType;
-    chip::ByteSpan name;
-} AudioOutputInfo;
+    Application application;
+    chip::EndpointId endpoint;
+} ApplicationEP;
 
-// Struct for BasicCommissioningInfoType
-typedef struct _BasicCommissioningInfoType
+// Struct for Target
+typedef struct _Target
 {
-    uint32_t FailSafeExpiryLengthMs;
-} BasicCommissioningInfoType;
+    chip::ClusterId Cluster;
+    chip::EndpointId Endpoint;
+    chip::DeviceTypeId DeviceType;
+} Target;
 
-// Struct for ConfigureReportingRecord
-typedef struct _ConfigureReportingRecord
+// Struct for AccessControlEntry
+typedef struct _AccessControlEntry
 {
-    uint8_t direction;
-    chip::AttributeId attributeId;
-    uint8_t attributeType;
-    uint16_t minimumReportingInterval;
-    uint16_t maximumReportingInterval;
-    uint8_t * reportableChangeLocation;
-    uint16_t timeoutPeriod;
-} ConfigureReportingRecord;
+    chip::FabricIndex FabricIndex;
+    uint8_t Privilege;
+    uint8_t AuthMode;
+    /* TYPE WARNING: array array defaults to */ uint8_t * Subjects;
+    /* TYPE WARNING: array array defaults to */ uint8_t * Targets;
+} AccessControlEntry;
 
-// Struct for ConfigureReportingStatusRecord
-typedef struct _ConfigureReportingStatusRecord
+// Struct for ActionStruct
+typedef struct _ActionStruct
 {
-    uint8_t status;
-    uint8_t direction;
-    chip::AttributeId attributeId;
-} ConfigureReportingStatusRecord;
-
-// Struct for ContentLaunchAdditionalInfo
-typedef struct _ContentLaunchAdditionalInfo
-{
-    uint8_t * name;
-    uint8_t * value;
-} ContentLaunchAdditionalInfo;
-
-// Struct for ContentLaunchBrandingInformation
-typedef struct _ContentLaunchBrandingInformation
-{
-    uint8_t * providerName;
-    uint8_t background;
-    uint8_t logo;
-    uint8_t progressBar;
-    uint8_t splash;
-    uint8_t waterMark;
-} ContentLaunchBrandingInformation;
-
-// Struct for ContentLaunchDimension
-typedef struct _ContentLaunchDimension
-{
-    uint8_t * width;
-    uint8_t * height;
-    uint8_t metric;
-} ContentLaunchDimension;
-
-// Struct for ContentLaunchParamater
-typedef struct _ContentLaunchParamater
-{
+    uint16_t ActionID;
+    chip::CharSpan Name;
     uint8_t Type;
-    uint8_t * Value;
-    /* TYPE WARNING: array array defaults to */ uint8_t * ExternalIDList;
-} ContentLaunchParamater;
+    uint16_t EndpointListID;
+    uint16_t SupportedCommands;
+    uint8_t Status;
+} ActionStruct;
 
-// Struct for ContentLaunchStyleInformation
-typedef struct _ContentLaunchStyleInformation
+// Struct for ApplicationBasicApplication
+typedef struct _ApplicationBasicApplication
 {
-    uint8_t * imageUrl;
-    uint8_t * color;
-    uint8_t size;
-} ContentLaunchStyleInformation;
+    uint16_t catalogVendorId;
+    chip::CharSpan applicationId;
+} ApplicationBasicApplication;
+
+// Struct for BasicCommissioningInfo
+typedef struct _BasicCommissioningInfo
+{
+    uint16_t FailSafeExpiryLengthSeconds;
+} BasicCommissioningInfo;
+
+// Struct for BatChargeFaultChangeType
+typedef struct _BatChargeFaultChangeType
+{
+    /* TYPE WARNING: array array defaults to */ uint8_t * current;
+    /* TYPE WARNING: array array defaults to */ uint8_t * previous;
+} BatChargeFaultChangeType;
+
+// Struct for BatFaultChangeType
+typedef struct _BatFaultChangeType
+{
+    /* TYPE WARNING: array array defaults to */ uint8_t * current;
+    /* TYPE WARNING: array array defaults to */ uint8_t * previous;
+} BatFaultChangeType;
+
+// Struct for ChannelInfo
+typedef struct _ChannelInfo
+{
+    uint16_t majorNumber;
+    uint16_t minorNumber;
+    chip::CharSpan name;
+    chip::CharSpan callSign;
+    chip::CharSpan affiliateCallSign;
+} ChannelInfo;
 
 // Struct for DeviceType
 typedef struct _DeviceType
@@ -117,49 +219,69 @@ typedef struct _DeviceType
     uint16_t revision;
 } DeviceType;
 
-// Struct for DiscoverAttributesInfoRecord
-typedef struct _DiscoverAttributesInfoRecord
+// Struct for DlCredential
+typedef struct _DlCredential
 {
-    chip::AttributeId attributeId;
-    uint8_t attributeType;
-} DiscoverAttributesInfoRecord;
+    uint8_t CredentialType;
+    uint16_t CredentialIndex;
+} DlCredential;
 
-// Struct for ExtendedDiscoverAttributesInfoRecord
-typedef struct _ExtendedDiscoverAttributesInfoRecord
+// Struct for EndpointListStruct
+typedef struct _EndpointListStruct
 {
-    chip::AttributeId attributeId;
-    uint8_t attributeType;
-    uint8_t attributeAccessControl;
-} ExtendedDiscoverAttributesInfoRecord;
+    uint16_t EndpointListID;
+    chip::CharSpan Name;
+    uint8_t Type;
+    /* TYPE WARNING: array array defaults to */ uint8_t * Endpoints;
+} EndpointListStruct;
+
+// Struct for ExtensionEntry
+typedef struct _ExtensionEntry
+{
+    chip::FabricIndex FabricIndex;
+    chip::ByteSpan Data;
+} ExtensionEntry;
 
 // Struct for FabricDescriptor
 typedef struct _FabricDescriptor
 {
-    uint8_t FabricIndex;
+    chip::FabricIndex FabricIndex;
     chip::ByteSpan RootPublicKey;
     uint16_t VendorId;
     chip::FabricId FabricId;
     chip::NodeId NodeId;
-    chip::ByteSpan Label;
+    chip::CharSpan Label;
 } FabricDescriptor;
 
-// Struct for GroupKey
-typedef struct _GroupKey
+// Struct for GroupInfoMapStruct
+typedef struct _GroupInfoMapStruct
 {
-    uint16_t VendorId;
-    uint16_t GroupKeyIndex;
-    chip::ByteSpan GroupKeyRoot;
-    uint64_t GroupKeyEpochStartTime;
-    uint8_t GroupKeySecurityPolicy;
-} GroupKey;
+    chip::FabricIndex FabricIndex;
+    chip::GroupId GroupId;
+    /* TYPE WARNING: array array defaults to */ uint8_t * Endpoints;
+    chip::CharSpan GroupName;
+} GroupInfoMapStruct;
 
-// Struct for GroupState
-typedef struct _GroupState
+// Struct for GroupKeyMapStruct
+typedef struct _GroupKeyMapStruct
 {
-    uint16_t VendorId;
-    uint16_t VendorGroupId;
-    uint16_t GroupKeySetIndex;
-} GroupState;
+    chip::FabricIndex FabricIndex;
+    chip::GroupId GroupId;
+    uint16_t GroupKeySetID;
+} GroupKeyMapStruct;
+
+// Struct for GroupKeySetStruct
+typedef struct _GroupKeySetStruct
+{
+    uint16_t GroupKeySetID;
+    uint8_t GroupKeySecurityPolicy;
+    chip::ByteSpan EpochKey0;
+    uint64_t EpochStartTime0;
+    chip::ByteSpan EpochKey1;
+    uint64_t EpochStartTime1;
+    chip::ByteSpan EpochKey2;
+    uint64_t EpochStartTime2;
+} GroupKeySetStruct;
 
 // Struct for IasAceZoneStatusResult
 typedef struct _IasAceZoneStatusResult
@@ -168,42 +290,46 @@ typedef struct _IasAceZoneStatusResult
     uint16_t zoneStatus;
 } IasAceZoneStatusResult;
 
-// Struct for LabelStruct
-typedef struct _LabelStruct
-{
-    chip::ByteSpan label;
-    chip::ByteSpan value;
-} LabelStruct;
-
-// Struct for MediaInputInfo
-typedef struct _MediaInputInfo
+// Struct for InputInfo
+typedef struct _InputInfo
 {
     uint8_t index;
     uint8_t inputType;
-    chip::ByteSpan name;
-    chip::ByteSpan description;
-} MediaInputInfo;
+    chip::CharSpan name;
+    chip::CharSpan description;
+} InputInfo;
 
-// Struct for MediaPlaybackPosition
-typedef struct _MediaPlaybackPosition
+// Struct for LabelStruct
+typedef struct _LabelStruct
 {
-    uint64_t updatedAt;
-    uint64_t position;
-} MediaPlaybackPosition;
+    chip::CharSpan label;
+    chip::CharSpan value;
+} LabelStruct;
+
+// Struct for LineupInfo
+typedef struct _LineupInfo
+{
+    chip::CharSpan operatorName;
+    chip::CharSpan lineupName;
+    chip::CharSpan postalCode;
+    uint8_t lineupInfoType;
+} LineupInfo;
+
+// Struct for ModeOptionStruct
+typedef struct _ModeOptionStruct
+{
+    chip::CharSpan Label;
+    uint8_t Mode;
+    uint32_t SemanticTag;
+} ModeOptionStruct;
 
 // Struct for NOCStruct
 typedef struct _NOCStruct
 {
-    uint8_t FabricIndex;
+    chip::FabricIndex FabricIndex;
     chip::ByteSpan NOC;
+    chip::ByteSpan ICAC;
 } NOCStruct;
-
-// Struct for NavigateTargetTargetInfo
-typedef struct _NavigateTargetTargetInfo
-{
-    uint8_t identifier;
-    chip::ByteSpan name;
-} NavigateTargetTargetInfo;
 
 // Struct for NeighborTable
 typedef struct _NeighborTable
@@ -224,14 +350,23 @@ typedef struct _NeighborTable
     bool IsChild;
 } NeighborTable;
 
+// Struct for NetworkInfo
+typedef struct _NetworkInfo
+{
+    chip::ByteSpan NetworkID;
+    bool Connected;
+} NetworkInfo;
+
 // Struct for NetworkInterfaceType
 typedef struct _NetworkInterfaceType
 {
-    chip::ByteSpan Name;
-    bool FabricConnected;
+    chip::CharSpan Name;
+    bool IsOperational;
     bool OffPremiseServicesReachableIPv4;
     bool OffPremiseServicesReachableIPv6;
     chip::ByteSpan HardwareAddress;
+    /* TYPE WARNING: array array defaults to */ uint8_t * IPv4Addresses;
+    /* TYPE WARNING: array array defaults to */ uint8_t * IPv6Addresses;
     uint8_t Type;
 } NetworkInterfaceType;
 
@@ -259,6 +394,21 @@ typedef struct _OperationalDatasetComponents
     bool ChannelMaskPresent;
 } OperationalDatasetComponents;
 
+// Struct for OutputInfo
+typedef struct _OutputInfo
+{
+    uint8_t index;
+    uint8_t outputType;
+    chip::CharSpan name;
+} OutputInfo;
+
+// Struct for PlaybackPosition
+typedef struct _PlaybackPosition
+{
+    uint64_t updatedAt;
+    uint64_t position;
+} PlaybackPosition;
+
 // Struct for PowerProfileRecord
 typedef struct _PowerProfileRecord
 {
@@ -268,50 +418,30 @@ typedef struct _PowerProfileRecord
     uint8_t powerProfileState;
 } PowerProfileRecord;
 
+// Struct for ProviderLocation
+typedef struct _ProviderLocation
+{
+    chip::FabricIndex FabricIndex;
+    chip::NodeId ProviderNodeID;
+    chip::EndpointId Endpoint;
+} ProviderLocation;
+
 // Struct for ReadAttributeStatusRecord
 typedef struct _ReadAttributeStatusRecord
 {
     chip::AttributeId attributeId;
-    uint8_t status;
+    chip::Protocols::InteractionModel::Status status;
     uint8_t attributeType;
     uint8_t * attributeLocation;
 } ReadAttributeStatusRecord;
-
-// Struct for ReadReportingConfigurationAttributeRecord
-typedef struct _ReadReportingConfigurationAttributeRecord
-{
-    uint8_t direction;
-    chip::AttributeId attributeId;
-} ReadReportingConfigurationAttributeRecord;
-
-// Struct for ReadReportingConfigurationRecord
-typedef struct _ReadReportingConfigurationRecord
-{
-    uint8_t status;
-    uint8_t direction;
-    chip::AttributeId attributeId;
-    uint8_t attributeType;
-    uint16_t minimumReportingInterval;
-    uint16_t maximumReportingInterval;
-    uint8_t * reportableChangeLocation;
-    uint16_t timeoutPeriod;
-} ReadReportingConfigurationRecord;
 
 // Struct for ReadStructuredAttributeRecord
 typedef struct _ReadStructuredAttributeRecord
 {
     chip::AttributeId attributeId;
     uint8_t indicator;
-    uint16_t indicies;
+    /* TYPE WARNING: array array defaults to */ uint8_t * indicies;
 } ReadStructuredAttributeRecord;
-
-// Struct for ReportAttributeRecord
-typedef struct _ReportAttributeRecord
-{
-    chip::AttributeId attributeId;
-    uint8_t attributeType;
-    uint8_t * attributeLocation;
-} ReportAttributeRecord;
 
 // Struct for RouteTable
 typedef struct _RouteTable
@@ -354,8 +484,46 @@ typedef struct _ScheduledPhase
 typedef struct _SecurityPolicy
 {
     uint16_t RotationTime;
-    uint8_t Flags;
+    uint16_t Flags;
 } SecurityPolicy;
+
+// Struct for SemanticTag
+typedef struct _SemanticTag
+{
+    uint16_t MfgCode;
+    uint16_t Value;
+} SemanticTag;
+
+// Struct for SoftwareFaultStruct
+typedef struct _SoftwareFaultStruct
+{
+    uint64_t Id;
+    chip::CharSpan Name;
+    chip::ByteSpan FaultRecording;
+} SoftwareFaultStruct;
+
+// Struct for TargetInfo
+typedef struct _TargetInfo
+{
+    uint8_t identifier;
+    chip::CharSpan name;
+} TargetInfo;
+
+// Struct for TargetStruct
+typedef struct _TargetStruct
+{
+    chip::FabricIndex FabricIndex;
+    chip::NodeId Node;
+    chip::GroupId Group;
+    chip::EndpointId Endpoint;
+    chip::ClusterId Cluster;
+} TargetStruct;
+
+// Struct for TestFabricScoped
+typedef struct _TestFabricScoped
+{
+    chip::FabricIndex fabricIndex;
+} TestFabricScoped;
 
 // Struct for TestListStructOctet
 typedef struct _TestListStructOctet
@@ -367,14 +535,21 @@ typedef struct _TestListStructOctet
 // Struct for ThreadInterfaceScanResult
 typedef struct _ThreadInterfaceScanResult
 {
-    chip::ByteSpan DiscoveryResponse;
+    uint64_t PanId;
+    uint64_t ExtendedPanId;
+    chip::CharSpan NetworkName;
+    uint16_t Channel;
+    uint8_t Version;
+    uint64_t ExtendedAddress;
+    int8_t RSSI;
+    uint8_t LQI;
 } ThreadInterfaceScanResult;
 
 // Struct for ThreadMetrics
 typedef struct _ThreadMetrics
 {
     uint64_t Id;
-    chip::ByteSpan Name;
+    chip::CharSpan Name;
     uint32_t StackFreeCurrent;
     uint32_t StackFreeMinimum;
     uint32_t StackSize;
@@ -391,34 +566,23 @@ typedef struct _TransferredPhase
     uint16_t maxActivationDelay;
 } TransferredPhase;
 
-// Struct for TvChannelInfo
-typedef struct _TvChannelInfo
-{
-    uint16_t majorNumber;
-    uint16_t minorNumber;
-    chip::ByteSpan name;
-    chip::ByteSpan callSign;
-    chip::ByteSpan affiliateCallSign;
-} TvChannelInfo;
-
-// Struct for TvChannelLineupInfo
-typedef struct _TvChannelLineupInfo
-{
-    uint8_t * operatorName;
-    uint8_t * lineupName;
-    uint8_t * postalCode;
-    uint8_t lineupInfoType;
-} TvChannelLineupInfo;
-
 // Struct for WiFiInterfaceScanResult
 typedef struct _WiFiInterfaceScanResult
 {
     uint8_t Security;
     chip::ByteSpan SSID;
     chip::ByteSpan BSSID;
-    uint8_t Channel;
-    uint32_t FrequencyBand;
+    uint16_t Channel;
+    uint8_t WiFiBand;
+    int8_t RSSI;
 } WiFiInterfaceScanResult;
+
+// Struct for WiredFaultChangeType
+typedef struct _WiredFaultChangeType
+{
+    /* TYPE WARNING: array array defaults to */ uint8_t * current;
+    /* TYPE WARNING: array array defaults to */ uint8_t * previous;
+} WiredFaultChangeType;
 
 // Struct for WriteAttributeRecord
 typedef struct _WriteAttributeRecord
@@ -431,7 +595,7 @@ typedef struct _WriteAttributeRecord
 // Struct for WriteAttributeStatusRecord
 typedef struct _WriteAttributeStatusRecord
 {
-    uint8_t status;
+    chip::Protocols::InteractionModel::Status status;
     chip::AttributeId attributeId;
 } WriteAttributeStatusRecord;
 
@@ -440,7 +604,7 @@ typedef struct _WriteStructuredAttributeRecord
 {
     chip::AttributeId attributeId;
     uint8_t indicator;
-    uint16_t indicies;
+    /* TYPE WARNING: array array defaults to */ uint8_t * indicies;
     uint8_t attributeType;
     uint8_t * attributeLocation;
 } WriteStructuredAttributeRecord;
@@ -448,8 +612,8 @@ typedef struct _WriteStructuredAttributeRecord
 // Struct for WriteStructuredAttributeStatusRecord
 typedef struct _WriteStructuredAttributeStatusRecord
 {
-    uint8_t status;
+    chip::Protocols::InteractionModel::Status status;
     chip::AttributeId attributeId;
     uint8_t indicator;
-    uint16_t indicies;
+    /* TYPE WARNING: array array defaults to */ uint8_t * indicies;
 } WriteStructuredAttributeStatusRecord;

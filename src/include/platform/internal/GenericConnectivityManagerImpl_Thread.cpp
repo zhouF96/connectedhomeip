@@ -44,6 +44,11 @@ void GenericConnectivityManagerImpl_Thread<ImplClass>::_OnPlatformEvent(const Ch
         (event->Type == DeviceEventType::kThreadStateChange && event->ThreadStateChange.NetDataChanged);
     const bool fabricMembershipChanged = (event->Type == DeviceEventType::kFabricMembershipChange);
 
+    if (threadConnChanged && event->ThreadConnectivityChange.Result == kConnectivity_Established)
+    {
+        ThreadStackMgrImpl().OnThreadAttachFinished();
+    }
+
     // If any of the above events has occurred, assess whether there's been a change in
     // service connectivity via Thread.
     if (threadConnChanged || threadAddrChanged || threadNetDataChanged || fabricMembershipChanged)
@@ -109,7 +114,11 @@ void GenericConnectivityManagerImpl_Thread<ImplClass>::UpdateServiceConnectivity
             event.ServiceConnectivityChange.ViaThread.Result =
                 (haveServiceConnectivity) ? kConnectivity_Established : kConnectivity_Lost;
             event.ServiceConnectivityChange.Overall.Result = event.ServiceConnectivityChange.ViaThread.Result;
-            PlatformMgr().PostEvent(&event);
+            CHIP_ERROR status                              = PlatformMgr().PostEvent(&event);
+            if (status != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Failed to post thread connectivity change: %" CHIP_ERROR_FORMAT, status.Format());
+            }
         }
     }
 }

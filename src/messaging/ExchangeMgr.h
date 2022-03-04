@@ -30,10 +30,9 @@
 #include <lib/support/Pool.h>
 #include <lib/support/TypeTraits.h>
 #include <messaging/ExchangeContext.h>
-#include <messaging/ExchangeMgrDelegate.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 
 namespace chip {
@@ -50,7 +49,7 @@ static constexpr int16_t kAnyMessageType = -1;
  *    It works on be behalf of higher layers, creating ExchangeContexts and
  *    handling the registration/unregistration of unsolicited message handlers.
  */
-class DLL_EXPORT ExchangeManager : public SecureSessionMgrDelegate
+class DLL_EXPORT ExchangeManager : public SessionMessageDelegate
 {
     friend class ExchangeContext;
 
@@ -65,14 +64,14 @@ public:
      *  construction until a call to Shutdown is made to terminate the
      *  instance.
      *
-     *  @param[in]    sessionMgr    A pointer to the SecureSessionMgr object.
+     *  @param[in]    sessionManager    A pointer to the SessionManager object.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
      *          kState_NotInitialized.
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(SecureSessionMgr * sessionMgr);
+    CHIP_ERROR Init(SessionManager * sessionManager);
 
     /**
      *  Shutdown the ExchangeManager. This terminates this instance
@@ -100,7 +99,7 @@ public:
      *  @return   A pointer to the created ExchangeContext object On success. Otherwise NULL if no object
      *            can be allocated or is available.
      */
-    ExchangeContext * NewContext(SessionHandle session, ExchangeDelegate * delegate);
+    ExchangeContext * NewContext(const SessionHandle & session, ExchangeDelegate * delegate);
 
     void ReleaseContext(ExchangeContext * ec) { mContextPool.ReleaseObject(ec); }
 
@@ -184,15 +183,15 @@ public:
      */
     void CloseAllContextsForDelegate(const ExchangeDelegate * delegate);
 
-    void SetDelegate(ExchangeMgrDelegate * delegate) { mDelegate = delegate; }
-
-    SecureSessionMgr * GetSessionMgr() const { return mSessionMgr; }
+    SessionManager * GetSessionManager() const { return mSessionManager; }
 
     ReliableMessageMgr * GetReliableMessageMgr() { return &mReliableMessageMgr; };
 
     FabricIndex GetFabricIndex() { return mFabricIndex; }
 
     uint16_t GetNextKeyId() { return ++mNextKeyId; }
+
+    size_t GetNumActiveExchanges() { return mContextPool.Allocated(); }
 
 private:
     enum class State
@@ -226,11 +225,8 @@ private:
     uint16_t mNextKeyId;
     State mState;
 
-    ExchangeMgrDelegate * mDelegate;
-    SecureSessionMgr * mSessionMgr;
+    SessionManager * mSessionManager;
     ReliableMessageMgr mReliableMessageMgr;
-
-    ApplicationExchangeDispatch mDefaultExchangeDispatch;
 
     FabricIndex mFabricIndex = 0;
 
@@ -241,17 +237,9 @@ private:
     CHIP_ERROR RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegate * delegate);
     CHIP_ERROR UnregisterUMH(Protocols::Id protocolId, int16_t msgType);
 
-    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source) override;
-
-    void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, SessionHandle session,
+    void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, const SessionHandle & session,
                            const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
                            System::PacketBufferHandle && msgBuf) override;
-
-    void OnNewConnection(SessionHandle session) override;
-#if CHIP_CONFIG_TEST
-public: // Allow OnConnectionExpired to be called directly from tests.
-#endif  // CHIP_CONFIG_TEST
-    void OnConnectionExpired(SessionHandle session) override;
 };
 
 } // namespace Messaging

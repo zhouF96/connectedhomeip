@@ -24,6 +24,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <platform/Darwin/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
 
 // Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
@@ -43,15 +44,22 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     // Initialize the configuration system.
     err = Internal::PosixConfig::Init();
     SuccessOrExit(err);
+    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
+    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
     mRunLoopSem = dispatch_semaphore_create(0);
+
+    // Ensure there is a dispatch queue available
+    GetWorkQueue();
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     err = Internal::GenericPlatformManagerImpl<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
 
-    SystemLayer.SetDispatchQueue(GetWorkQueue());
+    mStartTime = System::SystemClock().GetMonotonicTimestamp();
+
+    static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer()).SetDispatchQueue(GetWorkQueue());
 
 exit:
     return err;
@@ -114,12 +122,63 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     return GenericPlatformManagerImpl<ImplClass>::_Shutdown();
 }
 
-void PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)
+CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)
 {
+    if (mWorkQueue == nullptr)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     const ChipDeviceEvent eventCopy = *event;
     dispatch_async(mWorkQueue, ^{
         Impl()->DispatchEvent(&eventCopy);
     });
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+PlatformManagerImpl::_SetUserLabelList(
+    EndpointId endpoint, AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+{
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+PlatformManagerImpl::_GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales)
+{
+    // In Darwin simulation, return following hardcoded list of Strings that are valid values for the ActiveLocale.
+    supportedLocales.add(CharSpan::fromCharString("Test"));
+    supportedLocales.add(CharSpan::fromCharString("en-US"));
+    supportedLocales.add(CharSpan::fromCharString("de-DE"));
+    supportedLocales.add(CharSpan::fromCharString("fr-FR"));
+    supportedLocales.add(CharSpan::fromCharString("en-GB"));
+    supportedLocales.add(CharSpan::fromCharString("es-ES"));
+    supportedLocales.add(CharSpan::fromCharString("zh-CN"));
+    supportedLocales.add(CharSpan::fromCharString("it-IT"));
+    supportedLocales.add(CharSpan::fromCharString("ja-JP"));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+PlatformManagerImpl::_GetSupportedCalendarTypes(
+    AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes)
+{
+    // In Darwin simulation, return following supported Calendar Types
+    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kBuddhist);
+    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kChinese);
+    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kCoptic);
+    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kEthiopian);
+    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kGregorian);
+    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kHebrew);
+    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kIndian);
+    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kIslamic);
+    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kJapanese);
+    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kKorean);
+    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kPersian);
+    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kTaiwanese);
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace DeviceLayer

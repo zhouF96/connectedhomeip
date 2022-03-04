@@ -36,9 +36,11 @@ An example RPC command:
   rpcs.chip.rpc.DeviceCommon.GetDeviceInfo()
 """
 
+import json
 import argparse
 from collections import namedtuple
 import logging
+import functools
 import sys
 from typing import Any, BinaryIO
 import socket
@@ -46,15 +48,23 @@ from inspect import cleandoc
 import serial  # type: ignore
 import re
 import pw_cli.log
-from pw_console.console_app import embed
+from pw_console import PwConsoleEmbed
 from pw_console.__main__ import create_temp_log_file
 from pw_hdlc.rpc import HdlcRpcClient, default_channels
+from pw_rpc import callback_client
+from pw_rpc.console_tools.console import ClientInfo, flattened_rpc_completions
+
 
 # Protos
+from attributes_service import attributes_service_pb2
 from button_service import button_service_pb2
+from descriptor_service import descriptor_service_pb2
 from device_service import device_service_pb2
+from echo_service import echo_pb2
 from lighting_service import lighting_service_pb2
 from locking_service import locking_service_pb2
+from ot_cli_service import ot_cli_service_pb2
+from thread_service import thread_service_pb2
 from wifi_service import wifi_service_pb2
 
 _LOG = logging.getLogger(__name__)
@@ -64,11 +74,16 @@ PW_RPC_MAX_PACKET_SIZE = 256
 SOCKET_SERVER = 'localhost'
 SOCKET_PORT = 33000
 
-PROTOS = [button_service_pb2,
+PROTOS = [attributes_service_pb2,
+          button_service_pb2,
+          descriptor_service_pb2,
+          device_service_pb2,
+          echo_pb2,
           lighting_service_pb2,
           locking_service_pb2,
-          wifi_service_pb2,
-          device_service_pb2]
+          ot_cli_service_pb2,
+          thread_service_pb2,
+          wifi_service_pb2]
 
 
 def _parse_args():
@@ -107,6 +122,10 @@ def _start_ipython_terminal(client: HdlcRpcClient) -> None:
         LOG=_DEVICE_LOG,
     )
 
+    client_info = ClientInfo('channel_client',
+                             client.client.channel(1).rpcs, client.client)
+    completions = flattened_rpc_completions([client_info])
+
     welcome_message = cleandoc("""
         Welcome to the CHIP RPC Console!
 
@@ -118,12 +137,25 @@ def _start_ipython_terminal(client: HdlcRpcClient) -> None:
           LOG.warning('Message appears console log window.')
     """)
 
-    embed(global_vars=local_variables,
-          local_vars=None,
-          loggers=[_DEVICE_LOG],
-          repl_startup_message=welcome_message,
-          help_text=__doc__,
-          app_title="CHIP Console")
+    interactive_console = PwConsoleEmbed(
+        global_vars=local_variables,
+        local_vars=None,
+        loggers={
+            'Device Logs': [_DEVICE_LOG],
+            'Host Logs': [logging.getLogger()],
+        },
+        repl_startup_message=welcome_message,
+        help_text=__doc__,
+        app_title="CHIP Console",
+    )
+    interactive_console.hide_windows('Host Logs')
+    interactive_console.add_sentence_completer(completions)
+
+    # Setup Python logger propagation
+    interactive_console.setup_python_logging()
+    # Don't send device logs to the root logger.
+    _DEVICE_LOG.propagate = False
+    interactive_console.embed()
 
 
 class SocketClientImpl:
@@ -196,9 +228,16 @@ def console(device: str, baudrate: int,
             _LOG.exception('Failed to initialize socket at %s', socket_addr)
             return 1
 
+    callback_client_impl = callback_client.Impl(
+        default_unary_timeout_s=5.0,
+        default_stream_timeout_s=None,
+    )
+
     _start_ipython_terminal(
         HdlcRpcClient(read, PROTOS, default_channels(write),
-                      lambda data: write_to_output(data, output)))
+                      lambda data: write_to_output(data, output),
+                      client_impl=callback_client_impl)
+    )
     return 0
 
 

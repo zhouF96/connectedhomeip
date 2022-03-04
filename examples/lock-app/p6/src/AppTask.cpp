@@ -25,7 +25,7 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
-#include <app/server/Mdns.h>
+#include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -36,6 +36,9 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
+
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/P6/NetworkCommissioningDriver.h>
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
@@ -57,17 +60,28 @@ bool sIsWiFiStationProvisioned = false;
 bool sIsWiFiStationEnabled     = false;
 bool sIsWiFiStationConnected   = false;
 bool sHaveBLEConnections       = false;
-bool sHaveServiceConnectivity  = false;
 
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
 } // namespace
 
+using namespace ::chip;
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::System;
 
 AppTask AppTask::sAppTask;
+
+namespace {
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::P6WiFiDriver::GetInstance()));
+} // namespace
+
+void NetWorkCommissioningInstInit()
+{
+    sWiFiNetworkCommissioningInstance.Init();
+}
 
 CHIP_ERROR AppTask::StartAppTask()
 {
@@ -96,13 +110,13 @@ CHIP_ERROR AppTask::Init()
                 if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established ||
                     event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
                 {
-                    chip::app::Mdns::StartServer();
+                    chip::app::DnssdServer::Instance().StartServer();
                 }
             }
         },
         0);
     // Init ZCL Data Model
-    InitServer();
+    chip::Server::GetInstance().Init();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -122,8 +136,8 @@ CHIP_ERROR AppTask::Init()
         P6_LOG("funct timer create failed");
         appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
-
-    P6_LOG("Current Firmware Version: %d", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION);
+    NetWorkCommissioningInstInit();
+    P6_LOG("Current Software Version: %d", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
     err = BoltLockMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
@@ -162,11 +176,10 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     while (true)
     {
-        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, pdMS_TO_TICKS(10));
-        while (eventReceived == pdTRUE)
+        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
+        if (eventReceived == pdTRUE)
         {
             sAppTask.DispatchEvent(&event);
-            eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
         }
         // Collect connectivity and configuration state from the CHIP stack. Because
         // the CHIP event loop is being run in a separate task, the stack must be
@@ -179,7 +192,6 @@ void AppTask::AppTaskMain(void * pvParameter)
             sIsWiFiStationConnected   = ConnectivityMgr().IsWiFiStationConnected();
             sIsWiFiStationProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
             sHaveBLEConnections       = (ConnectivityMgr().NumBLEConnections() != 0);
-            sHaveServiceConnectivity  = ConnectivityMgr().HaveServiceConnectivity();
             PlatformMgr().UnlockChipStack();
         }
 
@@ -197,13 +209,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         // Otherwise, blink the LED ON for a very short time.
         if (sAppTask.mFunction != Function::kFactoryReset)
         {
-            // Consider the system to be "fully connected" if it has service
-            // connectivity
-            if (sHaveServiceConnectivity)
-            {
-                sStatusLED.Set(true);
-            }
-            else if (sIsWiFiStationEnabled && sIsWiFiStationProvisioned && (!sIsWiFiStationConnected || !sHaveServiceConnectivity))
+            if (sIsWiFiStationEnabled && sIsWiFiStationProvisioned && !sIsWiFiStationConnected)
             {
                 sStatusLED.Blink(950, 50);
             }
@@ -325,7 +331,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * event)
     {
         // Actually trigger Factory Reset
         sAppTask.mFunction = Function::kNoneSelected;
-        ConfigurationMgr().InitiateFactoryReset();
+        chip::Server::GetInstance().ScheduleFactoryReset();
     }
 }
 
@@ -342,7 +348,7 @@ void AppTask::FunctionHandler(AppEvent * event)
     // FACTORY_RESET_TRIGGER_TIMEOUT to signal factory reset has been initiated.
     // To cancel factory reset: release the APP_FUNCTION_BUTTON once all LEDs
     // start blinking within the FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
-    if (event->ButtonEvent.Action == APP_BUTTON_PRESSED)
+    if (event->ButtonEvent.Action == APP_BUTTON_RELEASED)
     {
         if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kNoneSelected)
         {

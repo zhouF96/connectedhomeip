@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020 Project CHIP Authors
+ *   Copyright (c) 2020-2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,59 +18,64 @@
 package chip.devicecontroller;
 
 import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCallback;
 import android.util.Log;
+import androidx.annotation.Nullable;
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
-import chip.devicecontroller.mdns.ChipMdnsCallback;
-import chip.devicecontroller.mdns.ServiceResolver;
+import chip.devicecontroller.model.ChipAttributePath;
+import java.util.List;
 
 /** Controller to interact with the CHIP device. */
 public class ChipDeviceController {
   private static final String TAG = ChipDeviceController.class.getSimpleName();
-
   private long deviceControllerPtr;
   private int connectionId;
-  private BluetoothGatt bleGatt;
   private CompletionListener completionListener;
 
-  public ChipDeviceController(
-      KeyValueStoreManager manager, ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback) {
-    deviceControllerPtr = newDeviceController(manager, resolver, chipMdnsCallback);
+  /**
+   * To load class and jni, we need to new AndroidChipPlatform after jni load but before new
+   * ChipDeviceController
+   */
+  public static void loadJni() {
+    return;
+  }
+
+  public ChipDeviceController() {
+    deviceControllerPtr = newDeviceController();
   }
 
   public void setCompletionListener(CompletionListener listener) {
     completionListener = listener;
   }
 
-  public BluetoothGatt getBluetoothGatt() {
-    return bleGatt;
-  }
-
-  public BluetoothGattCallback getCallback() {
-    return AndroidChipStack.getInstance().getCallback();
-  }
-
-  public void pairDevice(BluetoothGatt bleServer, long deviceId, long setupPincode) {
-    pairDevice(bleServer, deviceId, setupPincode, null);
+  public void pairDevice(
+      BluetoothGatt bleServer,
+      int connId,
+      long deviceId,
+      long setupPincode,
+      NetworkCredentials networkCredentials) {
+    pairDevice(bleServer, connId, deviceId, setupPincode, null, networkCredentials);
   }
 
   /**
    * Pair a device connected through BLE.
    *
-   * <p>TODO(#7985): Annotate csrNonce as Nullable.
-   *
    * @param bleServer the BluetoothGatt representing the BLE connection to the device
+   * @param connId the BluetoothGatt Id representing the BLE connection to the device
    * @param deviceId the node ID to assign to the device
    * @param setupPincode the pincode for the device
    * @param csrNonce the 32-byte CSR nonce to use, or null if we want to use an internally randomly
    *     generated CSR nonce.
    */
   public void pairDevice(
-      BluetoothGatt bleServer, long deviceId, long setupPincode, byte[] csrNonce) {
+      BluetoothGatt bleServer,
+      int connId,
+      long deviceId,
+      long setupPincode,
+      @Nullable byte[] csrNonce,
+      NetworkCredentials networkCredentials) {
     if (connectionId == 0) {
-      bleGatt = bleServer;
+      connectionId = connId;
 
-      connectionId = AndroidChipStack.getInstance().addConnection(this);
       if (connectionId == 0) {
         Log.e(TAG, "Failed to add Bluetooth connection.");
         completionListener.onError(new Exception("Failed to add Bluetooth connection."));
@@ -79,7 +84,8 @@ public class ChipDeviceController {
 
       Log.d(TAG, "Bluetooth connection added with ID: " + connectionId);
       Log.d(TAG, "Pairing device with ID: " + deviceId);
-      pairDevice(deviceControllerPtr, deviceId, connectionId, setupPincode, csrNonce);
+      pairDevice(
+          deviceControllerPtr, deviceId, connectionId, setupPincode, csrNonce, networkCredentials);
     } else {
       Log.e(TAG, "Bluetooth connection already in use.");
       completionListener.onError(new Exception("Bluetooth connection already in use."));
@@ -87,31 +93,95 @@ public class ChipDeviceController {
   }
 
   public void pairDeviceWithAddress(
-      long deviceId, String address, int port, int discriminator, long pinCode, byte[] csrNonce) {
+      long deviceId,
+      String address,
+      int port,
+      int discriminator,
+      long pinCode,
+      @Nullable byte[] csrNonce) {
     pairDeviceWithAddress(
         deviceControllerPtr, deviceId, address, port, discriminator, pinCode, csrNonce);
+  }
+
+  public void establishPaseConnection(long deviceId, int connId, long setupPincode) {
+    if (connectionId == 0) {
+      connectionId = connId;
+
+      if (connectionId == 0) {
+        Log.e(TAG, "Failed to add Bluetooth connection.");
+        completionListener.onError(new Exception("Failed to add Bluetooth connection."));
+        return;
+      }
+
+      Log.d(TAG, "Bluetooth connection added with ID: " + connectionId);
+      Log.d(TAG, "Establishing PASE connection with ID: " + deviceId);
+      establishPaseConnection(deviceControllerPtr, deviceId, connId, setupPincode);
+    } else {
+      Log.e(TAG, "Bluetooth connection already in use.");
+      completionListener.onError(new Exception("Bluetooth connection already in use."));
+    }
+  }
+
+  /**
+   * Establish a secure PASE connection to the given device via IP address.
+   *
+   * @param deviceId the ID of the node to connect to
+   * @param address the IP address at which the node is located
+   * @param port the port at which the node is located
+   * @param setupPincode the pincode for this node
+   */
+  public void establishPaseConnection(long deviceId, String address, int port, long setupPincode) {
+    Log.d(TAG, "Establishing PASE connection with ID: " + deviceId);
+    establishPaseConnectionByAddress(deviceControllerPtr, deviceId, address, port, setupPincode);
+  }
+
+  /**
+   * Initiates the automatic commissioning flow using the specified network credentials. It is
+   * expected that a secure session has already been established via {@link
+   * #establishPaseConnection(long, int, long)}.
+   *
+   * @param deviceId the ID of the node to be commissioned
+   * @param networkCredentials the credentials (Wi-Fi or Thread) to be provisioned
+   */
+  public void commissionDevice(long deviceId, @Nullable NetworkCredentials networkCredentials) {
+    commissionDevice(deviceControllerPtr, deviceId, /* csrNonce= */ null, networkCredentials);
+  }
+
+  /**
+   * Initiates the automatic commissioning flow using the specified network credentials. It is
+   * expected that a secure session has already been established via {@link
+   * #establishPaseConnection(long, int, long)}.
+   *
+   * @param deviceId the ID of the node to be commissioned
+   * @param csrNonce a nonce to be used for the CSR request
+   * @param networkCredentials the credentials (Wi-Fi or Thread) to be provisioned
+   */
+  public void commissionDevice(
+      long deviceId, @Nullable byte[] csrNonce, @Nullable NetworkCredentials networkCredentials) {
+    commissionDevice(deviceControllerPtr, deviceId, csrNonce, networkCredentials);
   }
 
   public void unpairDevice(long deviceId) {
     unpairDevice(deviceControllerPtr, deviceId);
   }
 
-  public void pairTestDeviceWithoutSecurity(String ipAddress) {
-    pairTestDeviceWithoutSecurity(deviceControllerPtr, ipAddress);
+  /**
+   * Returns a pointer to a device currently being commissioned. This should be used before the
+   * device is operationally available.
+   */
+  public long getDeviceBeingCommissionedPointer(long nodeId) {
+    return getDeviceBeingCommissionedPointer(deviceControllerPtr, nodeId);
   }
 
   /**
-   * Returns a pointer to a device with the specified nodeId. The device is not guaranteed to be
-   * connected.
+   * Through GetConnectedDeviceCallback, returns a pointer to a connected device or an error.
    *
-   * <p>TODO(#8443): This method and getConnectedDevicePointer() could benefit from ChipDevice
-   * abstraction to hide the pointer passing.
+   * <p>The native code invoked by this method creates a strong reference to the provided callback,
+   * which is released only when GetConnectedDeviceCallback has returned success or failure.
+   *
+   * <p>TODO(#8443): This method could benefit from a ChipDevice abstraction to hide the pointer
+   * passing.
    */
-  public long getDevicePointer(long nodeId) {
-    return getDevicePointer(deviceControllerPtr, nodeId);
-  }
-
-  /** Through GetConnectedDeviceCallback, returns a pointer to a connected device or an error. */
   public void getConnectedDevicePointer(long nodeId, GetConnectedDeviceCallback callback) {
     GetConnectedDeviceCallbackJni jniCallback = new GetConnectedDeviceCallbackJni(callback);
     getConnectedDevicePointer(deviceControllerPtr, nodeId, jniCallback.getCallbackHandle());
@@ -123,10 +193,6 @@ public class ChipDeviceController {
 
   public void onConnectDeviceComplete() {
     completionListener.onConnectDeviceComplete();
-  }
-
-  public void onSendMessageComplete(String message) {
-    completionListener.onSendMessageComplete(message);
   }
 
   public void onStatusUpdate(int status) {
@@ -160,10 +226,7 @@ public class ChipDeviceController {
   }
 
   public void onNotifyChipConnectionClosed(int connId) {
-    // Clear connection state.
-    AndroidChipStack.getInstance().removeConnection(connId);
     connectionId = 0;
-    bleGatt = null;
 
     Log.d(TAG, "Calling onNotifyChipConnectionClosed()");
     completionListener.onNotifyChipConnectionClosed();
@@ -193,13 +256,7 @@ public class ChipDeviceController {
 
     Log.d(TAG, "Closing GATT and removing connection for " + connId);
 
-    // Close gatt
-    bleGatt.close();
-
-    // Clear connection state.
-    AndroidChipStack.getInstance().removeConnection(connId);
     connectionId = 0;
-    bleGatt = null;
     return true;
   }
 
@@ -207,31 +264,127 @@ public class ChipDeviceController {
     return getIpAddress(deviceControllerPtr, deviceId);
   }
 
+  /**
+   * Returns the {@link NetworkLocation} at which the given {@code deviceId} has been found.
+   *
+   * @param deviceId the 64-bit node ID of the device
+   * @throws ChipDeviceControllerException if the device location could not be resolved
+   */
+  public NetworkLocation getNetworkLocation(long deviceId) {
+    return getNetworkLocation(deviceControllerPtr, deviceId);
+  }
+
+  public long getCompressedFabricId() {
+    return getCompressedFabricId(deviceControllerPtr);
+  }
+
   public void updateDevice(long fabricId, long deviceId) {
     updateDevice(deviceControllerPtr, fabricId, deviceId);
   }
 
-  public void sendMessage(long deviceId, String message) {
-    sendMessage(deviceControllerPtr, deviceId, message);
+  public boolean openPairingWindow(long devicePtr, int duration) {
+    return openPairingWindow(deviceControllerPtr, devicePtr, duration);
   }
 
-  public void sendCommand(long deviceId, ChipCommandType command, int value) {
-    sendCommand(deviceControllerPtr, deviceId, command, value);
-  }
-
-  public boolean openPairingWindow(long deviceId, int duration) {
-    return openPairingWindow(deviceControllerPtr, deviceId, duration);
+  public boolean openPairingWindowWithPIN(
+      long devicePtr, int duration, long iteration, int discriminator, long setupPinCode) {
+    return openPairingWindowWithPIN(
+        deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode);
   }
 
   public boolean isActive(long deviceId) {
     return isActive(deviceControllerPtr, deviceId);
   }
 
-  private native long newDeviceController(
-      KeyValueStoreManager manager, ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback);
+  /* Shutdown all cluster attribute subscriptions for a given device */
+  public void shutdownSubscriptions(long devicePtr) {
+    shutdownSubscriptions(deviceControllerPtr, devicePtr);
+  }
+
+  /**
+   * Returns an attestation challenge for the given device, for which there must be an existing
+   * secure session.
+   *
+   * @param devicePtr a pointer to the device from which to retrieve the challenge
+   * @throws ChipDeviceControllerException if there is no secure session for the given device
+   */
+  public byte[] getAttestationChallenge(long devicePtr) {
+    return getAttestationChallenge(deviceControllerPtr, devicePtr);
+  }
+
+  /** Subscribe to the given attribute path. */
+  public void subscribeToPath(
+      SubscriptionEstablishedCallback subscriptionEstablishedCallback,
+      ReportCallback reportCallback,
+      long devicePtr,
+      List<ChipAttributePath> attributePaths,
+      int minInterval,
+      int maxInterval) {
+    ReportCallbackJni jniCallback =
+        new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback);
+    subscribeToPath(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        attributePaths,
+        minInterval,
+        maxInterval);
+  }
+
+  /** Read the given attribute path. */
+  public void readPath(
+      ReportCallback callback, long devicePtr, List<ChipAttributePath> attributePaths) {
+    ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback);
+    readPath(deviceControllerPtr, jniCallback.getCallbackHandle(), devicePtr, attributePaths);
+  }
+
+  /**
+   * Converts a given X.509v3 certificate into a Matter certificate.
+   *
+   * @throws ChipDeviceControllerException if there was an issue during encoding (e.g. out of
+   *     memory, invalid certificate format)
+   */
+  public native byte[] convertX509CertToMatterCert(byte[] x509Cert);
+
+  /**
+   * Generates a new PASE verifier and passcode ID for the given setup PIN code.
+   *
+   * @param devicePtr a pointer to the device object for which to generate the PASE verifier
+   * @param setupPincode the PIN code to use
+   * @param iterations the number of iterations for computing the verifier
+   * @param salt the 16-byte salt
+   */
+  public PaseVerifierParams computePaseVerifier(
+      long devicePtr, long setupPincode, long iterations, byte[] salt) {
+    return computePaseVerifier(deviceControllerPtr, devicePtr, setupPincode, iterations, salt);
+  }
+
+  private native PaseVerifierParams computePaseVerifier(
+      long deviceControllerPtr, long devicePtr, long setupPincode, long iterations, byte[] salt);
+
+  private native void subscribeToPath(
+      long deviceControllerPtr,
+      long callbackHandle,
+      long devicePtr,
+      List<ChipAttributePath> attributePaths,
+      int minInterval,
+      int maxInterval);
+
+  public native void readPath(
+      long deviceControllerPtr,
+      long callbackHandle,
+      long devicePtr,
+      List<ChipAttributePath> attributePaths);
+
+  private native long newDeviceController();
 
   private native void pairDevice(
-      long deviceControllerPtr, long deviceId, int connectionId, long pinCode, byte[] csrNonce);
+      long deviceControllerPtr,
+      long deviceId,
+      int connectionId,
+      long pinCode,
+      @Nullable byte[] csrNonce,
+      NetworkCredentials networkCredentials);
 
   private native void pairDeviceWithAddress(
       long deviceControllerPtr,
@@ -240,16 +393,26 @@ public class ChipDeviceController {
       int port,
       int discriminator,
       long pinCode,
-      byte[] csrNonce);
+      @Nullable byte[] csrNonce);
+
+  private native void establishPaseConnection(
+      long deviceControllerPtr, long deviceId, int connId, long setupPincode);
+
+  private native void establishPaseConnectionByAddress(
+      long deviceControllerPtr, long deviceId, String address, int port, long setupPincode);
+
+  private native void commissionDevice(
+      long deviceControllerPtr,
+      long deviceId,
+      @Nullable byte[] csrNonce,
+      @Nullable NetworkCredentials networkCredentials);
 
   private native void unpairDevice(long deviceControllerPtr, long deviceId);
 
-  private native long getDevicePointer(long deviceControllerPtr, long deviceId);
+  private native long getDeviceBeingCommissionedPointer(long deviceControllerPtr, long nodeId);
 
   private native void getConnectedDevicePointer(
       long deviceControllerPtr, long deviceId, long callbackHandle);
-
-  private native void pairTestDeviceWithoutSecurity(long deviceControllerPtr, String ipAddress);
 
   private native boolean disconnectDevice(long deviceControllerPtr, long deviceId);
 
@@ -257,16 +420,27 @@ public class ChipDeviceController {
 
   private native String getIpAddress(long deviceControllerPtr, long deviceId);
 
+  private native NetworkLocation getNetworkLocation(long deviceControllerPtr, long deviceId);
+
+  private native long getCompressedFabricId(long deviceControllerPtr);
+
   private native void updateDevice(long deviceControllerPtr, long fabricId, long deviceId);
 
-  private native void sendMessage(long deviceControllerPtr, long deviceId, String message);
+  private native boolean openPairingWindow(long deviceControllerPtr, long devicePtr, int duration);
 
-  private native void sendCommand(
-      long deviceControllerPtr, long deviceId, ChipCommandType command, int value);
-
-  private native boolean openPairingWindow(long deviceControllerPtr, long deviceId, int duration);
+  private native boolean openPairingWindowWithPIN(
+      long deviceControllerPtr,
+      long devicePtr,
+      int duration,
+      long iteration,
+      int discriminator,
+      long setupPinCode);
 
   private native boolean isActive(long deviceControllerPtr, long deviceId);
+
+  private native byte[] getAttestationChallenge(long deviceControllerPtr, long devicePtr);
+
+  private native void shutdownSubscriptions(long deviceControllerPtr, long devicePtr);
 
   static {
     System.loadLibrary("CHIPController");
@@ -287,9 +461,6 @@ public class ChipDeviceController {
 
     /** Notifies the completion of "ConnectDevice" command. */
     void onConnectDeviceComplete();
-
-    /** Notifies the completion of "SendMessage" echo command. */
-    void onSendMessageComplete(String message);
 
     /** Notifies the pairing status. */
     void onStatusUpdate(int status);

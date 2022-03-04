@@ -25,14 +25,23 @@ set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/app/sample-defaults.conf prj.conf)
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
+if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.conf)
+  list(APPEND CONF_FILE boards/${BOARD}.conf)
+endif()
+
 project(chip-nrfconnect-shell-example)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
 
-target_compile_options(app PRIVATE -Werror)
+# -Wmaybe-uninitialized has too many false positives, including on std::optional
+# and chip::Optional.  Make it nonfatal.
+#
+# See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80635
+target_compile_options(app PRIVATE -Werror -Wno-error=maybe-uninitialized)
 
 target_include_directories(app PRIVATE
                            ${CMAKE_CURRENT_SOURCE_DIR}
+                           ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common                           
                            ${APP_ROOT}/shell_common/include)
 
 target_sources(app PRIVATE

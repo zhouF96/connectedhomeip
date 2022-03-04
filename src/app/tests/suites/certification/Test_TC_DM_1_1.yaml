@@ -15,13 +15,22 @@
 name: 10.1.1. [TC-DM-1.1] Basic Cluster Server Attributes
 
 config:
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
-    - label: "Query Interaction Model Version"
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Query Data Model Revision"
       command: "readAttribute"
-      attribute: "InteractionModelVersion"
+      attribute: "DataModelRevision"
       response:
           constraints:
               type: uint16
@@ -56,9 +65,9 @@ tests:
           constraints:
               type: uint16
 
-    - label: "Query User Label"
+    - label: "Query Node Label"
       command: "readAttribute"
-      attribute: "UserLabel"
+      attribute: "NodeLabel"
       response:
           constraints:
               type: string
@@ -109,6 +118,7 @@ tests:
     - label: "Query ManufacturingDate"
       command: "readAttribute"
       attribute: "ManufacturingDate"
+      PICS: MANF_DATE
       optional: true
       response:
           constraints:
@@ -120,6 +130,7 @@ tests:
     - label: "Query PartNumber"
       command: "readAttribute"
       attribute: "PartNumber"
+      PICS: PART_NUM
       optional: true
       response:
           constraints:
@@ -169,3 +180,12 @@ tests:
       response:
           constraints:
               type: boolean
+
+    - label: "Query UniqueID"
+      command: "readAttribute"
+      attribute: "UniqueID"
+      optional: true
+      response:
+          constraints:
+              type: string
+              maxLength: 32

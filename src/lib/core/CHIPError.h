@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -91,7 +91,7 @@ public:
         kLwIP       = 0x3, ///< Encapsulated LwIP errors.
         kOpenThread = 0x4, ///< Encapsulated OpenThread errors.
         kPlatform   = 0x5, ///< Platform-defined encapsulation.
-        kLastRange  = kPlatform
+        kLastRange  = kPlatform,
     };
 
     /**
@@ -99,12 +99,14 @@ public:
      */
     enum class SdkPart : uint8_t
     {
-        kCore        = 0, ///< SDK core errors.
-        kInet        = 1, ///< Inet layer errors; see <inet/InetError.h>.
-        kDevice      = 2, ///< Device layer errors; see <platform/CHIPDeviceError.h>.
-        kASN1        = 3, ///< ASN1 errors; see <asn1/ASN1Error.h>.
-        kBLE         = 4, ///< BLE layer errors; see <ble/BleError.h>.
-        kApplication = 7, ///< Application-defined errors; see CHIP_APPLICATION_ERROR
+        kCore            = 0, ///< SDK core errors.
+        kInet            = 1, ///< Inet layer errors; see <inet/InetError.h>.
+        kDevice          = 2, ///< Device layer errors; see <platform/CHIPDeviceError.h>.
+        kASN1            = 3, ///< ASN1 errors; see <asn1/ASN1Error.h>.
+        kBLE             = 4, ///< BLE layer errors; see <ble/BleError.h>.
+        kIMGlobalStatus  = 5, ///< Interaction Model global status code.
+        kIMClusterStatus = 6, ///< Interaction Model cluster-specific status code.
+        kApplication     = 7, ///< Application-defined errors; see CHIP_APPLICATION_ERROR
     };
 
     ChipError() = default;
@@ -146,9 +148,10 @@ public:
      * (In C++20 this could be replaced by a consteval constructor.)
      */
 #if CHIP_CONFIG_ERROR_SOURCE
-#define CHIP_SDK_ERROR(part, code) (::chip::ChipError(chip::ChipError::SdkErrorConstant<(part), (code)>::value, __FILE__, __LINE__))
+#define CHIP_SDK_ERROR(part, code)                                                                                                 \
+    (::chip::ChipError(::chip::ChipError::SdkErrorConstant<(part), (code)>::value, __FILE__, __LINE__))
 #else // CHIP_CONFIG_ERROR_SOURCE
-#define CHIP_SDK_ERROR(part, code) (::chip::ChipError(chip::ChipError::SdkErrorConstant<(part), (code)>::value))
+#define CHIP_SDK_ERROR(part, code) (::chip::ChipError(::chip::ChipError::SdkErrorConstant<(part), (code)>::value))
 #endif // CHIP_CONFIG_ERROR_SOURCE
 
     /**
@@ -260,6 +263,23 @@ public:
         return (mError & (MakeMask(kRangeStart, kRangeLength) | MakeMask(kSdkPartStart, kSdkPartLength))) ==
             (MakeField(kRangeStart, static_cast<StorageType>(Range::kSDK)) |
              MakeField(kSdkPartStart, static_cast<StorageType>(part)));
+    }
+
+    /**
+     * Get the SDK code for an SDK error.
+     */
+    constexpr uint8_t GetSdkCode() const { return static_cast<uint8_t>(GetField(kSdkCodeStart, kSdkCodeLength, mError)); }
+
+    /**
+     * Test whether @a error is an SDK error representing an Interaction Model
+     * status.  If it is, it can be converted to/from an interaction model
+     * StatusIB struct.
+     */
+    constexpr bool IsIMStatus() const
+    {
+        // Open question: should CHIP_NO_ERROR be treated as an IM status for
+        // purposes of this test?
+        return IsPart(SdkPart::kIMGlobalStatus) || IsPart(SdkPart::kIMClusterStatus);
     }
 
 #if CHIP_CONFIG_ERROR_SOURCE
@@ -379,6 +399,14 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_APPLICATION_ERROR(e) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kApplication, (e))
 
 #define CHIP_CORE_ERROR(e) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kCore, (e))
+
+#define CHIP_IM_GLOBAL_STATUS(type)                                                                                                \
+    CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMGlobalStatus, to_underlying(Protocols::InteractionModel::Status::type))
+
+//
+// type must be a compile-time constant as mandated by CHIP_SDK_ERROR.
+//
+#define CHIP_IM_CLUSTER_STATUS(type) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMClusterStatus, type)
 
 // clang-format off
 
@@ -1204,16 +1232,13 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_INVALID_ACCESS_TOKEN                        CHIP_CORE_ERROR(0x58)
 
 /**
- *  @def CHIP_ERROR_WRONG_CERT_SUBJECT
+ *  @def CHIP_ERROR_WRONG_CERT_DN
  *
  *  @brief
- *    A certificate subject is wrong.
+ *    A certificate subject/issuer distinguished name is wrong.
  *
  */
-#define CHIP_ERROR_WRONG_CERT_SUBJECT                          CHIP_CORE_ERROR(0x59)
-
-// deprecated alias
-#define CHIP_ERROR_WRONG_CERTIFICATE_SUBJECT CHIP_ERROR_WRONG_CERT_SUBJECT
+#define CHIP_ERROR_WRONG_CERT_DN                               CHIP_CORE_ERROR(0x59)
 
 /**
  *  @def CHIP_ERROR_INVALID_PROVISIONING_BUNDLE
@@ -1315,13 +1340,13 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_RETRANS_TABLE_FULL                          CHIP_CORE_ERROR(0x64)
 
 /**
- *  @def CHIP_ERROR_INVALID_ACK_ID
+ *  @def CHIP_ERROR_INVALID_ACK_MESSAGE_COUNTER
  *
  *  @brief
  *    An acknowledgment id is invalid.
  *
  */
-#define CHIP_ERROR_INVALID_ACK_ID                              CHIP_CORE_ERROR(0x65)
+#define CHIP_ERROR_INVALID_ACK_MESSAGE_COUNTER                 CHIP_CORE_ERROR(0x65)
 
 /**
  *  @def CHIP_ERROR_SEND_THROTTLED
@@ -1511,7 +1536,7 @@ using CHIP_ERROR = ::chip::ChipError;
  *  @def CHIP_ERROR_INVALID_TAKE_PARAMETER
  *
  *  @brief
- *    Received an invalid TAKE paramter.
+ *    Received an invalid TAKE parameter.
  *
  */
 #define CHIP_ERROR_INVALID_TAKE_PARAMETER                      CHIP_CORE_ERROR(0x7c)
@@ -1867,14 +1892,6 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_INCOMPATIBLE_SCHEMA_VERSION                 CHIP_CORE_ERROR(0xa3)
 
 /**
- *  @def CHIP_ERROR_MISMATCH_UPDATE_REQUIRED_VERSION
- *
- *  @brief
- *    Encountered a mismatch between update required version and current version
- */
-#define CHIP_ERROR_MISMATCH_UPDATE_REQUIRED_VERSION            CHIP_CORE_ERROR(0xa4)
-
-/**
  *  @def CHIP_ERROR_ACCESS_DENIED
  *
  *  @brief
@@ -2010,13 +2027,13 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_UNSUPPORTED_WIRELESS_OPERATING_LOCATION     CHIP_CORE_ERROR(0xb3)
 
 /**
- *  @def CHIP_ERROR_MDNS_COLLISSION
+ *  @def CHIP_ERROR_MDNS_COLLISION
  *
  *  @brief
  *    The registered service name has collision on the LAN.
  *
  */
-#define CHIP_ERROR_MDNS_COLLISSION                             CHIP_CORE_ERROR(0xb4)
+#define CHIP_ERROR_MDNS_COLLISION                             CHIP_CORE_ERROR(0xb4)
 
 /**
  * @def CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH
@@ -2170,7 +2187,218 @@ using CHIP_ERROR = ::chip::ChipError;
  * @brief
  *   The fabric ID in ICA certificate doesn't match the one in NOC.
  */
-#define CHIP_ERROR_FABRIC_MISMATCH_ON_ICA                          CHIP_CORE_ERROR(0xc6)
+#define CHIP_ERROR_FABRIC_MISMATCH_ON_ICA                      CHIP_CORE_ERROR(0xc6)
+
+/**
+ * @def CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW
+ *
+ * @brief
+ *   The message counter of the received message is out of receiving window
+ */
+#define CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW               CHIP_CORE_ERROR(0xc7)
+
+/**
+ * @def CHIP_ERROR_REBOOT_SIGNAL_RECEIVED
+ *
+ * @brief
+ *   Termination signal is received
+ */
+#define CHIP_ERROR_REBOOT_SIGNAL_RECEIVED                      CHIP_CORE_ERROR(0xc8)
+
+/**
+ * @def CHIP_ERROR_NO_SHARED_TRUSTED_ROOT
+ *
+ * @brief
+ *   The CASE session could not be established as peer's credentials do not have
+ *   a common root of trust.
+ */
+#define CHIP_ERROR_NO_SHARED_TRUSTED_ROOT                      CHIP_CORE_ERROR(0xc9)
+
+/*
+ * @def CHIP_ERROR_IM_STATUS_CODE_RECEIVED
+ *
+ * @brief
+ *   Indicates an IM status code was received. Usually accompanied with
+ *   the actual IM status code.
+ */
+#define CHIP_ERROR_IM_STATUS_CODE_RECEIVED                     CHIP_CORE_ERROR(0xca)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_COMMAND_STATUS_IB
+ *
+ * @brief
+ *   The CommandStatusCodeIB is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_COMMAND_STATUS_IB         CHIP_CORE_ERROR(0xcb)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_IB
+ *
+ * @brief
+ *   The InvokeResponseIB is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_IB         CHIP_CORE_ERROR(0xcc)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_MESSAGE
+ *
+ * @brief
+ *   The InvokeResponseMessage is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_INVOKE_REQUEST_MESSAGE    CHIP_CORE_ERROR(0xcd)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_MESSAGE
+ *
+ * @brief
+ *   The InvokeResponseMessage is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_MESSAGE    CHIP_CORE_ERROR(0xce)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_REPORT_MESSAGE
+ *
+ * @brief
+ *   The InvokeResponseMessage is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_REPORT_MESSAGE    CHIP_CORE_ERROR(0xcf)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_WRITE_REQUEST_MESSAGE
+ *
+ * @brief
+ *   The WriteRequestMessage is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_WRITE_REQUEST_MESSAGE    CHIP_CORE_ERROR(0xd0)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_WRITE_RESPONSE_MESSAGE
+ *
+ * @brief
+ *   The WriteResponseMessage is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_WRITE_RESPONSE_MESSAGE    CHIP_CORE_ERROR(0xd1)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_READ_REQUEST_MESSAGE
+ *
+ * @brief
+ *   The ReadRequestMessage is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_READ_REQUEST_MESSAGE    CHIP_CORE_ERROR(0xd2)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_REQUEST_MESSAGE
+ *
+ * @brief
+ *   The SubscribeRequestMessage is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_REQUEST_MESSAGE    CHIP_CORE_ERROR(0xd3)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_RESPONSE_MESSAGE
+ *
+ * @brief
+ *   The SubscribeResponseMessage is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_RESPONSE_MESSAGE    CHIP_CORE_ERROR(0xd4)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_EVENT_REPORT_IB
+ *
+ * @brief
+ *   The EventReportIB is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_EVENT_REPORT_IB             CHIP_CORE_ERROR(0xd5)
+
+/*
+ * @def CHIP_ERROR_ANOTHER_COMMISSIONING_IN_PROGRESS
+ *
+ * @brief
+ *   Indicates that the commissioning window on the device is already open, and another
+ *   commissioning is in progress
+ */
+#define CHIP_ERROR_ANOTHER_COMMISSIONING_IN_PROGRESS           CHIP_CORE_ERROR(0xd6)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_CLUSTER_PATH_IB
+ *
+ * @brief
+ *   The ClusterPathIB is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_CLUSTER_PATH_IB             CHIP_CORE_ERROR(0xd6)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB
+ *
+ * @brief
+ *   The DataVersionFilterIB is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB             CHIP_CORE_ERROR(0xd7)
+
+/**
+ * @def CHIP_ERROR_NOT_FOUND
+ *
+ * @brief
+ *   The item referenced in the function call was not found
+ */
+#define CHIP_ERROR_NOT_FOUND                                       CHIP_CORE_ERROR(0xd8)
+
+/**
+ * @def CHIP_ERROR_INVALID_SCHEME_PREFIX
+ *
+ * @brief
+ *   The scheme field contains an invalid prefix
+ */
+#define CHIP_ERROR_INVALID_SCHEME_PREFIX             CHIP_CORE_ERROR(0xd6)
+
+/**
+ * @def CHIP_ERROR_MISSING_URI_SEPARATOR
+ *
+ * @brief
+ *   The URI separator is missing
+ */
+#define CHIP_ERROR_MISSING_URI_SEPARATOR             CHIP_CORE_ERROR(0xd7)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE
+ *
+ * @brief
+ *   The Attribute DataElement is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE                    CHIP_CORE_ERROR(0xd8)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE
+ *
+ * @brief
+ *   The Attribute DataElement is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE                    CHIP_CORE_ERROR(0xd9)
+
+/**
+ * @def CHIP_ERROR_INVALID_FILE_IDENTIFIER
+ *
+ * @brief
+ *   The file identifier, encoded in the first few bytes of a processed file,
+ *   has unexpected value.
+ */
+#define CHIP_ERROR_INVALID_FILE_IDENTIFIER                     CHIP_CORE_ERROR(0xda)
 
 /**
  *  @}

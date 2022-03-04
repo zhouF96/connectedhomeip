@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -350,8 +350,8 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_INVALID_ACCESS_TOKEN.AsInteger():
         desc = "Invalid access token";
         break;
-    case CHIP_ERROR_WRONG_CERT_SUBJECT.AsInteger():
-        desc = "Wrong certificate subject";
+    case CHIP_ERROR_WRONG_CERT_DN.AsInteger():
+        desc = "Wrong certificate distinguished name";
         break;
     case CHIP_ERROR_INVALID_PROVISIONING_BUNDLE.AsInteger():
         desc = "Invalid provisioning bundle";
@@ -389,8 +389,8 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_RETRANS_TABLE_FULL.AsInteger():
         desc = "Retransmit Table is already full";
         break;
-    case CHIP_ERROR_INVALID_ACK_ID.AsInteger():
-        desc = "Invalid Acknowledgment Id";
+    case CHIP_ERROR_INVALID_ACK_MESSAGE_COUNTER.AsInteger():
+        desc = "Invalid acknowledged message counter";
         break;
     case CHIP_ERROR_SEND_THROTTLED.AsInteger():
         desc = "Sending to peer is throttled on this Exchange";
@@ -545,9 +545,6 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_INCOMPATIBLE_SCHEMA_VERSION.AsInteger():
         desc = "Incompatible data schema version";
         break;
-    case CHIP_ERROR_MISMATCH_UPDATE_REQUIRED_VERSION.AsInteger():
-        desc = "Update Required Version mismatch";
-        break;
     case CHIP_ERROR_ACCESS_DENIED.AsInteger():
         desc = "The CHIP message is not granted access";
         break;
@@ -593,8 +590,8 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_UNSUPPORTED_WIRELESS_OPERATING_LOCATION.AsInteger():
         desc = "Unsupported wireless operating location";
         break;
-    case CHIP_ERROR_MDNS_COLLISSION.AsInteger():
-        desc = "mDNS collission";
+    case CHIP_ERROR_MDNS_COLLISION.AsInteger():
+        desc = "mDNS collision";
         break;
     case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH.AsInteger():
         desc = "Malformed Interacton Model Attribute Path";
@@ -643,6 +640,60 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
         break;
     case CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED.AsInteger():
         desc = "Duplicate message received";
+        break;
+    case CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW.AsInteger():
+        desc = "Message id out of window";
+        break;
+    case CHIP_ERROR_REBOOT_SIGNAL_RECEIVED.AsInteger():
+        desc = "Termination signal is received";
+        break;
+    case CHIP_ERROR_IM_STATUS_CODE_RECEIVED.AsInteger():
+        desc = "Interaction Model Error";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_COMMAND_STATUS_IB.AsInteger():
+        desc = "Malformed Interaction Model Command Status IB";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_IB.AsInteger():
+        desc = "Malformed Interaction Model Invoke Response code IB";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_INVOKE_REQUEST_MESSAGE.AsInteger():
+        desc = "Malformed Interaction Model Invoke Response Message";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_MESSAGE.AsInteger():
+        desc = "Malformed Interaction Model Invoke Response Message";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_REPORT_MESSAGE.AsInteger():
+        desc = "Malformed Interaction Model Attribute Report Message";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_WRITE_REQUEST_MESSAGE.AsInteger():
+        desc = "Malformed Interaction Model Write Request Message";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_WRITE_RESPONSE_MESSAGE.AsInteger():
+        desc = "Malformed Interaction Model Write Response Message";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_READ_REQUEST_MESSAGE.AsInteger():
+        desc = "Malformed Interaction Model Read Request Message";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_REQUEST_MESSAGE.AsInteger():
+        desc = "Malformed Interaction Model Subscribe Request Message";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_RESPONSE_MESSAGE.AsInteger():
+        desc = "Malformed Interaction Model Subscribe Response Message";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_EVENT_REPORT_IB.AsInteger():
+        desc = "Malformed Interaction Model Event Report IB";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_CLUSTER_PATH_IB.AsInteger():
+        desc = "Malformed Interaction Model Cluster Path IB";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB.AsInteger():
+        desc = "Malformed Interaction Model Data Version Filter IB";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE.AsInteger():
+        desc = "Malformed Interaction Model Status Response Message";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE.AsInteger():
+        desc = "Malformed Interaction Model Timed Request Message";
         break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR

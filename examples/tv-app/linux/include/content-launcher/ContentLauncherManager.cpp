@@ -18,110 +18,62 @@
 
 #include "ContentLauncherManager.h"
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
-#include <app-common/zap-generated/command-id.h>
-
-#include <app/Command.h>
-#include <app/CommandHandler.h>
-#include <app/util/af.h>
-#include <app/util/basic-types.h>
-#include <lib/core/CHIPSafeCasts.h>
-#include <lib/support/CodeUtils.h>
-
-#include <map>
-
 using namespace std;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::DataModel;
+using namespace chip::app::Clusters::ContentLauncher;
 
-CHIP_ERROR ContentLauncherManager::Init()
+ContentLauncherManager::ContentLauncherManager(list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // TODO: Store feature map once it is supported
-    map<string, bool> featureMap;
-    featureMap["CS"] = true;
-    featureMap["UP"] = true;
-    featureMap["WA"] = true;
-
-    SuccessOrExit(err);
-exit:
-    return err;
+    mAcceptHeaderList            = acceptHeaderList;
+    mSupportedStreamingProtocols = supportedStreamingProtocols;
 }
 
-vector<chip::ByteSpan> ContentLauncherManager::proxyGetAcceptsHeader()
+void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
+                                                 const DecodableList<ParameterType> & parameterList, bool autoplay,
+                                                 const CharSpan & data)
 {
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent for endpoint %d", mEndpointId);
+    string dataString(data.data(), data.size());
+
+    LaunchResponseType response;
     // TODO: Insert code here
-    vector<chip::ByteSpan> acceptedHeader;
-    char headerExample[]  = "exampleHeader";
-    int maximumVectorSize = 1;
-
-    for (uint16_t i = 0; i < maximumVectorSize; ++i)
-    {
-        acceptedHeader.push_back(chip::ByteSpan(chip::Uint8::from_char(headerExample), sizeof(headerExample)));
-    }
-    return acceptedHeader;
+    response.data   = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
+    response.status = ContentLauncher::StatusEnum::kSuccess;
+    helper.Success(response);
 }
 
-vector<EmberAfContentLaunchStreamingType> ContentLauncherManager::proxyGetSupportedStreamingTypes()
+void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const CharSpan & contentUrl,
+                                             const CharSpan & displayString, const BrandingInformationType & brandingInformation)
 {
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrl");
+
+    string contentUrlString(contentUrl.data(), contentUrl.size());
+    string displayStringString(displayString.data(), displayString.size());
+
     // TODO: Insert code here
-    vector<EmberAfContentLaunchStreamingType> supportedStreamingTypes;
-    supportedStreamingTypes.push_back(EMBER_ZCL_CONTENT_LAUNCH_STREAMING_TYPE_DASH);
-    supportedStreamingTypes.push_back(EMBER_ZCL_CONTENT_LAUNCH_STREAMING_TYPE_HLS);
-    return supportedStreamingTypes;
+    LaunchResponseType response;
+    response.data   = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
+    response.status = ContentLauncher::StatusEnum::kSuccess;
+    helper.Success(response);
 }
 
-ContentLaunchResponse ContentLauncherManager::proxyLaunchContentRequest(list<ContentLaunchParamater> parameterList, bool autoplay,
-                                                                        string data)
+CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder)
 {
-    // TODO: Insert code here
-    ContentLaunchResponse response;
-    response.data   = "Example data";
-    response.status = EMBER_ZCL_CONTENT_LAUNCH_STATUS_SUCCESS;
-    return response;
-}
-ContentLaunchResponse ContentLauncherManager::proxyLaunchUrlRequest(string contentUrl, string displayString,
-                                                                    ContentLaunchBrandingInformation brandingInformation)
-{
-    // TODO: Insert code here
-    ContentLaunchResponse response;
-    response.data   = "Example data";
-    response.status = EMBER_ZCL_CONTENT_LAUNCH_STATUS_SUCCESS;
-    return response;
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetAcceptHeaderList");
+    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        for (std::string & entry : mAcceptHeaderList)
+        {
+            CharSpan data = CharSpan::fromCharString(entry.c_str());
+            ReturnErrorOnFailure(encoder.Encode(data));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
-static void sendResponse(const char * responseName, ContentLaunchResponse launchResponse, chip::CommandId commandId)
+uint32_t ContentLauncherManager::HandleGetSupportedStreamingProtocols()
 {
-    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_CONTENT_LAUNCH_CLUSTER_ID,
-                              commandId, "us", launchResponse.status, &launchResponse.data);
-
-    EmberStatus status = emberAfSendResponse();
-    if (status != EMBER_SUCCESS)
-    {
-        ChipLogError(Zcl, "Failed to send %s. Error:%d", responseName, static_cast<int>(status));
-    }
-}
-
-bool emberAfContentLauncherClusterLaunchContentCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command,
-                                                        bool autoplay, unsigned char * data)
-{
-
-    string dataString(reinterpret_cast<char *>(data));
-    list<ContentLaunchParamater> parameterList;
-    ContentLaunchResponse response = ContentLauncherManager().proxyLaunchContentRequest(parameterList, autoplay, dataString);
-    sendResponse("LaunchContent", response, ZCL_LAUNCH_CONTENT_RESPONSE_COMMAND_ID);
-    return true;
-}
-
-bool emberAfContentLauncherClusterLaunchURLCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command,
-                                                    unsigned char * contentUrl, unsigned char * displayString)
-{
-    string contentUrlString(reinterpret_cast<char *>(contentUrl));
-    string displayStringString(reinterpret_cast<char *>(displayString));
-    ContentLaunchBrandingInformation brandingInformation;
-    ContentLaunchResponse response =
-        ContentLauncherManager().proxyLaunchUrlRequest(contentUrlString, displayStringString, brandingInformation);
-    sendResponse("LaunchURL", response, ZCL_LAUNCH_URL_RESPONSE_COMMAND_ID);
-    return true;
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetSupportedStreamingProtocols");
+    return mSupportedStreamingProtocols;
 }

@@ -2,11 +2,12 @@
 
 #include "platform/internal/CHIPDeviceLayerInternal.h"
 
-#include <inet/InetLayer.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 #include <platform/ScopedLock.h>
 #include <platform/internal/GenericPlatformManagerImpl.cpp>
+#include <platform/mbed/DiagnosticDataProviderImpl.h>
+#include <platform/mbed/SystemTimeSupport.h>
 #include <rtos/ThisThread.h>
 
 #include "MbedEventTimeout.h"
@@ -23,6 +24,13 @@ using namespace ::chip::System;
 
 namespace chip {
 namespace DeviceLayer {
+
+namespace {
+System::LayerSocketsLoop & SystemLayerSocketsLoop()
+{
+    return static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer());
+}
+} // anonymous namespace
 
 // TODO: Event and timer processing is not efficient from a memory perspective.
 // Both occupy at least 24 bytes when only 4 bytes is required.
@@ -46,8 +54,16 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         mQueue.~EventQueue();
         new (&mQueue) events::EventQueue(event_size * CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE);
 
-        mQueue.background(
-            [&](int t) { MbedEventTimeout::AttachTimeout([&] { SystemLayer.Signal(); }, std::chrono::milliseconds{ t }); });
+        mQueue.background([&](int t) {
+            if (t < 0)
+            {
+                MbedEventTimeout::DetachTimeout();
+            }
+            else
+            {
+                MbedEventTimeout::AttachTimeout([&] { SystemLayerSocketsLoop().Signal(); }, std::chrono::milliseconds{ t });
+            }
+        });
 
         // Reinitialize the Mutexes
         mThisStateMutex.~Mutex();
@@ -57,12 +73,13 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         new (&mChipStackMutex) rtos::Mutex();
 
         // Reinitialize the condition variable
-        mEvenLoopStopCond.~ConditionVariable();
-        new (&mEvenLoopStopCond) rtos::ConditionVariable(mThisStateMutex);
+        mEventLoopCond.~ConditionVariable();
+        new (&mEventLoopCond) rtos::ConditionVariable(mThisStateMutex);
 
         mShouldRunEventLoop.store(false);
 
         mEventLoopHasStopped = false;
+        mEventLoopHasRun     = false;
     }
     else
     {
@@ -75,8 +92,14 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     tcpip_init(NULL, NULL);
 #endif
 
+    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
+    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
+
+    auto err = System::Clock::InitClock_RealTime();
+    SuccessOrExit(err);
+
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
-    auto err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
+    err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
     SuccessOrExit(err);
     mInitialized = true;
 
@@ -98,7 +121,7 @@ void PlatformManagerImpl::_UnlockChipStack()
     mChipStackMutex.unlock();
 }
 
-void PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * eventPtr)
+CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * eventPtr)
 {
     auto handle = mQueue.call([event = *eventPtr, this] {
         LockChipStack();
@@ -109,7 +132,9 @@ void PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * eventPtr)
     if (!handle)
     {
         ChipLogError(DeviceLayer, "Error posting event: Not enough memory");
+        return CHIP_ERROR_NO_MEMORY;
     }
+    return CHIP_NO_ERROR;
 }
 
 void PlatformManagerImpl::ProcessDeviceEvents()
@@ -142,25 +167,27 @@ void PlatformManagerImpl::_RunEventLoop()
         }
 
         mEventLoopHasStopped = false;
+        mEventLoopHasRun     = true;
+        mEventLoopCond.notify_all();
     }
 
     LockChipStack();
 
     ChipLogProgress(DeviceLayer, "CHIP Run event loop");
-    SystemLayer.EventLoopBegins();
-    while (true)
+    SystemLayerSocketsLoop().EventLoopBegins();
+    while (mShouldRunEventLoop.load())
     {
-        SystemLayer.PrepareEvents();
+        SystemLayerSocketsLoop().PrepareEvents();
 
         UnlockChipStack();
-        SystemLayer.WaitForEvents();
+        SystemLayerSocketsLoop().WaitForEvents();
         LockChipStack();
 
-        SystemLayer.HandleEvents();
+        SystemLayerSocketsLoop().HandleEvents();
 
         ProcessDeviceEvents();
     }
-    SystemLayer.EventLoopEnds();
+    SystemLayerSocketsLoop().EventLoopEnds();
 
     UnlockChipStack();
 
@@ -168,7 +195,7 @@ void PlatformManagerImpl::_RunEventLoop()
     {
         mbed::ScopedLock<rtos::Mutex> lock(mThisStateMutex);
         mEventLoopHasStopped = true;
-        mEvenLoopStopCond.notify_all();
+        mEventLoopCond.notify_all();
     }
 }
 
@@ -192,6 +219,9 @@ CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask()
         ChipLogError(DeviceLayer, "Fail to start internal loop task thread");
     }
 
+    // Wait for event loop run
+    mEventLoopCond.wait([this] { return mEventLoopHasRun == true; });
+
     return TranslateOsStatus(error);
 }
 
@@ -210,7 +240,7 @@ CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
 
     // Wake from select so it unblocks processing
     LockChipStack();
-    SystemLayer.Signal();
+    SystemLayerSocketsLoop().Signal();
     UnlockChipStack();
 
     osStatus err = osOK;
@@ -220,7 +250,7 @@ CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
     if (mChipTaskId != rtos::ThisThread::get_id())
     {
         // First it waits for the condition variable to finish
-        mEvenLoopStopCond.wait([this] { return mEventLoopHasStopped == true; });
+        mEventLoopCond.wait([this] { return mEventLoopHasStopped == true; });
 
         // Then if it was running on the internal task, wait for it to finish
         if (mChipTaskId == mLoopTask.get_id())
@@ -234,9 +264,9 @@ CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
     return TranslateOsStatus(err);
 }
 
-CHIP_ERROR PlatformManagerImpl::_StartChipTimer(int64_t durationMS)
+CHIP_ERROR PlatformManagerImpl::_StartChipTimer(System::Clock::Timeout duration)
 {
-    // Let SystemLayer.PrepareSelect() handle timers.
+    // Let LayerSocketsLoop::PrepareSelect() handle timers.
     return CHIP_NO_ERROR;
 }
 
@@ -246,7 +276,13 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     // Call up to the base class _Shutdown() to perform the actual stack de-initialization
     // and clean-up
     //
-    return GenericPlatformManagerImpl<ImplClass>::_Shutdown();
+    auto err = GenericPlatformManagerImpl<ImplClass>::_Shutdown();
+    if (err == CHIP_NO_ERROR)
+    {
+        mInitialized = false;
+        mQueue.background(nullptr);
+    }
+    return err;
 }
 
 CHIP_ERROR PlatformManagerImpl::TranslateOsStatus(osStatus error)

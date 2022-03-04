@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file implements an object for a CHIP Echo unsolicitied
+ *      This file implements an object for a CHIP Echo unsolicited
  *      responder (server).
  *
  */
@@ -53,8 +53,8 @@ void EchoServer::Shutdown()
     }
 }
 
-CHIP_ERROR EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                         const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
+CHIP_ERROR EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                         System::PacketBufferHandle && payload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle response;

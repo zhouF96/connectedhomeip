@@ -68,7 +68,7 @@
 #include CHIP_PLATFORM_CONFIG_INCLUDE
 #endif
 
-/* Include a SystemLayer project-specific configuration file, if defined.
+/* Include a System::Layer project-specific configuration file, if defined.
  *
  * An application or module that incorporates CHIP can define a project configuration
  * file to override standard System Layer configuration with application-specific values.
@@ -79,7 +79,7 @@
 #include SYSTEM_PROJECT_CONFIG_INCLUDE
 #endif // SYSTEM_PROJECT_CONFIG_INCLUDE
 
-/* Include a SystemLayer platform-specific configuration file, if defined.
+/* Include a System::Layer platform-specific configuration file, if defined.
  *
  * A platform configuration file contains overrides to standard System Layer configuration
  * that are specific to the platform or OS on which CHIP is running.  It is typically
@@ -300,7 +300,7 @@
  *          1 -- Message Type
  *          2 -- Exchange Id
  *          4 -- Profile Id
- *          4 -- Acknowleged Message Id
+ *          4 -- Acknowledged Message Id
  *
  *    @note A number of these fields are optional or not presently used. So most headers will be considerably smaller than this.
  */
@@ -321,6 +321,18 @@
 #endif /* CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE */
 
 /**
+ *  @def CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_TYPE
+ *
+ *  @brief
+ *      LwIP @pbuf_type for System::PacketBuffer allocations.
+ *
+ *      Note that this does not affect allocations by LwIP itself, e.g. the normal receive path.
+ */
+#ifndef CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_TYPE
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_TYPE PBUF_POOL
+#endif /* CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_TYPE */
+
+/**
  *  @def CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX
  *
  *  @brief
@@ -331,8 +343,8 @@
  *      Only socket platforms can override the default value. On LwIP-based platforms, the size is derived from the PBUF size
  *      and overriding the value will result in a compile-time error.
  *
- *      This value should be set large enough to accomodate the usage of PacketBuffer in the system. In particular, for the use
- *      in CHIP, the value should be set to accomodate the desired path MTU (i.e. the largest IP packet that can be sent over
+ *      This value should be set large enough to accommodate the usage of PacketBuffer in the system. In particular, for the use
+ *      in CHIP, the value should be set to accommodate the desired path MTU (i.e. the largest IP packet that can be sent over
  *      the network interface) plus any protocol overhead.
  *
  *      For example, sending an IP packet over the tunnel requires additional overheads that depend on platform's network
@@ -438,20 +450,6 @@ struct LwIPEvent;
 #ifndef CHIP_SYSTEM_CONFIG_NUM_TIMERS
 #define CHIP_SYSTEM_CONFIG_NUM_TIMERS 32
 #endif /* CHIP_SYSTEM_CONFIG_NUM_TIMERS */
-
-/**
- *  @def CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
- *
- *  @brief
- *      This defines whether (1) or not (0) the implementation uses the System::Timer pool.
- */
-#ifndef CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
-#if CHIP_SYSTEM_CONFIG_NUM_TIMERS > 0
-#define CHIP_SYSTEM_CONFIG_USE_TIMER_POOL 1
-#else
-#define CHIP_SYSTEM_CONFIG_USE_TIMER_POOL 0
-#endif
-#endif /* CHIP_SYSTEM_CONFIG_USE_TIMER_POOL */
 
 /**
  *  @def CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS

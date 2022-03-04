@@ -18,10 +18,13 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
+#include <app/AttributeAccessInterface.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/Linux/GlibTypeDeleter.h>
 #include <platform/Linux/dbus/openthread/introspect.h>
+#include <platform/NetworkCommissioning.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
@@ -49,6 +52,11 @@ public:
 
     CHIP_ERROR _SetThreadProvision(ByteSpan netInfo);
 
+    void _OnNetworkScanFinished(GAsyncResult * res);
+    static void _OnNetworkScanFinished(GObject * source_object, GAsyncResult * res, gpointer user_data);
+
+    CHIP_ERROR GetExtendedPanId(uint8_t extPanId[Thread::kSizeExtendedPanId]);
+
     void _ErasePersistentInfo();
 
     bool _IsThreadProvisioned();
@@ -57,19 +65,25 @@ public:
 
     bool _IsThreadAttached();
 
+    CHIP_ERROR _AttachToThreadNetwork(ByteSpan netInfo, NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
+
     CHIP_ERROR _SetThreadEnabled(bool val);
+
+    void _OnThreadAttachFinished(void);
+
+    static void _OnThreadBrAttachFinished(GObject * source_object, GAsyncResult * res, gpointer user_data);
 
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType();
 
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
 
-    void _GetThreadPollingConfig(ConnectivityManager::ThreadPollingConfig & pollingConfig);
-
-    CHIP_ERROR _SetThreadPollingConfig(const ConnectivityManager::ThreadPollingConfig & pollingConfig);
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    CHIP_ERROR _GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig);
+    CHIP_ERROR _SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig);
+    CHIP_ERROR _RequestSEDFastPollingMode(bool onOff);
+#endif
 
     bool _HaveMeshConnectivity();
-
-    void _OnMessageLayerActivityChanged(bool messageLayerIsActive);
 
     CHIP_ERROR _GetAndLogThreadStatsCounters();
 
@@ -84,6 +98,12 @@ public:
     CHIP_ERROR _GetPollPeriod(uint32_t & buf);
 
     CHIP_ERROR _JoinerStart();
+
+    void _ResetThreadNetworkDiagnosticsCounts();
+
+    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
+
+    CHIP_ERROR _StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback);
 
     ~ThreadStackManagerImpl() = default;
 
@@ -101,6 +121,19 @@ private:
 
     static constexpr char kPropertyDeviceRole[] = "DeviceRole";
 
+    struct ThreadNetworkScanned
+    {
+        uint16_t panId;
+        uint64_t extendedPanId;
+        uint8_t networkName[16];
+        uint8_t networkNameLen;
+        uint16_t channel;
+        uint8_t version;
+        uint64_t extendedAddress;
+        int8_t rssi;
+        uint8_t lqi;
+    };
+
     std::unique_ptr<OpenthreadIoOpenthreadBorderRouter, GObjectDeleter> mProxy;
 
     static void OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorderRouter * proxy, GVariant * changed_properties,
@@ -109,8 +142,16 @@ private:
 
     Thread::OperationalDataset mDataset = {};
 
+    NetworkCommissioning::ThreadDriver::ScanCallback * mpScanCallback;
+    NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
+
     bool mAttached;
 };
+
+inline void ThreadStackManagerImpl::_OnThreadAttachFinished(void)
+{
+    // stub for ThreadStackManager.h
+}
 
 } // namespace DeviceLayer
 } // namespace chip

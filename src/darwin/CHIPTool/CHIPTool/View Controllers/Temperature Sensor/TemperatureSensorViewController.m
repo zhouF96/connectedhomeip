@@ -14,7 +14,7 @@
 @property (nonatomic, strong) UILabel * temperatureLabel;
 @property (nonatomic, strong) UITextField * minIntervalInSecondsTextField;
 @property (nonatomic, strong) UITextField * maxIntervalInSecondsTextField;
-@property (nonatomic, strong) UITextField * deltaInFahrenheitTextField;
+@property (nonatomic, strong) UITextField * deltaInCelsiusTextField;
 @property (nonatomic, strong) UIButton * sendReportingSetup;
 @end
 
@@ -51,7 +51,7 @@
 {
     [_minIntervalInSecondsTextField resignFirstResponder];
     [_maxIntervalInSecondsTextField resignFirstResponder];
-    [_deltaInFahrenheitTextField resignFirstResponder];
+    [_deltaInCelsiusTextField resignFirstResponder];
 }
 
 - (void)setupUI
@@ -120,15 +120,15 @@
     [maxIntervalInSecondsView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
 
     // Delta
-    _deltaInFahrenheitTextField = [UITextField new];
-    _deltaInFahrenheitTextField.keyboardType = UIKeyboardTypeNumberPad;
-    UILabel * deltaInFahrenheitLabel = [UILabel new];
-    [deltaInFahrenheitLabel setText:@"Delta (F):"];
-    UIView * deltaInFahrenheitView = [CHIPUIViewUtils viewWithLabel:deltaInFahrenheitLabel textField:_deltaInFahrenheitTextField];
-    [stackView addArrangedSubview:deltaInFahrenheitView];
+    _deltaInCelsiusTextField = [UITextField new];
+    _deltaInCelsiusTextField.keyboardType = UIKeyboardTypeNumberPad;
+    UILabel * deltaInCelsiusLabel = [UILabel new];
+    [deltaInCelsiusLabel setText:@"Delta (°C):"];
+    UIView * deltaInCelsiusView = [CHIPUIViewUtils viewWithLabel:deltaInCelsiusLabel textField:_deltaInCelsiusTextField];
+    [stackView addArrangedSubview:deltaInCelsiusView];
 
-    deltaInFahrenheitView.translatesAutoresizingMaskIntoConstraints = false;
-    [deltaInFahrenheitView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
+    deltaInCelsiusView.translatesAutoresizingMaskIntoConstraints = false;
+    [deltaInCelsiusView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
 
     // Reporting button
     _sendReportingSetup = [UIButton new];
@@ -173,13 +173,11 @@
                 CHIPTemperatureMeasurement * cluster =
                     [[CHIPTemperatureMeasurement alloc] initWithDevice:chipDevice endpoint:1 queue:dispatch_get_main_queue()];
 
-                [cluster
-                    readAttributeMeasuredValueWithResponseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
-                        if (error != nil)
-                            return;
-                        NSNumber * value = values[@"value"];
-                        [self updateTempInUI:value.shortValue];
-                    }];
+                [cluster readAttributeMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                    if (error != nil)
+                        return;
+                    [self updateTempInUI:value.shortValue];
+                }];
             } else {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }
@@ -194,33 +192,30 @@
 {
     int minIntervalSeconds = [_minIntervalInSecondsTextField.text intValue];
     int maxIntervalSeconds = [_maxIntervalInSecondsTextField.text intValue];
-    int deltaInFahrenheit = [_deltaInFahrenheitTextField.text intValue];
+    int deltaInCelsius = [_deltaInCelsiusTextField.text intValue];
 
-    NSLog(@"Sending temp reporting values: min %@ max %@ value %@", @(minIntervalSeconds), @(maxIntervalSeconds),
-        @(deltaInFahrenheit));
+    NSLog(
+        @"Sending temp reporting values: min %@ max %@ value %@", @(minIntervalSeconds), @(maxIntervalSeconds), @(deltaInCelsius));
 
     if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
                 CHIPTemperatureMeasurement * cluster =
                     [[CHIPTemperatureMeasurement alloc] initWithDevice:chipDevice endpoint:1 queue:dispatch_get_main_queue()];
-
-                [cluster
-                    configureAttributeMeasuredValueWithMinInterval:minIntervalSeconds
-                                                       maxInterval:maxIntervalSeconds
-                                                            change:deltaInFahrenheit
-                                                   responseHandler:^(NSError * error, NSDictionary * values) {
-                                                       if (error == nil)
-                                                           return;
-                                                       NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@",
-                                                           [error description]);
-                                                   }];
-
-                [cluster reportAttributeMeasuredValueWithResponseHandler:^(NSError * error, NSDictionary * values) {
-                    if (error != nil)
-                        return;
-                    NSNumber * value = values[@"value"];
-                    [self updateTempInUI:value.shortValue];
-                }];
+                CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+                params.keepPreviousSubscriptions = @YES;
+                [cluster subscribeAttributeMeasuredValueWithMinInterval:@(minIntervalSeconds)
+                                                            maxInterval:@(maxIntervalSeconds)
+                                                                 params:params
+                                                subscriptionEstablished:nil
+                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                              if (error) {
+                                                                  NSLog(@"Status: update reportAttributeMeasuredValue completed "
+                                                                        @"with error %@",
+                                                                      [error description]);
+                                                                  return;
+                                                              }
+                                                              [self updateTempInUI:value.shortValue];
+                                                          }];
             } else {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }

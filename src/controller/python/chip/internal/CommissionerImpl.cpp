@@ -17,7 +17,10 @@
 #include <memory>
 
 #include <controller/CHIPDeviceController.h>
+#include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/ThreadOperationalDataset.h>
@@ -27,6 +30,8 @@
 
 #include "ChipThreadWork.h"
 
+using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
+
 namespace {
 
 class ServerStorageDelegate : public chip::PersistentStorageDelegate
@@ -35,7 +40,10 @@ public:
     CHIP_ERROR
     SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
-        return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
+        size_t bytesRead = 0;
+        CHIP_ERROR err   = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead);
+        size             = static_cast<uint16_t>(bytesRead);
+        return err;
     }
 
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
@@ -74,6 +82,7 @@ private:
 };
 
 ServerStorageDelegate gServerStorage;
+chip::SimpleFabricStorage gFabricStorage;
 ScriptDevicePairingDelegate gPairingDelegate;
 chip::Controller::ExampleOperationalCredentialsIssuer gOperationalCredentialsIssuer;
 
@@ -95,18 +104,27 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
 
         // System and Inet layers explicitly passed to indicate that the CHIP stack is
         // already assumed initialized
-        chip::Controller::CommissionerInitParams params;
-
-        params.storageDelegate = &gServerStorage;
-        params.systemLayer     = &chip::DeviceLayer::SystemLayer;
-        params.inetLayer       = &chip::DeviceLayer::InetLayer;
-        params.pairingDelegate = &gPairingDelegate;
-
+        chip::Controller::SetupParams commissionerParams;
+        chip::Controller::FactoryInitParams factoryParams;
         chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
         chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
         chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
-
         chip::Crypto::P256Keypair ephemeralKey;
+
+        // Initialize device attestation verifier
+        // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
+        const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
+        chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
+
+        err = gFabricStorage.Initialize(&gServerStorage);
+        SuccessOrExit(err);
+
+        factoryParams.fabricStorage            = &gFabricStorage;
+        factoryParams.fabricIndependentStorage = &gServerStorage;
+
+        commissionerParams.pairingDelegate = &gPairingDelegate;
+        commissionerParams.storageDelegate = &gServerStorage;
+
         err = ephemeralKey.Initialize();
         SuccessOrExit(err);
 
@@ -125,17 +143,18 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
             chip::MutableByteSpan nocSpan(noc.Get(), chip::Controller::kMaxCHIPDERCertLength);
             chip::MutableByteSpan icacSpan(icac.Get(), chip::Controller::kMaxCHIPDERCertLength);
             chip::MutableByteSpan rcacSpan(rcac.Get(), chip::Controller::kMaxCHIPDERCertLength);
-            err = gOperationalCredentialsIssuer.GenerateNOCChainAfterValidation(localDeviceId, 0, ephemeralKey.Pubkey(), rcacSpan,
-                                                                                icacSpan, nocSpan);
+            err = gOperationalCredentialsIssuer.GenerateNOCChainAfterValidation(localDeviceId, /* fabricId = */ 1,
+                                                                                ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
             SuccessOrExit(err);
 
-            params.operationalCredentialsDelegate = &gOperationalCredentialsIssuer;
-            params.ephemeralKeypair               = &ephemeralKey;
-            params.controllerRCAC                 = rcacSpan;
-            params.controllerICAC                 = icacSpan;
-            params.controllerNOC                  = nocSpan;
+            commissionerParams.operationalCredentialsDelegate = &gOperationalCredentialsIssuer;
+            commissionerParams.operationalKeypair             = &ephemeralKey;
+            commissionerParams.controllerRCAC                 = rcacSpan;
+            commissionerParams.controllerICAC                 = icacSpan;
+            commissionerParams.controllerNOC                  = nocSpan;
 
-            err = result->Init(params);
+            SuccessOrExit(DeviceControllerFactory::GetInstance().Init(factoryParams));
+            err = DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, *result);
         }
     exit:
         ChipLogProgress(Controller, "Commissioner initialization status: %s", chip::ErrorStr(err));
@@ -173,7 +192,7 @@ pychip_internal_Commissioner_BleConnectForPairing(chip::Controller::DeviceCommis
     chip::python::ChipMainThreadScheduleAndWait([&]() {
         chip::RendezvousParameters params;
 
-        params.SetDiscriminator(discriminator).SetSetupPINCode(pinCode).SetRemoteNodeId(remoteNodeId);
+        params.SetDiscriminator(discriminator).SetSetupPINCode(pinCode);
 #if CONFIG_NETWORK_LAYER_BLE
         params.SetBleLayer(chip::DeviceLayer::ConnectivityMgr().GetBleLayer()).SetPeerAddress(chip::Transport::PeerAddress::BLE());
 #endif

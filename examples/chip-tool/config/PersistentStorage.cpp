@@ -32,13 +32,20 @@ using namespace ::chip;
 using namespace ::chip::Controller;
 using namespace ::chip::Logging;
 
-constexpr const char kFilename[]           = "/tmp/chip_tool_config.ini";
 constexpr const char kDefaultSectionName[] = "Default";
 constexpr const char kPortKey[]            = "ListenPort";
 constexpr const char kLoggingKey[]         = "LoggingLevel";
 constexpr const char kLocalNodeIdKey[]     = "LocalNodeId";
-constexpr const char kRemoteNodeIdKey[]    = "RemoteNodeId";
 constexpr LogCategory kDefaultLoggingLevel = kLogCategory_Detail;
+
+std::string GetFilename(const char * name)
+{
+    if (name == nullptr)
+    {
+        return "/tmp/chip_tool_config.ini";
+    }
+    return "/tmp/chip_tool_config." + std::string(name) + ".ini";
+}
 
 namespace {
 
@@ -71,22 +78,22 @@ std::string Base64ToString(const std::string & b64Value)
 
 } // namespace
 
-CHIP_ERROR PersistentStorage::Init()
+CHIP_ERROR PersistentStorage::Init(const char * name)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     std::ifstream ifs;
-    ifs.open(kFilename, std::ifstream::in);
+    ifs.open(GetFilename(name), std::ifstream::in);
     if (!ifs.good())
     {
-        CommitConfig();
-        ifs.open(kFilename, std::ifstream::in);
+        CommitConfig(name);
+        ifs.open(GetFilename(name), std::ifstream::in);
     }
     VerifyOrExit(ifs.is_open(), err = CHIP_ERROR_OPEN_FAILED);
 
+    mName = name;
     mConfig.parse(ifs);
     ifs.close();
-
 exit:
     return err;
 }
@@ -97,7 +104,7 @@ CHIP_ERROR PersistentStorage::SyncGetKeyValue(const char * key, void * value, ui
 
     auto section = mConfig.sections[kDefaultSectionName];
     auto it      = section.find(key);
-    ReturnErrorCodeIf(it == section.end(), CHIP_ERROR_KEY_NOT_FOUND);
+    ReturnErrorCodeIf(it == section.end(), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
     ReturnErrorCodeIf(!inipp::extract(section[key], iniValue), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -122,25 +129,27 @@ CHIP_ERROR PersistentStorage::SyncSetKeyValue(const char * key, const void * val
     section[key] = StringToBase64(std::string(static_cast<const char *>(value), size));
 
     mConfig.sections[kDefaultSectionName] = section;
-    return CommitConfig();
+    return CommitConfig(mName);
 }
 
 CHIP_ERROR PersistentStorage::SyncDeleteKeyValue(const char * key)
 {
     auto section = mConfig.sections[kDefaultSectionName];
+    auto it      = section.find(key);
+    ReturnErrorCodeIf(it == section.end(), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+
     section.erase(key);
 
     mConfig.sections[kDefaultSectionName] = section;
-    return CommitConfig();
+    return CommitConfig(mName);
 }
 
-CHIP_ERROR PersistentStorage::CommitConfig()
+CHIP_ERROR PersistentStorage::CommitConfig(const char * name)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     std::ofstream ofs;
-    std::string tmpPath = kFilename;
-    tmpPath.append(".tmp");
+    std::string tmpPath = GetFilename(name) + ".tmp";
     ofs.open(tmpPath, std::ofstream::out | std::ofstream::trunc);
     VerifyOrExit(ofs.good(), err = CHIP_ERROR_WRITE_FAILED);
 
@@ -148,7 +157,7 @@ CHIP_ERROR PersistentStorage::CommitConfig()
     ofs.close();
     VerifyOrExit(ofs.good(), err = CHIP_ERROR_WRITE_FAILED);
 
-    VerifyOrExit(rename(tmpPath.c_str(), kFilename) == 0, err = CHIP_ERROR_WRITE_FAILED);
+    VerifyOrExit(rename(tmpPath.c_str(), GetFilename(name).c_str()) == 0, err = CHIP_ERROR_WRITE_FAILED);
 
 exit:
     return err;
@@ -157,9 +166,10 @@ exit:
 uint16_t PersistentStorage::GetListenPort()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
     // By default chip-tool listens on CHIP_PORT + 1. This is done in order to avoid
     // having 2 servers listening on CHIP_PORT when one runs an accessory server locally.
-    uint16_t chipListenPort = CHIP_PORT + 1;
+    uint16_t chipListenPort = static_cast<uint16_t>(CHIP_PORT + 1);
 
     char value[6];
     uint16_t size = static_cast<uint16_t>(sizeof(value));
@@ -209,43 +219,23 @@ LogCategory PersistentStorage::GetLoggingLevel()
     return chipLogLevel;
 }
 
-NodeId PersistentStorage::GetNodeId(const char * key, NodeId defaultVal)
+NodeId PersistentStorage::GetLocalNodeId()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     uint64_t nodeId;
     uint16_t size = static_cast<uint16_t>(sizeof(nodeId));
-    err           = SyncGetKeyValue(key, &nodeId, size);
+    err           = SyncGetKeyValue(kLocalNodeIdKey, &nodeId, size);
     if (err == CHIP_NO_ERROR)
     {
         return static_cast<NodeId>(Encoding::LittleEndian::HostSwap64(nodeId));
     }
 
-    return defaultVal;
+    return kTestControllerNodeId;
 }
 
-NodeId PersistentStorage::GetLocalNodeId()
-{
-    return GetNodeId(kLocalNodeIdKey, kTestControllerNodeId);
-}
-
-NodeId PersistentStorage::GetRemoteNodeId()
-{
-    return GetNodeId(kRemoteNodeIdKey, kTestDeviceNodeId);
-}
-
-CHIP_ERROR PersistentStorage::SetNodeId(const char * key, NodeId value)
+CHIP_ERROR PersistentStorage::SetLocalNodeId(NodeId value)
 {
     uint64_t nodeId = Encoding::LittleEndian::HostSwap64(value);
-    return SyncSetKeyValue(key, &nodeId, sizeof(nodeId));
-}
-
-CHIP_ERROR PersistentStorage::SetLocalNodeId(NodeId nodeId)
-{
-    return SetNodeId(kLocalNodeIdKey, nodeId);
-}
-
-CHIP_ERROR PersistentStorage::SetRemoteNodeId(NodeId nodeId)
-{
-    return SetNodeId(kRemoteNodeIdKey, nodeId);
+    return SyncSetKeyValue(kLocalNodeIdKey, &nodeId, sizeof(nodeId));
 }

@@ -24,7 +24,8 @@
 
 #pragma once
 
-#include <app/MessageDef/ReportData.h>
+#include <access/AccessControl.h>
+#include <app/MessageDef/ReportDataMessage.h>
 #include <app/ReadHandler.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
@@ -60,6 +61,12 @@ public:
      */
     CHIP_ERROR Init();
 
+    void Shutdown();
+
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    void SetWriterReserved(uint32_t aReservedSize) { mReservedSize = aReservedSize; }
+#endif
+
     /**
      * Main work-horse function that executes the run-loop.
      */
@@ -77,6 +84,44 @@ public:
      */
     CHIP_ERROR ScheduleRun();
 
+    /**
+     * Application marks mutated change path and would be sent out in later report.
+     */
+    CHIP_ERROR SetDirty(ClusterInfo & aClusterInfo);
+
+    /**
+     * @brief
+     *  Schedule the event delivery
+     *
+     */
+    CHIP_ERROR ScheduleEventDelivery(ConcreteEventPath & aPath, EventOptions::Type aUrgent, uint32_t aBytesWritten);
+
+    /*
+     * Resets the tracker that tracks the currently serviced read handler.
+     * apReadHandler can be non-null to indicate that the reset is due to a
+     * specific ReadHandler being deallocated.
+     */
+    void ResetReadHandlerTracker(ReadHandler * apReadHandlerBeingDeleted)
+    {
+        if (apReadHandlerBeingDeleted == mRunningReadHandler)
+        {
+            // Just decrement, so our increment after we finish running it will
+            // do the right thing.
+            --mCurReadHandlerIdx;
+        }
+        else
+        {
+            // No idea what to do here to make the indexing sane.  Just start at
+            // the beginning.  We need to do better here; see
+            // https://github.com/project-chip/connectedhomeip/issues/13809
+            mCurReadHandlerIdx = 0;
+        }
+    }
+
+    uint32_t GetNumReportsInFlight() { return mNumReportsInFlight; }
+
+    void ScheduleUrgentEventDeliverySync();
+
 private:
     friend class TestReportingEngine;
     /**
@@ -85,16 +130,33 @@ private:
      */
     CHIP_ERROR BuildAndSendSingleReportData(ReadHandler * apReadHandler);
 
-    CHIP_ERROR BuildSingleReportDataAttributeDataList(ReportData::Builder & reportDataBuilder, ReadHandler * apReadHandler);
-    CHIP_ERROR BuildSingleReportDataEventList(ReportData::Builder & reportDataBuilder, ReadHandler * apReadHandler);
-    CHIP_ERROR RetrieveClusterData(AttributeDataList::Builder & aAttributeDataList, ClusterInfo & aClusterInfo);
-    EventNumber CountEvents(ReadHandler * apReadHandler, EventNumber * apInitialEvents);
+    CHIP_ERROR BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler,
+                                                       bool * apHasMoreChunks, bool * apHasEncodedData);
+    CHIP_ERROR BuildSingleReportDataEventReports(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler,
+                                                 bool * apHasMoreChunks, bool * apHasEncodedData);
+    CHIP_ERROR RetrieveClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
+                                   AttributeReportIBs::Builder & aAttributeReportIBs,
+                                   const ConcreteReadAttributePath & aClusterInfo,
+                                   AttributeValueEncoder::AttributeEncodeState * apEncoderState);
 
+    // If version match, it means don't send, if version mismatch, it means send.
+    // If client sends the same path with multiple data versions, client will get the data back per the spec, because at least one
+    // of those will fail to match.  This function should return false if either nothing in the list matches the given
+    // endpoint+cluster in the path or there is an entry in the list that matches the endpoint+cluster in the path but does not
+    // match the current data version of that cluster.
+    bool IsClusterDataVersionMatch(ClusterInfo * aDataVersionFilterList, const ConcreteReadAttributePath & aPath);
+
+    /**
+     * Check all active subscription, if the subscription has no paths that intersect with global dirty set,
+     * it would clear dirty flag for that subscription
+     *
+     */
+    void UpdateReadHandlerDirty(ReadHandler & aReadHandler);
     /**
      * Send Report via ReadHandler
      *
      */
-    CHIP_ERROR SendReport(ReadHandler * apReadHandler, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR SendReport(ReadHandler * apReadHandler, System::PacketBufferHandle && aPayload, bool aHasMoreChunks);
 
     /**
      * Generate and send the report data request when there exists subscription or read request
@@ -102,11 +164,24 @@ private:
      */
     static void Run(System::Layer * aSystemLayer, void * apAppState);
 
+    CHIP_ERROR ScheduleUrgentEventDelivery(ConcreteEventPath & aPath);
+    CHIP_ERROR ScheduleBufferPressureEventDelivery(uint32_t aBytesWritten);
+    void GetMinEventLogPosition(uint32_t & aMinLogPosition);
+
     /**
-     * Boolean to show if more chunk message on the way
+     * If the provided path is a superset of our of our existing paths, update that existing path to match the
+     * provided path.
+     *
+     * Return whether one of our paths is now a superset of the provided path.
+     */
+    bool MergeOverlappedAttributePath(ClusterInfo & aAttributePath);
+
+    /**
+     * Boolean to indicate if ScheduleRun is pending. This flag is used to prevent calling ScheduleRun multiple times
+     * within the same execution context to avoid applying too much pressure on platforms that use small, fixed size event queues.
      *
      */
-    bool mMoreChunkedMessages = false;
+    bool mRunScheduled = false;
 
     /**
      * The number of report date request in flight
@@ -119,6 +194,21 @@ private:
      *
      */
     uint32_t mCurReadHandlerIdx = 0;
+
+    /**
+     * The read handler we're calling BuildAndSendSingleReportData on right now.
+     */
+    ReadHandler * mRunningReadHandler = nullptr;
+
+    /**
+     *  mGlobalDirtySet is used to track the set of attribute/event paths marked dirty for reporting purposes.
+     *
+     */
+    ObjectPool<ClusterInfo, CHIP_IM_SERVER_MAX_NUM_DIRTY_SET> mGlobalDirtySet;
+
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    uint32_t mReservedSize = 0;
+#endif
 };
 
 }; // namespace reporting

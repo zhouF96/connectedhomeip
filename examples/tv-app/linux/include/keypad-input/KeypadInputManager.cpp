@@ -18,31 +18,43 @@
 
 #include "KeypadInputManager.h"
 
-#include <app/util/af.h>
-#include <app/util/basic-types.h>
+using namespace chip;
+using namespace chip::app::Clusters::KeypadInput;
 
-#include <map>
-#include <string>
-
-using namespace std;
-
-CHIP_ERROR KeypadInputManager::Init()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // TODO: Store feature map once it is supported
-    map<string, bool> featureMap;
-    featureMap["NV"] = true;
-    featureMap["LK"] = true;
-    featureMap["NK"] = true;
-
-    SuccessOrExit(err);
-exit:
-    return err;
-}
-
-EmberAfKeypadInputStatus keypadInputClusterSendKey(EmberAfKeypadInputCecKeyCode keyCode)
+void KeypadInputManager::HandleSendKey(CommandResponseHelper<SendKeyResponseType> & helper, const CecKeyCodeType & keycCode)
 {
     // TODO: Insert code here
-    return EMBER_ZCL_KEYPAD_INPUT_STATUS_SUCCESS;
+    Commands::SendKeyResponse::Type response;
+
+    switch (keycCode)
+    {
+    case CecKeyCodeType::kUp:
+        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        break;
+    case CecKeyCodeType::kDown:
+        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        break;
+    case CecKeyCodeType::kLeft:
+        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        break;
+    case CecKeyCodeType::kRight:
+        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        break;
+    case CecKeyCodeType::kSelect:
+        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        break;
+    case CecKeyCodeType::kBackward:
+        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        break;
+    case CecKeyCodeType::kExit:
+        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        break;
+    case CecKeyCodeType::kRootMenu:
+        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        break;
+    default:
+        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kUnsupportedKey;
+    }
+
+    helper.Success(response);
 }

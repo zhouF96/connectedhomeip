@@ -24,9 +24,13 @@
 
 #pragma once
 
+#include <access/AccessControl.h>
+#include <app/AttributeAccessInterface.h>
+#include <app/AttributePathExpandIterator.h>
 #include <app/ClusterInfo.h>
 #include <app/EventManagement.h>
-#include <app/InteractionModelDelegate.h>
+#include <app/MessageDef/AttributePathIBs.h>
+#include <app/MessageDef/EventPathIBs.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CodeUtils.h>
@@ -40,6 +44,15 @@
 
 namespace chip {
 namespace app {
+
+//
+// Forward declare the Engine (which is in a different namespace) to be able to use
+// it as a friend class below.
+//
+namespace reporting {
+class Engine;
+}
+
 /**
  *  @class ReadHandler
  *
@@ -50,34 +63,45 @@ namespace app {
 class ReadHandler : public Messaging::ExchangeDelegate
 {
 public:
-    enum class ShutdownOptions
+    using SubjectDescriptor = Access::SubjectDescriptor;
+
+    enum class InteractionType : uint8_t
     {
-        KeepCurrentExchange,
-        AbortCurrentExchange,
+        Read,
+        Subscribe,
+    };
+
+    class Callback
+    {
+    public:
+        virtual ~Callback() = default;
+
+        /*
+         * Method that signals to a registered callback that this object
+         * has completed doing useful work and is now safe for release/destruction.
+         */
+        virtual void OnDone(ReadHandler & apReadHandlerObj) = 0;
     };
 
     /**
-     *  Initialize the ReadHandler. Within the lifetime
-     *  of this instance, this method is invoked once after object
-     *  construction until a call to Shutdown is made to terminate the
-     *  instance.
      *
-     *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
-     *          kState_NotInitialized.
-     *  @retval #CHIP_NO_ERROR On success.
+     *  Constructor.
+     *
+     *  The callback passed in has to outlive this handler object.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
-                    Messaging::ExchangeContext * apExchangeContext);
+    ReadHandler(Callback & apCallback, Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType);
+
+    /*
+     * Destructor - as part of destruction, it will abort the exchange context
+     * if a valid one still exists.
+     *
+     * See Abort() for details on when that might occur.
+     */
+    ~ReadHandler();
 
     /**
-     *  Shut down the ReadHandler. This terminates this instance
-     *  of the object and releases all held resources.
-     *
-     */
-    void Shutdown(ShutdownOptions aOptions = ShutdownOptions::KeepCurrentExchange);
-    /**
-     *  Process a read request.  Parts of the processing may end up being asynchronous, but the ReadHandler
+     *  Process a read/subscribe request.  Parts of the processing may end up being asynchronous, but the ReadHandler
      *  guarantees that it will call Shutdown on itself when processing is done (including if OnReadInitialRequest
      *  returns an error).
      *
@@ -85,27 +109,34 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR OnReadInitialRequest(System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnInitialRequest(System::PacketBufferHandle && aPayload);
 
     /**
      *  Send ReportData to initiator
      *
      *  @param[in]    aPayload             A payload that has read request data
+     *  @param[in]    aMoreChunks          A flags indicating there will be more chunks expected to be sent for this read request
      *
      *  @retval #Others If fails to send report data
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload);
+    CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload, bool aMoreChunks);
 
-    bool IsFree() const { return mState == HandlerState::Uninitialized; }
-    bool IsReportable() const { return mState == HandlerState::Reportable; }
-    bool IsReporting() const { return mState == HandlerState::Reporting; }
-    virtual ~ReadHandler() = default;
+    /**
+     *  Returns whether this ReadHandler represents a subscription that was created by the other side of the provided exchange.
+     */
+    bool IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext);
 
+    bool IsReportable() const { return mState == HandlerState::GeneratingReports && !mHoldReport && (mDirty || !mHoldSync); }
+    bool IsGeneratingReports() const { return mState == HandlerState::GeneratingReports; }
+    bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
+
+    CHIP_ERROR ProcessDataVersionFilterList(DataVersionFilterIBs::Parser & aDataVersionFilterListParser);
     ClusterInfo * GetAttributeClusterInfolist() { return mpAttributeClusterInfoList; }
     ClusterInfo * GetEventClusterInfolist() { return mpEventClusterInfoList; }
-    EventNumber * GetVendedEventNumberList() { return mSelfProcessedEvents; }
+    ClusterInfo * GetDataVersionFilterlist() const { return mpDataVersionFilterList; }
+    EventNumber & GetEventMin() { return mEventMin; }
     PriorityLevel GetCurrentPriority() { return mCurrentPriority; }
 
     // if current priority is in the middle, it has valid snapshoted last event number, it check cleaness via comparing
@@ -113,36 +144,95 @@ public:
     // sanpshotted last event, check with latest last event number, re-setup snapshoted checkpoint, and compare again.
     bool CheckEventClean(EventManagement & aEventManager);
 
-    // Move to the next dirty priority from critical high priority to debug low priority, where last schedule event number
-    // is larger than current self vended event number
-    void MoveToNextScheduledDirtyPriority();
+    bool IsType(InteractionType type) const { return (mInteractionType == type); }
+    bool IsChunkedReport() { return mIsChunkedReport; }
+    bool IsPriming() { return mIsPrimingReports; }
+    bool IsActiveSubscription() const { return mActiveSubscription; }
+    bool IsFabricFiltered() const { return mIsFabricFiltered; }
+    CHIP_ERROR OnSubscribeRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
+    void GetSubscriptionId(uint64_t & aSubscriptionId) { aSubscriptionId = mSubscriptionId; }
+    AttributePathExpandIterator * GetAttributePathExpandIterator() { return &mAttributePathExpandIterator; }
+    void SetDirty()
+    {
+        mDirty = true;
+        // If the contents of the global dirty set have changed, we need to reset the iterator since the paths
+        // we've sent up till now are no longer valid and need to be invalidated.
+        mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributeClusterInfoList);
+        mAttributeEncoderState       = AttributeValueEncoder::AttributeEncodeState();
+    }
+    void ClearDirty() { mDirty = false; }
+    bool IsDirty() { return mDirty; }
+    NodeId GetInitiatorNodeId() const { return mInitiatorNodeId; }
+    FabricIndex GetAccessingFabricIndex() const { return mSubjectDescriptor.fabricIndex; }
 
-    bool IsInitialReport() { return mInitialReport; }
+    const SubjectDescriptor & GetSubjectDescriptor() const { return mSubjectDescriptor; }
+
+    void UnblockUrgentEventDelivery()
+    {
+        mHoldReport = false;
+        mDirty      = true;
+    }
+
+    const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
+    void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState) { mAttributeEncoderState = aState; }
+    uint32_t GetLastWrittenEventsBytes() { return mLastWrittenEventsBytes; }
+    CHIP_ERROR SendStatusReport(Protocols::InteractionModel::Status aStatus);
 
 private:
+    friend class TestReadInteraction;
+
+    //
+    // The engine needs to be able to Abort/Close a ReadHandler instance upon completion of work for a given read/subscribe
+    // interaction. We do not want to make these methods public just to give an adjacent class in the IM access, since public
+    // should really be taking application usage considerations as well. Hence, make it a friend.
+    //
+    friend class chip::app::reporting::Engine;
+
     enum class HandlerState
     {
-        Uninitialized = 0, ///< The handler has not been initialized
-        Initialized,       ///< The handler has been initialized and is ready
-        Reportable,        ///< The handler has received read request and is waiting for the data to send to be available
-        Reporting,         ///< The handler is reporting
+        Idle,                   ///< The handler has been initialized and is ready
+        GeneratingReports,      ///< The handler has received either a Read or Subscribe request and is the process of generating a
+                                ///< report.
+        AwaitingReportResponse, ///< The handler has sent the report to the client and is awaiting a status response.
+        AwaitingDestruction,    ///< The object has completed its work and is awaiting destruction by the application.
     };
 
+    /*
+     * This forcibly closes the exchange context if a valid one is pointed to. Such a situation does
+     * not arise during normal message processing flows that all normally call Close() above.
+     *
+     * This will eventually call Close() to drive the process of eventually releasing this object (unless called from the
+     * destructor).
+     *
+     * This is only called by a very narrow set of external objects as needed.
+     */
+    void Abort(bool aCalledFromDestructor = false);
+
+    /**
+     * Called internally to signal the completion of all work on this object, gracefully close the
+     * exchange and finally, signal to a registerd callback that it's
+     * safe to release this object.
+     */
+    void Close();
+
+    static void OnUnblockHoldReportCallback(System::Layer * apSystemLayer, void * apAppState);
+    static void OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLayer, void * apAppState);
+    CHIP_ERROR RefreshSubscribeSyncTimer();
+    CHIP_ERROR SendSubscribeResponse();
+    CHIP_ERROR ProcessSubscribeRequest(System::PacketBufferHandle && aPayload);
     CHIP_ERROR ProcessReadRequest(System::PacketBufferHandle && aPayload);
-    CHIP_ERROR ProcessAttributePathList(AttributePathList::Parser & aAttributePathListParser);
-    CHIP_ERROR ProcessEventPathList(EventPathList::Parser & aEventPathListParser);
-    CHIP_ERROR OnStatusReport(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                 const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
+    CHIP_ERROR ProcessAttributePathList(AttributePathIBs::Parser & aAttributePathListParser);
+    CHIP_ERROR ProcessEventPaths(EventPathIBs::Parser & aEventPathsParser);
+    CHIP_ERROR ProcessEventFilters(EventFilterIBs::Parser & aEventFiltersParser);
+    CHIP_ERROR OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                 System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
-    CHIP_ERROR OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                System::PacketBufferHandle && aPayload);
     void MoveToState(const HandlerState aTargetState);
 
     const char * GetStateStr() const;
-
-    // Merges aAttributePath inside the existing internal mpAttributeClusterInfoList
-    bool MergeOverlappedAttributePath(ClusterInfo & aAttributePath);
 
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
 
@@ -150,20 +240,51 @@ private:
     bool mSuppressResponse = false;
 
     // Current Handler state
-    HandlerState mState                      = HandlerState::Uninitialized;
+    HandlerState mState                      = HandlerState::Idle;
     ClusterInfo * mpAttributeClusterInfoList = nullptr;
     ClusterInfo * mpEventClusterInfoList     = nullptr;
+    ClusterInfo * mpDataVersionFilterList    = nullptr;
 
     PriorityLevel mCurrentPriority = PriorityLevel::Invalid;
 
-    // The event number of the last processed event for each priority level
-    EventNumber mSelfProcessedEvents[kNumPriorityLevel];
+    EventNumber mEventMin = 0;
 
     // The last schedule event number snapshoted in the beginning when preparing to fill new events to reports
-    EventNumber mLastScheduledEventNumber[kNumPriorityLevel];
+    EventNumber mLastScheduledEventNumber      = 0;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
-    InteractionModelDelegate * mpDelegate      = nullptr;
-    bool mInitialReport                        = false;
+    Callback & mCallback;
+
+    // Tracks whether we're in the initial phase of receiving priming
+    // reports, which is always true for reads and true for subscriptions
+    // prior to receiving a subscribe response.
+    bool mIsPrimingReports              = true;
+    InteractionType mInteractionType    = InteractionType::Read;
+    uint64_t mSubscriptionId            = 0;
+    uint16_t mMinIntervalFloorSeconds   = 0;
+    uint16_t mMaxIntervalCeilingSeconds = 0;
+    SessionHolder mSessionHandle;
+    // mHoldReport is used to prevent subscription data delivery while we are
+    // waiting for the min reporting interval to elapse.  If we have to send a
+    // report immediately due to an urgent event being queued,
+    // UnblockUrgentEventDelivery can be used to force mHoldReport to false.
+    bool mHoldReport         = false;
+    bool mDirty              = false;
+    bool mActiveSubscription = false;
+    // The flag indicating we are in the middle of a series of chunked report messages, this flag will be cleared during sending
+    // last chunked message.
+    bool mIsChunkedReport                                    = false;
+    NodeId mInitiatorNodeId                                  = kUndefinedNodeId;
+    AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
+    bool mIsFabricFiltered                                   = false;
+    // mHoldSync is used to prevent subscription empty report delivery while we
+    // are waiting for the max reporting interval to elaps.  When mHoldSync
+    // becomes false, we are allowed to send an empty report to keep the
+    // subscription alive on the client.
+    bool mHoldSync                   = false;
+    uint32_t mLastWrittenEventsBytes = 0;
+    SubjectDescriptor mSubjectDescriptor;
+    // The detailed encoding state for a single attribute, used by list chunking feature.
+    AttributeValueEncoder::AttributeEncodeState mAttributeEncoderState;
 };
 } // namespace app
 } // namespace chip

@@ -24,13 +24,11 @@
 
 #include <system/SystemClock.h>
 
-// common private
-#include "SystemLayerPrivate.h"
-
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TimeUtils.h>
 #include <system/SystemError.h>
 
+#include <limits>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -49,32 +47,32 @@
 
 namespace chip {
 namespace System {
+namespace Clock {
 
-bool Clock::IsEarlier(const Clock::MonotonicMilliseconds & inFirst, const Clock::MonotonicMilliseconds & inSecond)
-{
-    static const Clock::MonotonicMilliseconds kMaxTime_2 = static_cast<Clock::MonotonicMilliseconds>(
-        (static_cast<Clock::MonotonicMilliseconds>(0) - static_cast<Clock::MonotonicMilliseconds>(1)) / 2);
+namespace Internal {
 
-    // account for timer wrap with the assumption that no two input times will "naturally"
-    // be more than half the timer range apart.
-    return (((inFirst < inSecond) && (inSecond - inFirst < kMaxTime_2)) ||
-            ((inFirst > inSecond) && (inFirst - inSecond > kMaxTime_2)));
-}
+#if CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
+extern ClockImpl gClockImpl;
+#else  // CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
+ClockImpl gClockImpl;
+#endif // CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
+
+ClockBase * gClockBase = &gClockImpl;
+
+} // namespace Internal
 
 #if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
 
-namespace Platform {
-namespace Clock {
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
 
 // -------------------- Default Get/SetClock Functions for POSIX Systems --------------------
-
-#if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
 
 #if !HAVE_CLOCK_GETTIME && !HAVE_GETTIMEOFDAY
 #error "CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS requires either clock_gettime() or gettimeofday()"
 #endif
 
 #if HAVE_CLOCK_GETTIME
+
 #if HAVE_DECL_CLOCK_BOOTTIME
 // CLOCK_BOOTTIME is a Linux-specific option to clock_gettime for a clock which compensates for system sleep.
 #define MONOTONIC_CLOCK_ID CLOCK_BOOTTIME
@@ -83,109 +81,97 @@ namespace Clock {
 // CLOCK_MONOTONIC is defined in POSIX and hence is the default choice
 #define MONOTONIC_CLOCK_ID CLOCK_MONOTONIC
 #endif
-#endif // HAVE_CLOCK_GETTIME
 
-uint64_t GetMonotonicMicroseconds()
-{
-#if HAVE_CLOCK_GETTIME
-    struct timespec ts;
-    int res = clock_gettime(MONOTONIC_CLOCK_ID, &ts);
-    VerifyOrDie(res == 0);
-    return (static_cast<uint64_t>(ts.tv_sec) * kMicrosecondsPerSecond) +
-        (static_cast<uint64_t>(ts.tv_nsec) / kNanosecondsPerMicrosecond);
-#else  // HAVE_CLOCK_GETTIME
-    struct timeval tv;
-    int res = gettimeofday(&tv, NULL);
-    VerifyOrDie(res == 0);
-    return (tv.tv_sec * kMicrosecondsPerSecond) + tv.tv_usec;
-#endif // HAVE_CLOCK_GETTIME
-}
-
-uint64_t GetMonotonicMilliseconds()
-{
-    return GetMonotonicMicroseconds() / kMicrosecondsPerMillisecond;
-}
-
-CHIP_ERROR GetUnixTimeMicroseconds(uint64_t & curTime)
-{
-#if HAVE_CLOCK_GETTIME
-    struct timespec ts;
-    int res = clock_gettime(CLOCK_REALTIME, &ts);
-    if (res != 0)
-    {
-        return MapErrorPOSIX(errno);
-    }
-    if (ts.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
-    {
-        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
-    }
-    curTime = (static_cast<uint64_t>(ts.tv_sec) * kMicrosecondsPerSecond) +
-        (static_cast<uint64_t>(ts.tv_nsec) / kNanosecondsPerMicrosecond);
-    return CHIP_NO_ERROR;
-#else  // HAVE_CLOCK_GETTIME
-    struct timeval tv;
-    int res = gettimeofday(&tv, NULL);
-    if (res != 0)
-    {
-        return MapErrorPOSIX(errno);
-    }
-    if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
-    {
-        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
-    }
-    curTime = (tv.tv_sec * kMicrosecondsPerSecond) + tv.tv_usec;
-    return CHIP_NO_ERROR;
-#endif // HAVE_CLOCK_GETTIME
-}
-
-#if HAVE_CLOCK_SETTIME || HAVE_SETTIMEOFDAY
-
-CHIP_ERROR SetUnixTimeMicroseconds(uint64_t newCurTime)
-{
-#if HAVE_CLOCK_SETTIME
-    struct timespec ts;
-    ts.tv_sec  = static_cast<time_t>(newCurTime / kMicrosecondsPerSecond);
-    ts.tv_nsec = static_cast<long>(newCurTime % kMicrosecondsPerSecond) * kNanosecondsPerMicrosecond;
-    int res    = clock_settime(CLOCK_REALTIME, &ts);
-    if (res != 0)
-    {
-        return (errno == EPERM) ? CHIP_ERROR_ACCESS_DENIED : MapErrorPOSIX(errno);
-    }
-    return CHIP_NO_ERROR;
-#else  // HAVE_CLOCK_SETTIME
-    struct timeval tv;
-    tv.tv_sec  = static_cast<time_t>(newCurTime / kMicrosecondsPerSecond);
-    tv.tv_usec = static_cast<long>(newCurTime % kMicrosecondsPerSecond);
-    int res    = settimeofday(&tv, NULL);
-    if (res != 0)
-    {
-        return (errno == EPERM) ? CHIP_ERROR_ACCESS_DENIED : MapErrorPOSIX(errno);
-    }
-    return CHIP_NO_ERROR;
-#endif // HAVE_CLOCK_SETTIME
-}
-
-#else // !HAVE_CLOCK_SETTTIME
-
-CHIP_ERROR SetUnixTimeMicroseconds(uint64_t newCurTime)
+CHIP_ERROR ClockImpl::GetClock_RealTime(Microseconds64 & aCurTime)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-#endif // HAVE_CLOCK_SETTIME || HAVE_SETTIMEOFDAY
+CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Milliseconds64 & aCurTime)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ClockImpl::SetClock_RealTime(Microseconds64 aNewCurTime)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+Microseconds64 ClockImpl::GetMonotonicMicroseconds64()
+{
+    struct timespec ts;
+    int res = clock_gettime(MONOTONIC_CLOCK_ID, &ts);
+    VerifyOrDie(res == 0);
+    return Seconds64(ts.tv_sec) +
+        std::chrono::duration_cast<Microseconds64>(std::chrono::duration<uint64_t, std::nano>(ts.tv_nsec));
+}
+
+Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
+{
+    return std::chrono::duration_cast<Milliseconds64>(GetMonotonicMicroseconds64());
+}
+
+#endif // HAVE_CLOCK_GETTIME
+
+#if HAVE_GETTIMEOFDAY
+
+CHIP_ERROR ClockImpl::GetClock_RealTime(Microseconds64 & aCurTime)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Milliseconds64 & aCurTime)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ClockImpl::SetClock_RealTime(Microseconds64 aNewCurTime)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+Microseconds64 ClockImpl::GetMonotonicMicroseconds64()
+{
+    struct timeval tv;
+    int res = gettimeofday(&tv, NULL);
+    VerifyOrDie(res == 0);
+    return TimevalToMicroseconds(tv);
+}
+
+Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
+{
+    return std::chrono::duration_cast<Milliseconds64>(GetMonotonicMicroseconds64());
+}
+
+#endif // HAVE_GETTIMEOFDAY
 
 #endif // CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
 
-// -------------------- Default Get/SetClock Functions for LwIP Systems --------------------
-
 #if CHIP_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME
 
-uint64_t GetMonotonicMicroseconds(void)
+// -------------------- Default Get/SetClock Functions for LwIP Systems --------------------
+
+CHIP_ERROR ClockImpl::GetClock_RealTime(Microseconds64 & aCurTime)
 {
-    return GetMonotonicMilliseconds() * kMicrosecondsPerMillisecond;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-uint64_t GetMonotonicMilliseconds(void)
+CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Milliseconds64 & aCurTime)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ClockImpl::SetClock_RealTime(Microseconds64 aNewCurTime)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+Microseconds64 ClockImpl::GetMonotonicMicroseconds64()
+{
+    return GetMonotonicMilliseconds64();
+}
+
+Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
 {
     static volatile uint64_t overflow        = 0;
     static volatile u32_t lastSample         = 0;
@@ -222,41 +208,46 @@ uint64_t GetMonotonicMilliseconds(void)
         sample         = sys_now();
     }
 
-    return static_cast<uint64_t>(overflowSample | static_cast<uint64_t>(sample));
-}
-
-CHIP_ERROR GetUnixTimeMicroseconds(uint64_t & curTime)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-CHIP_ERROR SetUnixTimeMicroseconds(uint64_t newCurTime)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    return Milliseconds64(overflowSample | static_cast<uint64_t>(sample));
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME
-
-} // namespace Clock
-} // namespace Platform
 
 #endif // CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
 
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-Clock::MonotonicMilliseconds TimevalToMilliseconds(const timeval & in)
+Microseconds64 TimevalToMicroseconds(const timeval & tv)
 {
-    return static_cast<Clock::MonotonicMilliseconds>(in.tv_sec) * 1000 +
-        static_cast<Clock::MonotonicMilliseconds>(in.tv_usec / 1000);
+    return Seconds64(tv.tv_sec) + Microseconds64(tv.tv_usec);
 }
 
-void MillisecondsToTimeval(Clock::MonotonicMilliseconds in, timeval & out)
+void ToTimeval(Microseconds64 in, timeval & out)
 {
-    out.tv_sec  = static_cast<time_t>(in / 1000);
-    out.tv_usec = static_cast<suseconds_t>((in % 1000) * 1000);
+    Seconds32 seconds = std::chrono::duration_cast<Seconds32>(in);
+    in -= seconds;
+    out.tv_sec  = static_cast<time_t>(seconds.count());
+    out.tv_usec = static_cast<suseconds_t>(in.count());
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
+static_assert(std::numeric_limits<Microseconds64::rep>::is_integer, "Microseconds64 must be an integer type");
+static_assert(std::numeric_limits<Microseconds32::rep>::is_integer, "Microseconds32 must be an integer type");
+static_assert(std::numeric_limits<Milliseconds64::rep>::is_integer, "Milliseconds64 must be an integer type");
+static_assert(std::numeric_limits<Milliseconds32::rep>::is_integer, "Milliseconds32 must be an integer type");
+static_assert(std::numeric_limits<Seconds64::rep>::is_integer, "Seconds64 must be an integer type");
+static_assert(std::numeric_limits<Seconds32::rep>::is_integer, "Seconds32 must be an integer type");
+static_assert(std::numeric_limits<Seconds16::rep>::is_integer, "Seconds16 must be an integer type");
+
+static_assert(std::numeric_limits<Microseconds64::rep>::digits >= 64, "Microseconds64 must be at least 64 bits");
+static_assert(std::numeric_limits<Microseconds32::rep>::digits >= 32, "Microseconds32 must be at least 32 bits");
+static_assert(std::numeric_limits<Milliseconds64::rep>::digits >= 64, "Milliseconds64 must be at least 64 bits");
+static_assert(std::numeric_limits<Milliseconds32::rep>::digits >= 32, "Milliseconds32 must be at least 32 bits");
+static_assert(std::numeric_limits<Seconds64::rep>::digits >= 64, "Seconds64 must be at least 64 bits");
+static_assert(std::numeric_limits<Seconds32::rep>::digits >= 32, "Seconds32 must be at least 32 bits");
+static_assert(std::numeric_limits<Seconds16::rep>::digits >= 16, "Seconds16 must be at least 16 bits");
+
+} // namespace Clock
 } // namespace System
 } // namespace chip

@@ -26,18 +26,38 @@ include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 # Load NCS/Zephyr build system
 set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/app/sample-defaults.conf prj.conf)
 
-if (EXISTS boards/${BOARD}.conf)
+if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.conf)
   list(APPEND CONF_FILE boards/${BOARD}.conf)
 endif()
 
-# TODO: temporary fix to remove after solving static addressing problem on nrf5340
-if(BOARD STREQUAL "nrf5340dk_nrf5340_cpuapp")
-    list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-bt_private_addresses.conf)
+if(NOT BOARD STREQUAL "nrf52840dongle_nrf52840")
+    set(BUILD_WITH_DFU "MATTER" CACHE STRING "Build target with Device Firmware Upgrade support")
+else()
+    set(BUILD_WITH_DFU "OFF" CACHE STRING "Build target with Device Firmware Upgrade support")
 endif()
 
-option(BUILD_WITH_DFU "Build target with Device Firmware Upgrade support" OFF)
-if(BUILD_WITH_DFU)
-    list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-dfu_support.conf)
+if(NOT BUILD_WITH_DFU STREQUAL "OFF")
+    if(BUILD_WITH_DFU STREQUAL "BLE")
+        if(BOARD STREQUAL "nrf5340dk_nrf5340_cpuapp")
+            list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-multi_image_smp_dfu_support.conf)
+        else()
+            list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-single_image_smp_dfu_support.conf)
+        endif()
+    elseif(NOT BUILD_WITH_DFU STREQUAL "MATTER")
+        message(FATAL_ERROR "Selected invalid BUILD_WITH_DFU value: ${BUILD_WITH_DFU}")
+    endif()
+
+    list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-mcuboot_qspi_nor_support.conf)
+    # Enable Matter OTA Requestor
+    list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-ota_requestor.conf)
+
+    if(BOARD STREQUAL "nrf5340dk_nrf5340_cpuapp")
+        # DFU over Matter doesn't support multi-image update yet, but using this configs should not harm it anyway.
+        set(mcuboot_OVERLAY_CONFIG ${CMAKE_CURRENT_SOURCE_DIR}/configuration/mcuboot_multi_image_dfu.conf CACHE INTERNAL "")
+    else()
+        set(mcuboot_OVERLAY_CONFIG ${CMAKE_CURRENT_SOURCE_DIR}/configuration/mcuboot_single_image_dfu.conf CACHE INTERNAL "")
+    endif()
+    
     set(PM_STATIC_YML_FILE ${CMAKE_CURRENT_SOURCE_DIR}/configuration/${BOARD}/pm_static.yml)
 endif()
 
@@ -47,12 +67,19 @@ find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 project(chip-nrfconnect-lighting-example)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
+include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)
+include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 
-target_compile_options(app PRIVATE -Werror)
+# -Wmaybe-uninitialized has too many false positives, including on std::optional
+# and chip::Optional.  Make it nonfatal.
+#
+# See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80635
+target_compile_options(app PRIVATE -Werror -Wno-error=maybe-uninitialized)
 
 target_include_directories(app PRIVATE
                            main/include
                            ${LIGHTING_COMMON}
+                           ${GEN_DIR}
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/lighting-app
                            ${NLIO_ROOT}
@@ -64,55 +91,20 @@ target_sources(app PRIVATE
                main/LightingManager.cpp
                main/main.cpp
                main/ZclCallbacks.cpp
-               ${GEN_DIR}/lighting-app/zap-generated/attribute-size.cpp
                ${GEN_DIR}/lighting-app/zap-generated/callback-stub.cpp
                ${GEN_DIR}/lighting-app/zap-generated/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
-               ${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
-               ${CHIP_ROOT}/src/app/util/DataModelHandler.cpp
-               ${CHIP_ROOT}/src/app/reporting/reporting-default-configuration.cpp
-               ${CHIP_ROOT}/src/app/reporting/reporting.cpp
-               ${CHIP_ROOT}/src/app/util/af-event.cpp
-               ${CHIP_ROOT}/src/app/util/af-main-common.cpp
-               ${CHIP_ROOT}/src/app/util/attribute-list-byte-span.cpp
-               ${CHIP_ROOT}/src/app/util/attribute-size-util.cpp
-               ${CHIP_ROOT}/src/app/util/attribute-storage.cpp
-               ${CHIP_ROOT}/src/app/util/attribute-table.cpp
-               ${CHIP_ROOT}/src/app/util/binding-table.cpp
-               ${CHIP_ROOT}/src/app/util/chip-message-send.cpp
-               ${CHIP_ROOT}/src/app/util/client-api.cpp
-               ${CHIP_ROOT}/src/app/util/ember-compatibility-functions.cpp
-               ${CHIP_ROOT}/src/app/util/ember-print.cpp
-               ${CHIP_ROOT}/src/app/util/error-mapping.cpp
-               ${CHIP_ROOT}/src/app/util/message.cpp
-               ${CHIP_ROOT}/src/app/util/process-cluster-message.cpp
-               ${CHIP_ROOT}/src/app/util/process-global-message.cpp
-               ${CHIP_ROOT}/src/app/util/util.cpp
-               ${CHIP_ROOT}/src/app/server/EchoHandler.cpp
-               ${CHIP_ROOT}/src/app/server/Mdns.cpp
-               ${CHIP_ROOT}/src/app/server/OnboardingCodesUtil.cpp
-               ${CHIP_ROOT}/src/app/server/RendezvousServer.cpp
-               ${CHIP_ROOT}/src/app/server/Server.cpp
-               ${CHIP_ROOT}/src/app/clusters/administrator-commissioning-server/administrator-commissioning-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/basic/basic.cpp
-               ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp
-               ${CHIP_ROOT}/src/app/clusters/diagnostic-logs-server/diagnostic-logs-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/ethernet_network_diagnostics_server/ethernet_network_diagnostics_server.cpp
-               ${CHIP_ROOT}/src/app/clusters/thread_network_diagnostics_server/thread_network_diagnostics_server.cpp
-               ${CHIP_ROOT}/src/app/clusters/wifi_network_diagnostics_server/wifi_network_diagnostics_server.cpp
-               ${CHIP_ROOT}/src/app/clusters/software_diagnostics_server/software_diagnostics_server.cpp	       
-               ${CHIP_ROOT}/src/app/clusters/general-commissioning-server/general-commissioning-server.cpp               
-               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/operational-credentials-server/operational-credentials-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/level-control/level-control.cpp
-               ${CHIP_ROOT}/src/app/clusters/color-control-server/color-control-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/occupancy-sensor-server/occupancy-sensor-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp
-               ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
-               )
+               ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestor.cpp
+               ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp)
 
-if(BUILD_WITH_DFU)
+chip_configure_data_model(app
+    INCLUDE_SERVER
+    ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../lighting-common/lighting-app.zap
+    GEN_DIR ${GEN_DIR}/lighting-app/zap-generated
+)
+
+if(BUILD_WITH_DFU STREQUAL "BLE")
     target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUOverSMP.cpp)
 endif()
 
@@ -122,6 +114,9 @@ endif()
 
 if (CONFIG_CHIP_PW_RPC)
 
+# Make all targets created below depend on zephyr_interface to inherit MCU-related compilation flags
+link_libraries($<BUILD_INTERFACE:zephyr_interface>)
+
 set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
 include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
 include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
@@ -129,17 +124,42 @@ include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
 pw_set_backend(pw_log pw_log_basic)
 pw_set_backend(pw_assert pw_assert_log)
 pw_set_backend(pw_sys_io pw_sys_io.nrfconnect)
+pw_set_backend(pw_trace pw_trace_tokenized)
 set(dir_pw_third_party_nanopb "${CHIP_ROOT}/third_party/nanopb/repo" CACHE STRING "" FORCE)
 
 add_subdirectory(third_party/connectedhomeip/examples/platform/nrfconnect/pw_sys_io)
 add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)
 add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
 
+pw_proto_library(attributes_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/attributes_service.proto
+  INPUTS
+    ${CHIP_ROOT}/examples/common/pigweed/protos/attributes_service.options
+  PREFIX
+    attributes_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_protos
+)
+
 pw_proto_library(button_service
   SOURCES
     ${CHIP_ROOT}/examples/common/pigweed/protos/button_service.proto
   PREFIX
     button_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_protos
+)
+
+pw_proto_library(descriptor_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/descriptor_service.proto
+  PREFIX
+    descriptor_service
   STRIP_PREFIX
     ${CHIP_ROOT}/examples/common/pigweed/protos
   DEPS
@@ -161,17 +181,45 @@ pw_proto_library(device_service
 
 pw_proto_library(lighting_service
   SOURCES
-    ${CHIP_ROOT}/examples/lighting-app/lighting-common/lighting_service/lighting_service.proto
+    ${CHIP_ROOT}/examples/common/pigweed/protos/lighting_service.proto
   STRIP_PREFIX
-    ${CHIP_ROOT}/examples/lighting-app/lighting-common/
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  PREFIX
+    lighting_service
+  DEPS
+    pw_protobuf.common_protos
+)
+
+pw_proto_library(ot_cli_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/ot_cli_service.proto
+  INPUTS
+    ${CHIP_ROOT}/examples/common/pigweed/protos/ot_cli_service.options
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  PREFIX
+    ot_cli_service
+  DEPS
+    pw_protobuf.common_protos
+)
+
+pw_proto_library(thread_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/thread_service.proto
+  INPUTS
+    ${CHIP_ROOT}/examples/common/pigweed/protos/thread_service.options
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  PREFIX
+    thread_service
   DEPS
     pw_protobuf.common_protos
 )
 
 target_sources(app PRIVATE
-  main/Rpc.cpp
   ../../common/pigweed/RpcService.cpp
   ../../common/pigweed/nrfconnect/PigweedLoggerMutex.cpp
+  ${NRFCONNECT_COMMON}/Rpc.cpp
   ${NRFCONNECT_COMMON}/util/PigweedLogger.cpp
 )
 
@@ -179,21 +227,40 @@ target_include_directories(app PRIVATE
   ${PIGWEED_ROOT}/pw_sys_io/public
   ${CHIP_ROOT}/src/lib/support
   ${CHIP_ROOT}/src/system
+  ${NRFCONNECT_COMMON}
   ../../common
+  ../../common/pigweed
   ../../common/pigweed/nrfconnect)
 
+target_compile_options(app PRIVATE
+                       "-DPW_RPC_ATTRIBUTE_SERVICE=1"
+                       "-DPW_RPC_BUTTON_SERVICE=1"
+                       "-DPW_RPC_DESCRIPTOR_SERVICE=1"
+                       "-DPW_RPC_DEVICE_SERVICE=1"
+                       "-DPW_RPC_LIGHTING_SERVICE=1"
+                       "-DPW_RPC_THREAD_SERVICE=1"
+                       "-DPW_RPC_TRACING_SERVICE=1")
+
 target_link_libraries(app PRIVATE
+  attributes_service.nanopb_rpc
   button_service.nanopb_rpc
+  descriptor_service.nanopb_rpc
   device_service.nanopb_rpc
   lighting_service.nanopb_rpc
+  thread_service.nanopb_rpc
   pw_checksum
   pw_hdlc
   pw_log
   pw_rpc.server
+  pw_trace_tokenized
+  pw_trace_tokenized.trace_buffer
+  pw_trace_tokenized.rpc_service
+  pw_trace_tokenized.protos.nanopb_rpc
 )
 
-target_link_libraries(pw_build INTERFACE zephyr_interface)
+target_link_options(app
+  PUBLIC
+    "-T${PIGWEED_ROOT}/pw_tokenizer/pw_tokenizer_linker_sections.ld"
+)
 
 endif(CONFIG_CHIP_PW_RPC)
-
-include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)

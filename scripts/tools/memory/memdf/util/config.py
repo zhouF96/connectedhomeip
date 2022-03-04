@@ -41,8 +41,8 @@ import memdf.util.pretty
 #               supplied as keyword arguments to `argparse.add_argument()`,
 #               except for:
 #                   'alias': list of alternate command line option names
-#   'postprocess': a callable invoked after argument parsing with two
-#               arguments: the config and the key
+#   'postprocess': a callable invoked after argument parsing with three
+#               arguments: the config, the key, and the description entry.
 #
 # Special keys can be used to control argument parser groups. By default any
 # configuration key containing a ‘.’ belongs to a group determined by the
@@ -157,6 +157,7 @@ class Config:
             arg_info = arg_info.copy()
             name = arg_info.pop('argument', '--' + key.replace('.', '-'))
             names = [name] + arg_info.pop('alias', [])
+            info['names'] = names
             for k in ['metavar', 'choices']:
                 if k in info:
                     arg_info[k] = info[k]
@@ -171,7 +172,7 @@ class Config:
                 elif isinstance(default, int) and 'metavar' not in info:
                     arg_info['action'] = 'count'
             if postprocess := info.get('postprocess'):
-                self.postprocess_args[key] = postprocess
+                self.postprocess_args[key] = (postprocess, info)
 
             group: Optional[str] = info.get('group')
             if group is None and (e := key.find('.')) > 0:
@@ -226,15 +227,22 @@ class Config:
                 key = 'args.' + dest
             self.put(key, value)
 
-        # Postprocess config.
-        for key, action in self.postprocess_args.items():
-            action(self, key)
-
         # Configure logging.
-        verbose = self.get('verbose', 0)
-        level = (logging.DEBUG if verbose > 1 else
-                 logging.INFO if verbose else logging.WARNING)
-        logging.basicConfig(level=level)
+        if self.get('log-level') is None:
+            verbose = self.get('verbose', 0)
+            self.put('log-level',
+                     (logging.DEBUG if verbose > 1 else
+                      logging.INFO if verbose else logging.WARNING))
+        else:
+            self.put('log-level',
+                     getattr(logging, self.get('log-level').upper()))
+        logging.basicConfig(level=self.get('log-level'),
+                            format=self.get('log-format'))
+
+        # Postprocess config.
+        for key, postprocess in self.postprocess_args.items():
+            action, info = postprocess
+            action(self, key, info)
 
         memdf.util.pretty.debug(self.d)
         return self
@@ -285,6 +293,17 @@ class ParseSizeAction(argparse.Action):
 
 # Config description of options shared by all tools.
 CONFIG: ConfigDescription = {
+    'log-level': {
+        'help':
+            'Set logging level: one of critical, error, warning, info, debug.',
+        'default': None,
+        'choices': ['critical', 'error', 'warning', 'info', 'debug'],
+    },
+    'log-format': {
+        'help': 'Set logging format',
+        'metavar': 'FORMAT',
+        'default': '%(message)s',
+    },
     'verbose': {
         'help': 'Show informational messages; repeat for debugging messages',
         'default': 0,

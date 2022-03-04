@@ -31,21 +31,6 @@ namespace chip {
 // The largest supported value for Rendezvous discriminators
 const uint16_t kMaxRendezvousDiscriminatorValue = 0xFFF;
 
-class DLL_EXPORT RendezvousAdvertisementDelegate
-{
-public:
-    /// called to start advertising that rendezvous is possible (commisioning available)
-    virtual CHIP_ERROR StartAdvertisement() const { return CHIP_ERROR_NOT_IMPLEMENTED; }
-
-    /// called when advertisement is not needed for Rendezvous (e.g. got a BLE connection)
-    virtual CHIP_ERROR StopAdvertisement() const { return CHIP_ERROR_NOT_IMPLEMENTED; }
-
-    /// Called when a rendezvous operation is complete
-    virtual void RendezvousComplete() const {}
-
-    virtual ~RendezvousAdvertisementDelegate() {}
-};
-
 class RendezvousParameters
 {
 public:
@@ -63,17 +48,9 @@ public:
 
     bool HasPeerAddress() const { return mPeerAddress.IsInitialized(); }
     Transport::PeerAddress GetPeerAddress() const { return mPeerAddress; }
-    const Optional<ByteSpan> GetCSRNonce() const { return mCSRNonce; }
     RendezvousParameters & SetPeerAddress(const Transport::PeerAddress & peerAddress)
     {
         mPeerAddress = peerAddress;
-        return *this;
-    }
-
-    // The lifetime of the buffer csrNonce is pointing to, should exceed the lifetime of RendezvousParameter object.
-    RendezvousParameters & SetCSRNonce(ByteSpan csrNonce)
-    {
-        mCSRNonce.SetValue(csrNonce);
         return *this;
     }
 
@@ -85,39 +62,12 @@ public:
         return *this;
     }
 
-    bool HasLocalNodeId() const { return mLocalNodeId.HasValue(); }
-    const Optional<NodeId> GetLocalNodeId() const { return mLocalNodeId; }
-    RendezvousParameters & SetLocalNodeId(NodeId nodeId)
-    {
-        mLocalNodeId.SetValue(nodeId);
-        return *this;
-    }
-
-    bool HasRemoteNodeId() const { return mRemoteNodeId.HasValue(); }
-    const Optional<NodeId> GetRemoteNodeId() const { return mRemoteNodeId; }
-    RendezvousParameters & SetRemoteNodeId(NodeId nodeId)
-    {
-        mRemoteNodeId.SetValue(nodeId);
-        return *this;
-    }
-
     bool HasPASEVerifier() const { return mHasPASEVerifier; }
-    bool HasCSRNonce() const { return mCSRNonce.HasValue(); }
-    const PASEVerifier & GetPASEVerifier() const { return mPASEVerifier; }
-    RendezvousParameters & SetPASEVerifier(PASEVerifier & verifier)
+    const Spake2pVerifier & GetPASEVerifier() const { return mPASEVerifier; }
+    RendezvousParameters & SetPASEVerifier(Spake2pVerifier & verifier)
     {
         memmove(&mPASEVerifier, &verifier, sizeof(verifier));
         mHasPASEVerifier = true;
-        return *this;
-    }
-
-    bool HasAdvertisementDelegate() const { return mAdvDelegate != nullptr; }
-
-    const RendezvousAdvertisementDelegate * GetAdvertisementDelegate() const { return mAdvDelegate; }
-
-    RendezvousParameters & SetAdvertisementDelegate(RendezvousAdvertisementDelegate * delegate)
-    {
-        mAdvDelegate = delegate;
         return *this;
     }
 
@@ -142,17 +92,12 @@ public:
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 private:
-    Optional<NodeId> mLocalNodeId;        ///< the local node id
     Transport::PeerAddress mPeerAddress;  ///< the peer node address
-    Optional<NodeId> mRemoteNodeId;       ///< the remote node id
     uint32_t mSetupPINCode  = 0;          ///< the target peripheral setup PIN Code
     uint16_t mDiscriminator = UINT16_MAX; ///< the target peripheral discriminator
-    Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner
 
-    PASEVerifier mPASEVerifier;
+    Spake2pVerifier mPASEVerifier;
     bool mHasPASEVerifier = false;
-
-    RendezvousAdvertisementDelegate * mAdvDelegate = nullptr;
 
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer               = nullptr;

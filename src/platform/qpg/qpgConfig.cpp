@@ -40,16 +40,18 @@ namespace Internal {
 
 CHIP_ERROR QPGConfig::Init()
 {
-    qvCHIP_Nvm_Init();
+    const qvStatus_t status = qvCHIP_KvsInit();
 
-    return CHIP_NO_ERROR;
-}
+    if (QV_STATUS_NO_ERROR == status)
+    {
+        return CHIP_NO_ERROR;
+    }
+    else if (QV_STATUS_BUFFER_TOO_SMALL == status)
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
 
-uint16_t QPGConfig::GetSettingsMaxValueLength(Key key)
-{
-    uint16_t keyLen;
-
-    return (qvCHIP_Nvm_GetMaxKeyLen(key, &keyLen) == QV_STATUS_NO_ERROR) ? keyLen : 0;
+    return CHIP_ERROR_INTERNAL;
 }
 
 CHIP_ERROR QPGConfig::ReadConfigValue(Key key, bool & val)

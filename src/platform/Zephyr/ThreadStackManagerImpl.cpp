@@ -27,7 +27,7 @@
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
 #include <platform/Zephyr/ThreadStackManagerImpl.h>
 
-#include <inet/IPEndPointBasis.h>
+#include <inet/UDPEndPointImpl.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
@@ -46,24 +46,18 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 
     ReturnErrorOnFailure(GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(instance));
 
-    IPEndPointBasis::SetJoinMulticastGroupHandler([](InterfaceId, const IPAddress & address) {
+    UDPEndPointImplSockets::SetJoinMulticastGroupHandler([](InterfaceId, const IPAddress & address) {
         const otIp6Address otAddress = ToOpenThreadIP6Address(address);
         const auto otError           = otIp6SubscribeMulticastAddress(openthread_get_default_instance(), &otAddress);
         return MapOpenThreadError(otError);
     });
 
-    IPEndPointBasis::SetLeaveMulticastGroupHandler([](InterfaceId, const IPAddress & address) {
+    UDPEndPointImplSockets::SetLeaveMulticastGroupHandler([](InterfaceId, const IPAddress & address) {
         const otIp6Address otAddress = ToOpenThreadIP6Address(address);
         const auto otError           = otIp6UnsubscribeMulticastAddress(openthread_get_default_instance(), &otAddress);
         return MapOpenThreadError(otError);
     });
 
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_StartThreadTask()
-{
-    // Intentionally empty.
     return CHIP_NO_ERROR;
 }
 
@@ -83,9 +77,25 @@ void ThreadStackManagerImpl::_UnlockThreadStack()
     openthread_api_mutex_unlock(openthread_get_default_context());
 }
 
-void ThreadStackManagerImpl::_ProcessThreadActivity()
+void ThreadStackManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
-    // Intentionally empty.
+    Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::_OnPlatformEvent(event);
+
+    if (event->Type == DeviceEventType::kThreadStateChange && event->ThreadStateChange.RoleChanged)
+    {
+        const bool isAttached = IsThreadAttached();
+        VerifyOrReturn(isAttached != mIsAttached);
+
+        ChipDeviceEvent attachEvent;
+        attachEvent.Type                            = DeviceEventType::kThreadConnectivityChange;
+        attachEvent.ThreadConnectivityChange.Result = isAttached ? kConnectivity_Established : kConnectivity_Lost;
+
+        CHIP_ERROR error = PlatformMgr().PostEvent(&attachEvent);
+        VerifyOrReturn(error == CHIP_NO_ERROR,
+                       ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, error.Format()));
+
+        mIsAttached = isAttached;
+    }
 }
 
 } // namespace DeviceLayer

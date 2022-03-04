@@ -20,8 +20,20 @@
  *server implementation of the Application Launcher cluster.
  *******************************************************************************
  ******************************************************************************/
-struct ApplicationLauncherResponse
-{
-    uint8_t status;
-    uint8_t * data;
-};
+
+#pragma once
+
+#include "application-launcher-delegate.h"
+#include <app-common/zap-generated/cluster-objects.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ApplicationLauncher {
+
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+
+} // namespace ApplicationLauncher
+} // namespace Clusters
+} // namespace app
+} // namespace chip

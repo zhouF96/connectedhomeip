@@ -27,3 +27,41 @@ config CHIP_NFC_COMMISSIONING
 	imply NFC_NDEF_URI_MSG
 	help
 	  Enables NFC commissioning by sharing onboarding payload in NFC tag.
+
+# See config/zephyr/Kconfig for full definition
+config CHIP_OTA_REQUESTOR
+	bool
+	imply DFU_TARGET
+	imply IMG_MANAGER
+	imply STREAM_FLASH
+	imply STREAM_FLASH_ERASE
+
+config CHIP_OTA_REQUESTOR_BUFFER_SIZE
+	int "OTA Requestor image buffer size"
+	default 1024
+	depends on CHIP_OTA_REQUESTOR
+	help
+	  Configures size of the buffer used by OTA Requestor when downloading and
+	  writing a new firmware image to flash.
+
+config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
+	bool "Auto-reboot when firmware update is applied"
+	default y
+	depends on CHIP_OTA_REQUESTOR
+	imply REBOOT
+	help
+	  When a user consents to apply a firmware update, and the update package is
+	  downloaded, reboot the device automatically to swap the old and the new
+	  firmware images.
+
+# See config/zephyr/Kconfig for full definition
+config CHIP_OTA_IMAGE_BUILD
+	bool
+	default y if CHIP_OTA_REQUESTOR
+	depends on SIGN_IMAGES
+
+config CHIP_DEBUG_SYMBOLS
+	bool "Generate debug symbols"
+	default y
+	help
+	  Build the application with debug symbols.

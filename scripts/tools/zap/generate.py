@@ -93,11 +93,32 @@ def runArgumentsParser():
     return (zap_file, zcl_file, templates_file, output_dir)
 
 
+def extractGeneratedIdl(output_dir, zap_config_path):
+    """Find a file Clusters.matter in the output directory and
+       place it along with the input zap file.
+
+       Intent is to make the "zap content" more humanly understandable.
+    """
+    idl_path = os.path.join(output_dir, "Clusters.matter")
+    if not os.path.exists(idl_path):
+        return
+
+    target_path = zap_config_path.replace(".zap", ".matter")
+    if not target_path.endswith(".matter"):
+        # We expect "something.zap" and don't handle corner cases of
+        # multiple extensions. This is to work with existing codebase only
+        raise Error("Unexpected input zap file  %s" % self.zap_config)
+
+    os.rename(idl_path, target_path)
+
+
 def runGeneration(zap_file, zcl_file, templates_file, output_dir):
     generator_dir = getDirPath('third_party/zap/repo')
     os.chdir(generator_dir)
     subprocess.check_call(['node', './src-script/zap-generate.js', '-z',
                           zcl_file, '-g', templates_file, '-i', zap_file, '-o', output_dir])
+
+    extractGeneratedIdl(output_dir, zap_file)
 
 
 def runClangPrettifier(templates_file, output_dir):
@@ -149,10 +170,18 @@ def runJavaPrettifier(templates_file, output_dir):
 def main():
     checkPythonVersion()
 
+    # The maximum meory usage is over 4GB (#15620)
+    os.environ["NODE_OPTIONS"] = "--max-old-space-size=8192"
     zap_file, zcl_file, templates_file, output_dir = runArgumentsParser()
     runGeneration(zap_file, zcl_file, templates_file, output_dir)
-    runClangPrettifier(templates_file, output_dir)
-    runJavaPrettifier(templates_file, output_dir)
+
+    prettifiers = [
+        runClangPrettifier,
+        runJavaPrettifier,
+    ]
+
+    for prettifier in prettifiers:
+        prettifier(templates_file, output_dir)
 
 
 if __name__ == '__main__':

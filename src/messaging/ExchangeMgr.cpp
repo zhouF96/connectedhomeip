@@ -33,11 +33,11 @@
 #include <inttypes.h>
 #include <stddef.h>
 
+#include <crypto/RandUtils.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/RandUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -59,20 +59,20 @@ namespace Messaging {
  *    prior to use.
  *
  */
-ExchangeManager::ExchangeManager() : mDelegate(nullptr), mReliableMessageMgr(mContextPool)
+ExchangeManager::ExchangeManager() : mReliableMessageMgr(mContextPool)
 {
     mState = State::kState_NotInitialized;
 }
 
-CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
+CHIP_ERROR ExchangeManager::Init(SessionManager * sessionManager)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrReturnError(mState == State::kState_NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
-    mSessionMgr = sessionMgr;
+    mSessionManager = sessionManager;
 
-    mNextExchangeId = GetRandU16();
+    mNextExchangeId = chip::Crypto::GetRandU16();
     mNextKeyId      = 0;
 
     for (auto & handler : UMHandlerPool)
@@ -83,10 +83,9 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
         handler.Reset();
     }
 
-    sessionMgr->SetDelegate(this);
+    sessionManager->SetMessageDelegate(this);
 
-    mReliableMessageMgr.Init(sessionMgr->SystemLayer(), sessionMgr);
-    ReturnErrorOnFailure(mDefaultExchangeDispatch.Init(mSessionMgr));
+    mReliableMessageMgr.Init(sessionManager->SystemLayer());
 
     mState = State::kState_Initialized;
 
@@ -95,18 +94,14 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
 
 CHIP_ERROR ExchangeManager::Shutdown()
 {
+    VerifyOrReturnError(mState == State::kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
+
     mReliableMessageMgr.Shutdown();
 
-    mContextPool.ForEachActiveObject([](auto * ec) {
-        // There should be no active object in the pool
-        assert(false);
-        return true;
-    });
-
-    if (mSessionMgr != nullptr)
+    if (mSessionManager != nullptr)
     {
-        mSessionMgr->SetDelegate(nullptr);
-        mSessionMgr = nullptr;
+        mSessionManager->SetMessageDelegate(nullptr);
+        mSessionManager = nullptr;
     }
 
     mState = State::kState_NotInitialized;
@@ -114,7 +109,7 @@ CHIP_ERROR ExchangeManager::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-ExchangeContext * ExchangeManager::NewContext(SessionHandle session, ExchangeDelegate * delegate)
+ExchangeContext * ExchangeManager::NewContext(const SessionHandle & session, ExchangeDelegate * delegate)
 {
     return mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
 }
@@ -138,16 +133,6 @@ CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForProtocol(Proto
 CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(Protocols::Id protocolId, uint8_t msgType)
 {
     return UnregisterUMH(protocolId, static_cast<int16_t>(msgType));
-}
-
-void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source)
-{
-#if CHIP_ERROR_LOGGING
-    char srcAddressStr[Transport::PeerAddress::kMaxToStringSize];
-    source.ToString(srcAddressStr);
-
-    ChipLogError(ExchangeManager, "Error receiving message from %s: %s", srcAddressStr, ErrorStr(error));
-#endif // CHIP_ERROR_LOGGING
 }
 
 CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegate * delegate)
@@ -196,14 +181,16 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgT
 }
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                        SessionHandle session, const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
-                                        System::PacketBufferHandle && msgBuf)
+                                        const SessionHandle & session, const Transport::PeerAddress & source,
+                                        DuplicateMessage isDuplicate, System::PacketBufferHandle && msgBuf)
 {
     UnsolicitedMessageHandler * matchingUMH = nullptr;
 
-    ChipLogProgress(ExchangeManager, "Received message of type 0x%02x with vendorId 0x%04x and protocolId 0x%04x on exchange %d",
-                    payloadHeader.GetMessageType(), payloadHeader.GetProtocolID().GetVendorId(),
-                    payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetExchangeID());
+    ChipLogProgress(ExchangeManager,
+                    "Received message of type " ChipLogFormatMessageType " with protocolId " ChipLogFormatProtocolId
+                    " and MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchangeId,
+                    payloadHeader.GetMessageType(), ChipLogValueProtocolId(payloadHeader.GetProtocolID()),
+                    packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromReceivedHeader(payloadHeader));
 
     MessageFlags msgFlags;
     if (isDuplicate == DuplicateMessage::Yes)
@@ -211,29 +198,42 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         msgFlags.Set(MessageFlagValues::kDuplicateMessage);
     }
 
-    // Search for an existing exchange that the message applies to. If a match is found...
-    bool found = false;
-    mContextPool.ForEachActiveObject([&](auto * ec) {
-        if (ec->MatchExchange(session, packetHeader, payloadHeader))
-        {
-            // Found a matching exchange. Set flag for correct subsequent MRP
-            // retransmission timeout selection.
-            if (!ec->HasRcvdMsgFromPeer())
-            {
-                ec->SetMsgRcvdFromPeer(true);
-            }
-
-            // Matched ExchangeContext; send to message handler.
-            ec->HandleMessage(packetHeader, payloadHeader, source, msgFlags, std::move(msgBuf));
-            found = true;
-            return false;
-        }
-        return true;
-    });
-
-    if (found)
+    // Skip retrieval of exchange for group message since no exchange is stored
+    // for group msg (optimization)
+    if (!packetHeader.IsGroupSession())
     {
-        return;
+        // Search for an existing exchange that the message applies to. If a match is found...
+        bool found = false;
+        mContextPool.ForEachActiveObject([&](auto * ec) {
+            if (ec->MatchExchange(session, packetHeader, payloadHeader))
+            {
+                // Found a matching exchange. Set flag for correct subsequent MRP
+                // retransmission timeout selection.
+                if (!ec->HasRcvdMsgFromPeer())
+                {
+                    ec->SetMsgRcvdFromPeer(true);
+                }
+
+                ChipLogDetail(ExchangeManager, "Found matching exchange: " ChipLogFormatExchange ", Delegate: %p",
+                              ChipLogValueExchange(ec), ec->GetDelegate());
+
+                // Matched ExchangeContext; send to message handler.
+                ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, source, msgFlags, std::move(msgBuf));
+                found = true;
+                return Loop::Break;
+            }
+            return Loop::Continue;
+        });
+
+        if (found)
+        {
+            return;
+        }
+    }
+    else
+    {
+        ChipLogProgress(ExchangeManager, "Received Groupcast Message with GroupId of %d",
+                        packetHeader.GetDestinationGroupId().Value());
     }
 
     // If it's not a duplicate message, search for an unsolicited message handler if it is marked as being sent by an initiator.
@@ -288,41 +288,23 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             return;
         }
 
-        ChipLogDetail(ExchangeManager, "ec id: %d, Delegate: 0x%p", ec->GetExchangeId(), ec->GetDelegate());
+        ChipLogDetail(ExchangeManager, "Handling via exchange: " ChipLogFormatExchange ", Delegate: %p", ChipLogValueExchange(ec),
+                      ec->GetDelegate());
 
-        CHIP_ERROR err = ec->HandleMessage(packetHeader, payloadHeader, source, msgFlags, std::move(msgBuf));
+        if (ec->IsEncryptionRequired() != packetHeader.IsEncrypted())
+        {
+            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_INVALID_MESSAGE_TYPE));
+            ec->Close();
+            return;
+        }
+
+        CHIP_ERROR err = ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, source, msgFlags, std::move(msgBuf));
         if (err != CHIP_NO_ERROR)
         {
             // Using same error message for all errors to reduce code size.
             ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(err));
         }
     }
-}
-
-void ExchangeManager::OnNewConnection(SessionHandle session)
-{
-    if (mDelegate != nullptr)
-    {
-        mDelegate->OnNewConnection(session, this);
-    }
-}
-
-void ExchangeManager::OnConnectionExpired(SessionHandle session)
-{
-    if (mDelegate != nullptr)
-    {
-        mDelegate->OnConnectionExpired(session, this);
-    }
-
-    mContextPool.ForEachActiveObject([&](auto * ec) {
-        if (ec->mSecureSession.HasValue() && ec->mSecureSession.Value() == session)
-        {
-            ec->OnConnectionExpired();
-            // Continue to iterate because there can be multiple exchanges
-            // associated with the connection.
-        }
-        return true;
-    });
 }
 
 void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * delegate)
@@ -337,7 +319,7 @@ void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * deleg
             ec->SetDelegate(nullptr);
             ec->Close();
         }
-        return true;
+        return Loop::Continue;
     });
 }
 

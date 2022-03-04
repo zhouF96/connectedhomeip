@@ -24,6 +24,7 @@
 
 #include <lib/support/ObjectLifeCycle.h>
 #include <system/SystemLayer.h>
+#include <system/SystemTimer.h>
 
 namespace chip {
 namespace System {
@@ -32,39 +33,28 @@ class LayerImplLwIP : public LayerLwIP
 {
 public:
     LayerImplLwIP();
-    ~LayerImplLwIP() { mLayerState.Destroy(); }
+    ~LayerImplLwIP() { VerifyOrDie(mLayerState.Destroy()); }
 
     // Layer overrides.
     CHIP_ERROR Init() override;
     CHIP_ERROR Shutdown() override;
     bool IsInitialized() const override { return mLayerState.IsInitialized(); }
-    CHIP_ERROR StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState) override;
+    CHIP_ERROR StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
     void CancelTimer(TimerCompleteCallback onComplete, void * appState) override;
     CHIP_ERROR ScheduleWork(TimerCompleteCallback onComplete, void * appState) override;
 
-    // LayerLwIP overrides.
-    CHIP_ERROR AddEventHandlerDelegate(EventHandlerDelegate & aDelegate);
-    CHIP_ERROR PostEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument);
-
 public:
     // Platform implementation.
-    CHIP_ERROR DispatchEvents(void); // XXX called only in a test → PlatformEventing::DispatchEvents → PlatformMgr().RunEventLoop()
-    CHIP_ERROR HandleEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument);
     CHIP_ERROR HandlePlatformTimer(void);
 
 private:
     friend class PlatformEventing;
 
-    static CHIP_ERROR HandleSystemLayerEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument);
+    CHIP_ERROR StartPlatformTimer(System::Clock::Timeout aDelay);
 
-    CHIP_ERROR DispatchEvent(Event aEvent);
-    CHIP_ERROR StartPlatformTimer(uint32_t aDelayMilliseconds);
-
-    static EventHandlerDelegate sSystemEventHandlerDelegate;
-
-    Timer::MutexedList mTimerList;
+    TimerPool<TimerList::Node> mTimerPool;
+    TimerList mTimerList;
     bool mHandlingTimerComplete; // true while handling any timer completion
-    const EventHandlerDelegate * mEventDelegateList;
     ObjectLifeCycle mLayerState;
 };
 

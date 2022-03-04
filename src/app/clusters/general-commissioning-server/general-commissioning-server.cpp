@@ -21,39 +21,182 @@
  *******************************************************************************
  ******************************************************************************/
 
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/internal/DeviceControlServer.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/ConfigurationManager.h>
+#include <platform/DeviceControlServer.h>
 
 using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::GeneralCommissioning;
+using namespace chip::app::Clusters::GeneralCommissioning::Attributes;
+using namespace chip::DeviceLayer;
 
-bool emberAfGeneralCommissioningClusterArmFailSafeCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                           uint16_t expiryLengthSeconds, uint64_t breadcrumb, uint32_t timeoutMs)
+#define CheckSuccess(expr, code)                                                                                                   \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (!::chip::ChipError::IsSuccess(expr))                                                                                   \
+        {                                                                                                                          \
+            CHIP_ERROR statusErr = commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::code);                  \
+            if (statusErr != CHIP_NO_ERROR)                                                                                        \
+            {                                                                                                                      \
+                ChipLogError(Zcl, "%s: %" CHIP_ERROR_FORMAT, #expr, statusErr.Format());                                           \
+            }                                                                                                                      \
+            return true;                                                                                                           \
+        }                                                                                                                          \
+    } while (false)
+
+namespace {
+
+class GeneralCommissioningAttrAccess : public AttributeAccessInterface
 {
-    CHIP_ERROR err = DeviceLayer::Internal::DeviceControlServer::DeviceControlSvr().ArmFailSafe(expiryLengthSeconds);
-    emberAfSendImmediateDefaultResponse(err == CHIP_NO_ERROR ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
+public:
+    // Register for the GeneralCommissioning cluster on all endpoints.
+    GeneralCommissioningAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), GeneralCommissioning::Id) {}
+
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+
+private:
+    CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &), AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadBasicCommissioningInfo(AttributeValueEncoder & aEncoder);
+};
+
+GeneralCommissioningAttrAccess gAttrAccess;
+
+CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    if (aPath.mClusterId != GeneralCommissioning::Id)
+    {
+        // We shouldn't have been called at all.
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    switch (aPath.mAttributeId)
+    {
+    case RegulatoryConfig::Id: {
+        return ReadIfSupported(&ConfigurationManager::GetRegulatoryLocation, aEncoder);
+    }
+    case LocationCapability::Id: {
+        return ReadIfSupported(&ConfigurationManager::GetLocationCapability, aEncoder);
+    }
+    case BasicCommissioningInfo::Id: {
+        return ReadBasicCommissioningInfo(aEncoder);
+    }
+    default: {
+        break;
+    }
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GeneralCommissioningAttrAccess::ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &),
+                                                           AttributeValueEncoder & aEncoder)
+{
+    uint8_t data;
+    CHIP_ERROR err = (DeviceLayer::ConfigurationMgr().*getter)(data);
+    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    {
+        data = 0;
+    }
+    else if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+
+    return aEncoder.Encode(data);
+}
+
+CHIP_ERROR GeneralCommissioningAttrAccess::ReadBasicCommissioningInfo(AttributeValueEncoder & aEncoder)
+{
+    BasicCommissioningInfo::TypeInfo::Type basicCommissioningInfo;
+
+    // TODO: The commissioner might use the critical parameters in BasicCommissioningInfo to initialize
+    // the CommissioningParameters at the beginning of commissioning flow.
+    basicCommissioningInfo.failSafeExpiryLengthSeconds = CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC;
+
+    return aEncoder.Encode(basicCommissioningInfo);
+}
+
+} // anonymous namespace
+
+bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler * commandObj,
+                                                           const app::ConcreteCommandPath & commandPath,
+                                                           const Commands::ArmFailSafe::DecodableType & commandData)
+{
+    FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    Commands::ArmFailSafeResponse::Type response;
+
+    /*
+     * If the fail-safe timer was not currently armed, then the fail-safe timer SHALL be armed.
+     * If the fail-safe timer was currently armed, and current accessing fabric matches the fail-safe
+     * context’s Fabric Index, then the fail-safe timer SHALL be re-armed.
+     */
+
+    FabricIndex accessingFabricIndex = commandObj->GetAccessingFabricIndex();
+
+    if (!failSafeContext.IsFailSafeArmed() || failSafeContext.MatchesFabricIndex(accessingFabricIndex))
+    {
+        CheckSuccess(failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
+                     Failure);
+        response.errorCode = CommissioningError::kOk;
+        CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
+    }
+    else
+    {
+        response.errorCode = CommissioningError::kBusyWithOtherAdmin;
+        CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
+    }
 
     return true;
 }
 
-bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(EndpointId endpoint, app::CommandHandler * commandObj)
+bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+    const Commands::CommissioningComplete::DecodableType & commandData)
 {
-    CHIP_ERROR err = DeviceLayer::Internal::DeviceControlServer::DeviceControlSvr().CommissioningComplete();
-    emberAfSendImmediateDefaultResponse(err == CHIP_NO_ERROR ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
+    DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
+
+    /*
+     * Pass fabric of commissioner to DeviceControlSvr.
+     * This allows device to send messages back to commissioner.
+     * Once bindings are implemented, this may no longer be needed.
+     */
+    SessionHandle handle = commandObj->GetExchangeContext()->GetSessionHandle();
+
+    CheckSuccess(server->CommissioningComplete(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex()), Failure);
+
+    Commands::CommissioningCompleteResponse::Type response;
+    response.errorCode = CommissioningError::kOk;
+    CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
 
     return true;
 }
 
-bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                                   uint8_t location, uint8_t * countryCode, uint64_t breadcrumb,
-                                                                   uint32_t timeoutMs)
+bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandHandler * commandObj,
+                                                                   const app::ConcreteCommandPath & commandPath,
+                                                                   const Commands::SetRegulatoryConfig::DecodableType & commandData)
 {
-    CHIP_ERROR err = DeviceLayer::Internal::DeviceControlServer::DeviceControlSvr().SetRegulatoryConfig(
-        location, reinterpret_cast<const char *>(countryCode), breadcrumb);
+    DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
 
-    emberAfSendImmediateDefaultResponse(err == CHIP_NO_ERROR ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
+    CheckSuccess(server->SetRegulatoryConfig(to_underlying(commandData.location), commandData.countryCode, commandData.breadcrumb),
+                 Failure);
+
+    Commands::SetRegulatoryConfigResponse::Type response;
+    response.errorCode = CommissioningError::kOk;
+    CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
 
     return true;
+}
+
+void MatterGeneralCommissioningPluginServerInitCallback()
+{
+    registerAttributeAccessOverride(&gAttrAccess);
 }

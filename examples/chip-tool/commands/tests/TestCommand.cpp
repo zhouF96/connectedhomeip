@@ -18,41 +18,56 @@
 
 #include "TestCommand.h"
 
-CHIP_ERROR TestCommand::Run()
+CHIP_ERROR TestCommand::RunCommand()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (mPICSFilePath.HasValue())
+    {
+        PICS.SetValue(PICSBooleanReader::Read(mPICSFilePath.Value()));
+    }
 
-    auto * ctx = GetExecContext();
-
-    err = ctx->commissioner->GetConnectedDevice(ctx->remoteId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
-    ReturnErrorOnFailure(err);
+    NextTest();
 
     return CHIP_NO_ERROR;
 }
 
-void TestCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device * device)
+CHIP_ERROR TestCommand::WaitForCommissionee(chip::NodeId nodeId)
 {
+    CurrentCommissioner().ReleaseOperationalDevice(nodeId);
+    return CurrentCommissioner().GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+}
+
+void TestCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)
+{
+    ChipLogProgress(chipTool, " **** Test Setup: Device Connected\n");
     auto * command = static_cast<TestCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Device connected, but cannot run the test, as the context is null"));
-    command->mDevice = device;
-    command->NextTest();
+    command->mDevices[command->GetIdentity()] = device;
+
+    LogErrorOnFailure(command->ContinueOnChipMainThread(CHIP_NO_ERROR));
 }
 
-void TestCommand::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error)
+void TestCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error)
 {
-    ChipLogError(chipTool, "Failed in connecting to the device %" PRIu64 ". Error %" CHIP_ERROR_FORMAT, deviceId, error.Format());
+    ChipLogProgress(chipTool, " **** Test Setup: Device Connection Failure [deviceId=%" PRIu64 ". Error %" CHIP_ERROR_FORMAT "\n]",
+                    peerId.GetNodeId(), error.Format());
     auto * command = static_cast<TestCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Test command context is null"));
-    command->SetCommandExitStatus(error);
+
+    LogErrorOnFailure(command->ContinueOnChipMainThread(CHIP_NO_ERROR));
 }
 
-void TestCommand::OnWaitForMsFn(chip::System::Layer * systemLayer, void * context)
+void TestCommand::Exit(std::string message)
 {
-    auto * command = static_cast<TestCommand *>(context);
-    command->NextTest();
+    ChipLogError(chipTool, " ***** Test Failure: %s\n", message.c_str());
+    SetCommandExitStatus(CHIP_ERROR_INTERNAL);
 }
 
-CHIP_ERROR TestCommand::WaitForMs(uint32_t ms)
+void TestCommand::ThrowFailureResponse()
 {
-    return chip::DeviceLayer::SystemLayer.StartTimer(ms, OnWaitForMsFn, this);
+    Exit("Expecting success response but got a failure response");
+}
+
+void TestCommand::ThrowSuccessResponse()
+{
+    Exit("Expecting failure response but got a success response");
 }

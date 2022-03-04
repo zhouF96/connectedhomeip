@@ -17,13 +17,13 @@
  */
 
 #include "commands/common/Commands.h"
+#include "commands/example/ExampleCredentialIssuerCommands.h"
 
 #include "commands/discover/Commands.h"
 #include "commands/pairing/Commands.h"
 #include "commands/payload/Commands.h"
 
 #include <zap-generated/cluster/Commands.h>
-#include <zap-generated/reporting/Commands.h>
 #include <zap-generated/test/Commands.h>
 
 // ================================================================================
@@ -31,13 +31,13 @@
 // ================================================================================
 int main(int argc, char * argv[])
 {
+    ExampleCredentialIssuerCommands credIssuerCommands;
     Commands commands;
-    registerCommandsDiscover(commands);
+    registerCommandsDiscover(commands, &credIssuerCommands);
     registerCommandsPayload(commands);
-    registerCommandsPairing(commands);
-    registerCommandsReporting(commands);
-    registerCommandsTests(commands);
-    registerClusters(commands);
+    registerCommandsPairing(commands, &credIssuerCommands);
+    registerCommandsTests(commands, &credIssuerCommands);
+    registerClusters(commands, &credIssuerCommands);
 
     return commands.Run(argc, argv);
 }

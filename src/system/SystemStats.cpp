@@ -22,9 +22,6 @@
  *  on the state of CHIP, Inet and System resources
  */
 
-// Include common private header
-#include "SystemLayerPrivate.h"
-
 // Include local headers
 #include <system/SystemTimer.h>
 
@@ -48,20 +45,13 @@ static const Label sStatsStrings[chip::System::Stats::kNumEntries] = {
     "SystemLayer_NumPacketBufs",
 #endif
     "SystemLayer_NumTimersInUse",
-#if INET_CONFIG_NUM_RAW_ENDPOINTS
-    "InetLayer_NumRawEpsInUse",
-#endif
 #if INET_CONFIG_NUM_TCP_ENDPOINTS
     "InetLayer_NumTCPEpsInUse",
 #endif
 #if INET_CONFIG_NUM_UDP_ENDPOINTS
     "InetLayer_NumUDPEpsInUse",
 #endif
-#if INET_CONFIG_NUM_DNS_RESOLVERS
-    "InetLayer_NumDNSResolversInUse",
-#endif
-    "ExchangeMgr_NumContextsInUse",   "ExchangeMgr_NumUMHandlersInUse",
-    "ExchangeMgr_NumBindings",        "MessageLayer_NumConnectionsInUse",
+    "ExchangeMgr_NumContextsInUse", "ExchangeMgr_NumUMHandlersInUse", "ExchangeMgr_NumBindings", "MessageLayer_NumConnectionsInUse",
 };
 
 count_t sResourcesInUse[kNumEntries];
@@ -116,6 +106,7 @@ bool Difference(Snapshot & result, Snapshot & after, Snapshot & before)
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_STATS && MEMP_STATS
+
 void UpdateLwipPbufCounts(void)
 {
 #if LWIP_PBUF_FROM_CUSTOM_POOLS

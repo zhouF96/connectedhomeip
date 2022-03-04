@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
@@ -55,11 +55,13 @@ public:
 
     // Key definitions for well-known keys.
     static const Key kConfigKey_SerialNum;
+    static const Key kConfigKey_UniqueId;
     static const Key kConfigKey_MfrDeviceId;
     static const Key kConfigKey_MfrDeviceCert;
     static const Key kConfigKey_MfrDeviceICACerts;
     static const Key kConfigKey_MfrDevicePrivateKey;
-    static const Key kConfigKey_ProductRevision;
+    static const Key kConfigKey_SoftwareVersion;
+    static const Key kConfigKey_HardwareVersion;
     static const Key kConfigKey_ManufacturingDate;
     static const Key kConfigKey_SetupPinCode;
     static const Key kConfigKey_FabricId;
@@ -71,14 +73,22 @@ public:
     static const Key kConfigKey_LastUsedEpochKeyId;
     static const Key kConfigKey_FailSafeArmed;
     static const Key kConfigKey_WiFiStationSecType;
-    static const Key kConfigKey_OperationalDeviceId;
-    static const Key kConfigKey_OperationalDeviceCert;
-    static const Key kConfigKey_OperationalDeviceICACerts;
-    static const Key kConfigKey_OperationalDevicePrivateKey;
     static const Key kConfigKey_SetupDiscriminator;
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
     static const Key kConfigKey_Breadcrumb;
+    static const Key kConfigKey_WiFiSSID;
+    static const Key kConfigKey_WiFiPassword;
+    static const Key kConfigKey_WiFiSecurity;
+    static const Key kConfigKey_WiFiMode;
+    static const Key kConfigKey_Spake2pIterationCount;
+    static const Key kConfigKey_Spake2pSalt;
+    static const Key kConfigKey_Spake2pVerifier;
+
+    // CHIP Counter keys
+    static const Key kCounterKey_RebootCount;
+    static const Key kCounterKey_UpTime;
+    static const Key kCounterKey_TotalOperationalHours;
 
     static const char kGroupKeyNamePrefix[];
 

@@ -29,9 +29,18 @@ if(NOT CHIP_ROOT)
     get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../../.. REALPATH)
 endif()
 
-set(CHIP_REQURIE_COMPONENTS freertos lwip bt mdns mbedtls fatfs)
-if (CONFIG_ENABLE_CHIP_SHELL)
-    list(APPEND CHIP_REQURIE_COMPONENTS console)
+include(${CMAKE_CURRENT_LIST_DIR}/ota-image.cmake)
+
+set(CHIP_REQURIE_COMPONENTS freertos lwip bt mdns mbedtls fatfs app_update console openthread)
+
+if (NOT CMAKE_BUILD_EARLY_EXPANSION)
+    if (CONFIG_COMPILER_OPTIMIZATION_DEFAULT OR CONFIG_COMPILER_OPTIMIZATION_NONE)
+        set(is_debug TRUE)
+    else()
+        if (NOT CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE)
+            message(FATAL_ERROR "CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE shall be set")
+        endif()
+    endif()
 endif()
 
 idf_component_register(SRCS chip.c chip.cpp
@@ -57,21 +66,27 @@ chip_gn_arg_append("esp32_ar"              "\"${CMAKE_AR}\"")
 chip_gn_arg_append("esp32_cc"              "\"${CMAKE_C_COMPILER}\"")
 chip_gn_arg_append("esp32_cxx"             "\"${CMAKE_CXX_COMPILER}\"")
 chip_gn_arg_append("esp32_cpu"             "\"esp32\"")
-chip_gn_arg_bool("is_debug"                is_debug)
+chip_gn_arg_bool("is_debug"                ${is_debug})
 
-if(CONFIG_BT_ENABLED)
+if(CONFIG_ENABLE_CHIPOBLE)
 chip_gn_arg_append("chip_config_network_layer_ble"           "true")
 else()
 chip_gn_arg_append("chip_config_network_layer_ble"           "false")
+endif()
+
+if(CONFIG_DISABLE_IPV4)
+    chip_gn_arg_append("chip_inet_config_enable_ipv4"        "false")
 endif()
 
 if(CONFIG_ENABLE_PW_RPC)
     string(APPEND chip_gn_args "import(\"//build_overrides/pigweed.gni\")\n")
     chip_gn_arg_append("remove_default_configs"             "[\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_build:cpp17\"]")
     chip_gn_arg_append("chip_build_pw_rpc_lib"              "true")
+    chip_gn_arg_append("chip_build_pw_trace_lib"            "true")
     chip_gn_arg_append("pw_log_BACKEND"                     "\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_log_basic\"")
     chip_gn_arg_append("pw_assert_BACKEND"                  "\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_assert_log\"")
     chip_gn_arg_append("pw_sys_io_BACKEND"                  "\"//third_party/connectedhomeip/examples/platform/esp32/pw_sys_io:pw_sys_io_esp32\"")
+    chip_gn_arg_append("pw_trace_BACKEND"                   "\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_trace_tokenized\"")
     chip_gn_arg_append("dir_pw_third_party_nanopb"          "\"//third_party/connectedhomeip/third_party/nanopb/repo\"")
     chip_gn_arg_append("pw_build_LINK_DEPS"                 "[\"\$dir_pw_assert:impl\", \"\$dir_pw_log:impl\"]")
 endif()
@@ -84,6 +99,22 @@ if (CONFIG_ENABLE_CHIP_SHELL)
     chip_gn_arg_append("chip_build_libshell"                "true")
 endif()
 
+if (CONFIG_OPENTHREAD_ENABLED)
+    chip_gn_arg_append("chip_enable_openthread"                 "true")
+endif()
+
+if (CONFIG_OPENTHREAD_FTD)
+    chip_gn_arg_append("chip_openthread_ftd"                    "true")
+endif()
+
+if (CONFIG_ENABLE_OTA_REQUESTOR)
+    chip_gn_arg_append("chip_enable_ota_requestor"                 "true")
+endif()
+
+if (CONFIG_ENABLE_ROTATING_DEVICE_ID)
+    chip_gn_arg_append("chip_enable_additional_data_advertising"   "true")
+    chip_gn_arg_append("chip_enable_rotating_device_id"            "true")
+endif()
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
 file(GENERATE OUTPUT "${args_gn_input}" CONTENT "${chip_gn_args}")
@@ -155,14 +186,20 @@ idf_component_get_property(freertos_dir freertos COMPONENT_DIR)
 
 # ESP-IDF components usually need 'freertos/<header.h>', while
 # CHIP might include do 'header.h'.
+# In IDF V5.0, this path has been moved to
+# '${freertos_component}/FreeRTOS-Kernel/include/freertos'
 target_include_directories(${COMPONENT_LIB} PRIVATE
-    "${freertos_dir}/include/freertos")
+    "${freertos_dir}/include/freertos"
+    "${freertos_dir}/FreeRTOS-Kernel/include/freertos")
 
 target_include_directories(${COMPONENT_LIB} INTERFACE
     "${CHIP_ROOT}/src/platform/ESP32"
+    "${CHIP_ROOT}/src/platform/OpenThread"
     "${CHIP_ROOT}/src/include"
     "${CHIP_ROOT}/src/lib"
     "${CHIP_ROOT}/src"
+    "${CHIP_ROOT}/zzz_generated/app-common"
+    "${CHIP_ROOT}/examples/platform/esp32"
     "${CHIP_ROOT}/third_party/nlassert/repo/include"
     "${CHIP_ROOT}/third_party/nlio/repo/include"
     "${CMAKE_CURRENT_BINARY_DIR}/src/include"
@@ -173,13 +210,25 @@ target_include_directories(${COMPONENT_LIB} INTERFACE
 idf_component_get_property(esp32_mbedtls_lib esp32_mbedtls COMPONENT_LIB)
 
 if(CONFIG_BT_ENABLED)
-    idf_component_get_property(bt_lib bt COMPONENT_LIB)
-    list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}> -lbtdm_app)
+    if("${CONFIG_IDF_TARGET}" STREQUAL "esp32h2")
+        idf_component_get_property(bt_lib bt COMPONENT_LIB)
+        idf_component_get_property(bt_dir bt COMPONENT_DIR)
+        list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}>)
+        list(APPEND chip_libraries ${bt_dir}/controller/lib/esp32h2beta/libcontroller_5p0_seq.a)
+    else()
+        idf_component_get_property(bt_lib bt COMPONENT_LIB)
+        list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}> -lbtdm_app)
+    endif()
 endif()
 
 if (CONFIG_ENABLE_CHIP_SHELL)
     idf_component_get_property(console_lib console COMPONENT_LIB)
     list(APPEND chip_libraries $<TARGET_FILE:${console_lib}>)
+endif()
+
+if(CONFIG_OPENTHREAD_ENABLED)
+    idf_component_get_property(openthread_lib openthread COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${openthread_lib}>)
 endif()
 
 if(NOT CONFIG_USE_MINIMAL_MDNS)
@@ -190,10 +239,25 @@ endif()
 idf_component_get_property(main_lib main COMPONENT_LIB)
 list(APPEND chip_libraries $<TARGET_FILE:${main_lib}>)
 
-target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group 
+target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group
                                                 ${chip_libraries}
-                                                $<TARGET_FILE:mbedcrypto> $<TARGET_FILE:${esp32_mbedtls_lib}> 
+                                                $<TARGET_FILE:mbedcrypto> $<TARGET_FILE:${esp32_mbedtls_lib}>
                                                 -Wl,--end-group)
 
 # Make the component dependent on our CHIP build
 add_dependencies(${COMPONENT_LIB} chip_gn)
+
+if(CONFIG_ENABLE_PW_RPC)
+    set(WRAP_FUNCTIONS esp_log_write)
+    target_link_libraries(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=${WRAP_FUNCTIONS}")
+endif()
+
+# Build Matter OTA image
+if (CONFIG_CHIP_OTA_IMAGE_BUILD)
+    chip_ota_image(chip-ota-image
+        INPUT_FILES ${BUILD_DIR}/${CMAKE_PROJECT_NAME}.bin
+        OUTPUT_FILE ${BUILD_DIR}/${CMAKE_PROJECT_NAME}-ota.bin
+    )
+    # Adding dependecy as app target so that this runs after images are ready
+    add_dependencies(chip-ota-image app)
+endif()

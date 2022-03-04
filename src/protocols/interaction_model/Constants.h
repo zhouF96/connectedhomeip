@@ -53,6 +53,7 @@ constexpr uint16_t kVersion = 0;
  */
 enum class MsgType : uint8_t
 {
+    StatusResponse        = 0x01,
     ReadRequest           = 0x02,
     SubscribeRequest      = 0x03,
     SubscribeResponse     = 0x04,
@@ -65,7 +66,7 @@ enum class MsgType : uint8_t
 };
 
 // This table comes from the IM's "Status Code Table" section from the Interaction Model spec.
-enum class ProtocolCode : uint16_t
+enum class Status : uint8_t
 {
     Success                = 0x0,
     Failure                = 0x01,
@@ -79,7 +80,8 @@ enum class ProtocolCode : uint16_t
     Deprecated84           = 0x84,
     InvalidCommand         = 0x85,
     UnsupportedAttribute   = 0x86,
-    InvalidValue           = 0x87,
+    ConstraintError        = 0x87,
+    InvalidValue           = ConstraintError, // Deprecated
     UnsupportedWrite       = 0x88,
     ResourceExhausted      = 0x89,
     Deprecated8a           = 0x8a,
@@ -90,7 +92,7 @@ enum class ProtocolCode : uint16_t
     UnsupportedRead        = 0x8f,
     Deprecated90           = 0x90,
     Deprecated91           = 0x91,
-    Reserved92             = 0x92, // ProtocolCode 0x92 does not have any comments in the spec.
+    DataVersionMismatch    = 0x92,
     Deprecated93           = 0x93,
     Timeout                = 0x94,
     Reserved95             = 0x95,
@@ -99,7 +101,6 @@ enum class ProtocolCode : uint16_t
     Reserved98             = 0x98,
     Reserved99             = 0x99,
     Reserved9a             = 0x9a,
-    ConstraintError        = 0x9b,
     Busy                   = 0x9c,
     Deprecatedc0           = 0xc0,
     Deprecatedc1           = 0xc1,
@@ -107,7 +108,8 @@ enum class ProtocolCode : uint16_t
     UnsupportedCluster     = 0xc3,
     Deprecatedc4           = 0xc4,
     NoUpstreamSubscription = 0xc5,
-    InvalidArgument        = 0xc6,
+    NeedsTimedInteraction  = 0xc6,
+    UnsupportedEvent       = 0xc7,
 };
 } // namespace InteractionModel
 

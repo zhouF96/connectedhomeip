@@ -18,24 +18,34 @@
 
 #pragma once
 
-#include <app/util/af-types.h>
-#include <lib/core/CHIPError.h>
-#include <map>
-#include <string>
+#include <app/clusters/account-login-server/account-login-server.h>
 
-class AccountLoginManager
+#include <app/util/af-types.h>
+
+using chip::CharSpan;
+using chip::app::CommandResponseHelper;
+using chip::Platform::CopyString;
+using AccountLoginDelegate = chip::app::Clusters::AccountLogin::Delegate;
+using GetSetupPINResponse  = chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Type;
+
+class AccountLoginManager : public AccountLoginDelegate
 {
 public:
-    bool isUserLoggedIn(std::string requestTempAccountIdentifier, std::string requestSetupPin);
-    std::string proxySetupPinRequest(std::string requestTempAccountIdentifier, chip::EndpointId endpoint);
-    void setTempAccountIdentifierForPin(std::string requestTempAccountIdentifier, std::string requestSetupPin);
+    AccountLoginManager() : AccountLoginManager("tempPin123"){};
+    AccountLoginManager(const char * setupPin);
 
-    static AccountLoginManager & GetInstance()
+    inline void SetSetupPin(char * setupPin) override { CopyString(mSetupPin, sizeof(mSetupPin), setupPin); };
+
+    bool HandleLogin(const CharSpan & tempAccountIdentifierString, const CharSpan & setupPinString) override;
+    bool HandleLogout() override;
+    void HandleGetSetupPin(CommandResponseHelper<GetSetupPINResponse> & helper,
+                           const CharSpan & tempAccountIdentifierString) override;
+    inline void GetSetupPin(char * setupPin, size_t setupPinSize, const CharSpan & tempAccountIdentifierString) override
     {
-        static AccountLoginManager instance;
-        return instance;
-    }
+        CopyString(setupPin, setupPinSize, mSetupPin);
+    };
 
-private:
-    std::map<std::string, std::string> accounts;
+protected:
+    static const size_t kSetupPinSize = 12;
+    char mSetupPin[kSetupPinSize];
 };

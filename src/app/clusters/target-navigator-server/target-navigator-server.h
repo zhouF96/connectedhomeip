@@ -21,8 +21,19 @@
  *******************************************************************************
  ******************************************************************************/
 
-struct TargetNavigatorResponse
-{
-    uint8_t status;
-    uint8_t * data;
-};
+#pragma once
+
+#include "target-navigator-delegate.h"
+#include <app-common/zap-generated/cluster-objects.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace TargetNavigator {
+
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+
+} // namespace TargetNavigator
+} // namespace Clusters
+} // namespace app
+} // namespace chip

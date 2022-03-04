@@ -74,7 +74,7 @@ static void PrintBufDebug(const System::PacketBufferHandle & buf)
 }
 
 const uint16_t BtpEngine::sDefaultFragmentSize = 20;  // 23-byte minimum ATT_MTU - 3 bytes for ATT operation header
-const uint16_t BtpEngine::sMaxFragmentSize     = 128; // Size of write and indication characteristics
+const uint16_t BtpEngine::sMaxFragmentSize     = 244; // Maximum size of BTP segment
 
 CHIP_ERROR BtpEngine::Init(void * an_app_state, bool expect_first_ack)
 {
@@ -182,10 +182,10 @@ CHIP_ERROR BtpEngine::HandleAckReceived(SequenceNumber_t ack_num)
     {
         mTxOldestUnackedSeqNum = ack_num;
 
-        // All oustanding fragments have been acknowledged.
+        // All outstanding fragments have been acknowledged.
         mExpectingAck = false;
     }
-    else // If ack is valid, but not for newest oustanding unacknowledged fragment...
+    else // If ack is valid, but not for newest outstanding unacknowledged fragment...
     {
         // Update newest unacknowledged fragment to one past that which was just acknowledged.
         mTxOldestUnackedSeqNum = ack_num;
@@ -196,7 +196,7 @@ CHIP_ERROR BtpEngine::HandleAckReceived(SequenceNumber_t ack_num)
 }
 
 // Calling convention:
-//   EncodeStandAloneAck may only be called if data arg is commited for immediate, synchronous subsequent transmission.
+//   EncodeStandAloneAck may only be called if data arg is committed for immediate, synchronous subsequent transmission.
 CHIP_ERROR BtpEngine::EncodeStandAloneAck(const PacketBufferHandle & data)
 {
     // Ensure enough headroom exists for the lower BLE layers.
@@ -321,6 +321,10 @@ CHIP_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle &&
 
         mRxBuf->AddToEnd(std::move(data));
         mRxBuf->CompactHead(); // will free 'data' and adjust rx buf's end/length
+
+        // For now, limit BtpEngine message size to max length of 1 pbuf, as we do for chip messages sent via IP.
+        // TODO add support for BtpEngine messages longer than 1 pbuf
+        VerifyOrExit(!mRxBuf->HasChainedBuffer(), err = CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG);
     }
     else if (mRxState == kState_InProgress)
     {
@@ -381,7 +385,7 @@ exit:
         }
         LogState();
 
-        if (!data.IsNull())
+        if (!data.IsNull()) // NOLINT(bugprone-use-after-move)
         {
             // Tack received data onto rx buffer, to be freed when end point resets protocol engine on close.
             if (!mRxBuf.IsNull())
@@ -408,7 +412,7 @@ PacketBufferHandle BtpEngine::TakeRxPacket()
 }
 
 // Calling convention:
-//   May only be called if data arg is commited for immediate, synchronous subsequent transmission.
+//   May only be called if data arg is committed for immediate, synchronous subsequent transmission.
 //   Returns false on error. Caller must free data arg on error.
 bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool send_ack)
 {
@@ -433,7 +437,7 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
         mTxLength = mTxBuf->DataLength();
 
         ChipLogDebugBtpEngine(Ble, ">>> CHIPoBle preparing to send whole message:");
-        PrintBufDebug(data);
+        PrintBufDebug(mTxBuf);
 
         // Determine fragment header size.
         uint8_t header_size =
@@ -489,7 +493,7 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
 
         characteristic[0] = headerFlags.Raw();
         ChipLogDebugBtpEngine(Ble, ">>> CHIPoBle preparing to send first fragment:");
-        PrintBufDebug(data);
+        PrintBufDebug(mTxBuf);
     }
     else if (mTxState == kState_InProgress)
     {

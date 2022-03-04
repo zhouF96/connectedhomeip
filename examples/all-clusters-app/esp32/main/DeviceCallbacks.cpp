@@ -28,15 +28,20 @@
 #include "Globals.h"
 #include "LEDWidget.h"
 #include "WiFiWidget.h"
+#include "esp_check.h"
+#include "esp_err.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
+#include "route_hook/esp_route_hook.h"
 #include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
-#include <app/Command.h>
-#include <app/server/Mdns.h>
+#include <app/CommandHandler.h>
+#include <app/clusters/identify-server/identify-server.h>
+#include <app/server/Dnssd.h>
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
-#include <lib/mdns/Advertiser.h>
+#include <lib/dnssd/Advertiser.h>
 #include <lib/support/CodeUtils.h>
 
 static const char * TAG = "app-devicecallbacks";
@@ -45,9 +50,49 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
 using namespace ::chip::DeviceLayer;
+using namespace chip::app;
 
-uint32_t identifyTimerCount;
 constexpr uint32_t kIdentifyTimerDelayMS = 250;
+
+void OnIdentifyTriggerEffect(Identify * identify)
+{
+    switch (identify->mCurrentEffectIdentifier)
+    {
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
+        statusLED1.Blink(kIdentifyTimerDelayMS * 2);
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
+        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE");
+        break;
+    default:
+        ChipLogProgress(Zcl, "No identifier effect");
+        break;
+    }
+    return;
+}
+
+Identify gIdentify0 = {
+    chip::EndpointId{ 0 },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+    OnIdentifyTriggerEffect,
+};
+
+Identify gIdentify1 = {
+    chip::EndpointId{ 1 },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+    OnIdentifyTriggerEffect,
+};
 
 void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
@@ -77,11 +122,15 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
             (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
         {
-            // MDNS server restart on any ip assignment: if link local ipv6 is configured, that
-            // will not trigger a 'internet connectivity change' as there is no internet
-            // connectivity. MDNS still wants to refresh its listening interfaces to include the
-            // newly selected address.
-            chip::app::Mdns::StartServer();
+            // MDNS server restart on any ip assignment: if link local ipv6 is
+            // configured, that will not trigger a 'internet connectivity change' as
+            // there is no internet connectivity. MDNS still wants to refresh its
+            // listening interfaces to include the newly selected address.
+            chip::app::DnssdServer::Instance().StartServer();
+        }
+        if (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned)
+        {
+            ESP_ERROR_CHECK(esp_route_hook_init(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF")));
         }
         break;
     }
@@ -90,29 +139,30 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
 }
 
 void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                                  uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
+                                                  uint8_t type, uint16_t size, uint8_t * value)
 {
-    ESP_LOGI(TAG, "PostAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: '0x%02x', Attribute ID: '0x%04x'", clusterId,
-             endpointId, attributeId);
+    ESP_LOGI(TAG,
+             "PostAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: "
+             "'0x%02x', Attribute ID: '0x%04x'",
+             clusterId, endpointId, attributeId);
 
     switch (clusterId)
     {
-    case ZCL_ON_OFF_CLUSTER_ID:
+    case Clusters::OnOff::Id:
         OnOnOffPostAttributeChangeCallback(endpointId, attributeId, value);
         break;
 
-    case ZCL_IDENTIFY_CLUSTER_ID:
-        OnIdentifyPostAttributeChangeCallback(endpointId, attributeId, value);
-        break;
-
-    case ZCL_LEVEL_CONTROL_CLUSTER_ID:
+    case Clusters::LevelControl::Id:
         OnLevelControlAttributeChangeCallback(endpointId, attributeId, value);
         break;
 #if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
-    case ZCL_COLOR_CONTROL_CLUSTER_ID:
+    case Clusters::ColorControl::Id:
         OnColorControlAttributeChangeCallback(endpointId, attributeId, value);
         break;
 #endif
+    case Clusters::Identify::Id:
+        OnIdentifyPostAttributeChangeCallback(endpointId, attributeId, size, value);
+        break;
     default:
         ESP_LOGI(TAG, "Unhandled cluster ID: %d", clusterId);
         break;
@@ -127,7 +177,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     {
         ESP_LOGI(TAG, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
         wifiLED.Set(true);
-        chip::app::Mdns::StartServer();
+        chip::app::DnssdServer::Instance().StartServer();
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
     {
@@ -137,7 +187,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
     {
         ESP_LOGI(TAG, "IPv6 Server ready...");
-        chip::app::Mdns::StartServer();
+        chip::app::DnssdServer::Instance().StartServer();
     }
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {
@@ -181,7 +231,8 @@ exit:
     return;
 }
 
-// Currently we only support ColorControl cluster for ESP32C3_DEVKITM which has an on-board RGB-LED
+// Currently we only support ColorControl cluster for ESP32C3_DEVKITM which has
+// an on-board RGB-LED
 #if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
 void DeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
@@ -211,38 +262,29 @@ exit:
 }
 #endif
 
-void IdentifyTimerHandler(Layer * systemLayer, void * appState)
+void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint16_t size,
+                                                            uint8_t * value)
 {
-    statusLED1.Animate();
-
-    if (identifyTimerCount)
+    if (attributeId == Clusters::Identify::Attributes::IdentifyTime::Id && size == 2)
     {
-        SystemLayer.StartTimer(kIdentifyTimerDelayMS, IdentifyTimerHandler, appState);
-        // Decrement the timer count.
-        identifyTimerCount--;
+        uint16_t identifyTime;
+        memcpy(&identifyTime, value, size);
+        if (identifyTime)
+        {
+            // Currently we have no separate indicator LEDs on each endpoints.
+            // We are using LED1 for endpoint 0,1 and LED2 for endpoint 2
+            endpointId == 2 ? statusLED2.Blink(kIdentifyTimerDelayMS * 2) : statusLED1.Blink(kIdentifyTimerDelayMS * 2);
+        }
+        else
+        {
+            bool onOffState;
+            endpointId == 0 ? onOffState = mEndpointOnOffState[0] : onOffState = mEndpointOnOffState[endpointId - 1];
+            endpointId == 2 ? statusLED2.Set(onOffState) : statusLED1.Set(onOffState);
+        }
     }
 }
 
-void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
-{
-    VerifyOrExit(attributeId == ZCL_IDENTIFY_TIME_ATTRIBUTE_ID, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
-    VerifyOrExit(endpointId == 1, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
-
-    statusLED1.Blink(kIdentifyTimerDelayMS * 2);
-
-    // timerCount represents the number of callback executions before we stop the timer.
-    // value is expressed in seconds and the timer is fired every 250ms, so just multiply value by 4.
-    // Also, we want timerCount to be odd number, so the ligth state ends in the same state it starts.
-    identifyTimerCount = (*value) * 4;
-
-    SystemLayer.CancelTimer(IdentifyTimerHandler, this);
-    SystemLayer.StartTimer(kIdentifyTimerDelayMS, IdentifyTimerHandler, this);
-
-exit:
-    return;
-}
-
-bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
+bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * commandObj)
 {
     emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
     return true;

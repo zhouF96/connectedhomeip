@@ -34,51 +34,66 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:latest
+            image: connectedhomeip/chip-build:0.5.56
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
-                - "/tmp/output_binaries:/tmp/output_binaries"
         steps:
             - name: Checkout
               uses: actions/checkout@v2
               with:
                   submodules: true
+
+            - name: Set up environment for size reports
+              if: ${{ !env.ACT }}
+              env:
+                  GH_CONTEXT: ${{ toJson(github) }}
+              run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
+
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
-              if: ${{ always() }}
+              if: ${{ always() }} && ${{ !env.ACT }}
               with:
                   name: bootstrap-logs
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
-            - name: Build example QPG6100 Lock App
+            - name: Build example QPG6105 Lock App
               timeout-minutes: 5
-              run: scripts/examples/gn_build_example.sh
-                   examples/lock-app/qpg out/lock_app_debug qpg_target_ic=\"qpg6100\"
-            - name: Build example QPG6100 Lighting App
+              run: |
+                  scripts/examples/gn_build_example.sh examples/lock-app/qpg out/lock_app_debug qpg_target_ic=\"qpg6105\"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    qpg qpg6105+debug lock-app \
+                    out/lock_app_debug/chip-qpg6105-lock-example.out \
+                    /tmp/bloat_reports/
+            - name: Build example QPG6105 Lighting App
               timeout-minutes: 5
-              run: scripts/examples/gn_build_example.sh
-                   examples/lighting-app/qpg out/lighting_app_debug qpg_target_ic=\"qpg6100\"
-            - name: Build example QPG6100 persistent-storage
+              run: |
+                  scripts/examples/gn_build_example.sh examples/lighting-app/qpg out/lighting_app_debug qpg_target_ic=\"qpg6105\"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    qpg qpg6105+debug lighting-app \
+                    out/lighting_app_debug/chip-qpg6105-lighting-example.out \
+                    /tmp/bloat_reports/
+            - name: Build example QPG6105 persistent-storage
               timeout-minutes: 5
-              run: scripts/examples/gn_build_example.sh
-                   examples/persistent-storage/qpg out/persistent-storage_app_debug qpg_target_ic=\"qpg6100\"
-            - name: Binary artifact suffix
-              id: outsuffix
-              uses: haya14busa/action-cond@v1.0.0
-              with:
-                  cond: ${{ github.event.pull_request.number == '' }}
-                  if_true: "${{ github.sha }}"
-                  if_false: "pull-${{ github.event.pull_request.number }}"
-            - name: Uploading Binaries
+              run: |
+                  scripts/examples/gn_build_example.sh examples/persistent-storage/qpg out/persistent-storage_app_debug \
+                    qpg_target_ic=\"qpg6105\"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    qpg qpg6105+debug persistent-storage-app \
+                    out/persistent-storage_app_debug/chip-qpg6105-persistent_storage-example.out \
+                    /tmp/bloat_reports/
+            - name: Build Matter SDK library
+              timeout-minutes: 5
+              run: |
+                  config/qpg/chip-gn/build.sh
+
+            - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
+              if: ${{ !env.ACT }}
               with:
-                  name:
-                      ${{ env.BUILD_TYPE }}-example-build-${{
-                      steps.outsuffix.outputs.value }}
+                  name: Size,QPG-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
                   path: |
-                      out/lighting_app_debug/chip-qpg6100-lighting-example.out
-                      out/lighting_app_debug/chip-qpg6100-lighting-example.out.map
+                      /tmp/bloat_reports/

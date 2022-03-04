@@ -30,34 +30,21 @@
 
 #include <errno.h>
 
-#define DEFAULT_MIN_SLEEP_PERIOD (60 * 60 * 24 * 30) // Month [sec]
-
 // Choose an approximation of PTHREAD_NULL if pthread.h doesn't define one.
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING && !defined(PTHREAD_NULL)
 #define PTHREAD_NULL 0
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING && !defined(PTHREAD_NULL)
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
-
-namespace chip {
-namespace Mdns {
-void GetMdnsTimeout(timeval & timeout);
-void HandleMdnsTimeout();
-} // namespace Mdns
-} // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
-
 namespace chip {
 namespace System {
 
+constexpr Clock::Seconds64 kDefaultMinSleepPeriod = Clock::Seconds64(60 * 60 * 24 * 30); // Month [sec]
+
 CHIP_ERROR LayerImplSelect::Init()
 {
-    VerifyOrReturnError(!mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
 
     RegisterPOSIXErrorFormatter();
-
-    ReturnErrorOnFailure(mTimerList.Init());
 
     for (auto & w : mSocketWatchPool)
     {
@@ -71,31 +58,33 @@ CHIP_ERROR LayerImplSelect::Init()
     // Create an event to allow an arbitrary thread to wake the thread in the select loop.
     ReturnErrorOnFailure(mWakeEvent.Open(*this));
 
-    VerifyOrReturnError(mLayerState.Init(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.SetInitialized(), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR LayerImplSelect::Shutdown()
 {
-    VerifyOrReturnError(mLayerState.Shutdown(), CHIP_ERROR_INCORRECT_STATE);
-
-    Timer * timer;
-    while ((timer = mTimerList.PopEarliest()) != nullptr)
-    {
-        timer->Clear();
+    VerifyOrReturnError(mLayerState.SetShuttingDown(), CHIP_ERROR_INCORRECT_STATE);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    TimerList::Node * timer;
+    while ((timer = mTimerList.PopEarliest()) != nullptr)
+    {
         if (timer->mTimerSource != nullptr)
         {
             dispatch_source_cancel(timer->mTimerSource);
             dispatch_release(timer->mTimerSource);
         }
+    }
+    mTimerPool.ReleaseAll();
+#else  // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    mTimerList.Clear();
+    mTimerPool.ReleaseAll();
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
-        timer->Release();
-    }
     mWakeEvent.Close(*this);
-    mLayerState.Reset(); // Return to uninitialized state to permit re-initialization.
+
+    mLayerState.ResetFromShuttingDown(); // Return to uninitialized state to permit re-initialization.
     return CHIP_NO_ERROR;
 }
 
@@ -121,19 +110,20 @@ void LayerImplSelect::Signal()
     CHIP_ERROR status = mWakeEvent.Notify();
     if (status != CHIP_NO_ERROR)
     {
+
         ChipLogError(chipSystemLayer, "System wake event notify failed: %" CHIP_ERROR_FORMAT, status.Format());
     }
 }
 
-CHIP_ERROR LayerImplSelect::StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState)
+CHIP_ERROR LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
 {
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_TimeoutImmediate, delayMilliseconds = 0);
+    CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_TimeoutImmediate, delay = System::Clock::kZero);
 
     CancelTimer(onComplete, appState);
 
-    Timer * timer = Timer::New(*this, delayMilliseconds, onComplete, appState);
+    TimerList::Node * timer = mTimerPool.Create(*this, SystemClock().GetMonotonicTimestamp() + delay, onComplete, appState);
     VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
@@ -141,14 +131,16 @@ CHIP_ERROR LayerImplSelect::StartTimer(uint32_t delayMilliseconds, TimerComplete
     if (dispatchQueue)
     {
         (void) mTimerList.Add(timer);
-        dispatch_source_t timerSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatchQueue);
+        dispatch_source_t timerSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, DISPATCH_TIMER_STRICT, dispatchQueue);
         if (timerSource == nullptr)
         {
             chipDie();
         }
 
         timer->mTimerSource = timerSource;
-        dispatch_source_set_timer(timerSource, dispatch_walltime(NULL, delayMilliseconds * NSEC_PER_MSEC), 0, 100 * NSEC_PER_MSEC);
+        dispatch_source_set_timer(
+            timerSource, dispatch_walltime(NULL, static_cast<int64_t>(Clock::Milliseconds64(delay).count() * NSEC_PER_MSEC)), 0,
+            2 * NSEC_PER_MSEC);
         dispatch_source_set_event_handler(timerSource, ^{
             dispatch_source_cancel(timerSource);
             dispatch_release(timerSource);
@@ -172,10 +164,8 @@ void LayerImplSelect::CancelTimer(TimerCompleteCallback onComplete, void * appSt
 {
     VerifyOrReturn(mLayerState.IsInitialized());
 
-    Timer * timer = mTimerList.Remove(onComplete, appState);
+    TimerList::Node * timer = mTimerList.Remove(onComplete, appState);
     VerifyOrReturn(timer != nullptr);
-
-    timer->Clear();
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     if (timer->mTimerSource != nullptr)
@@ -185,7 +175,7 @@ void LayerImplSelect::CancelTimer(TimerCompleteCallback onComplete, void * appSt
     }
 #endif
 
-    timer->Release();
+    mTimerPool.Release(timer);
     Signal();
 }
 
@@ -195,7 +185,7 @@ CHIP_ERROR LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void 
 
     CancelTimer(onComplete, appState);
 
-    Timer * timer = Timer::New(*this, 0, onComplete, appState);
+    TimerList::Node * timer = mTimerPool.Create(*this, SystemClock().GetMonotonicTimestamp(), onComplete, appState);
     VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
@@ -337,23 +327,17 @@ void LayerImplSelect::PrepareEvents()
 {
     assertChipStackLockedByCurrentThread();
 
-    constexpr Clock::MonotonicMilliseconds kMaxTimeout =
-        static_cast<Clock::MonotonicMilliseconds>(DEFAULT_MIN_SLEEP_PERIOD) * kMillisecondsPerSecond;
-    const Clock::MonotonicMilliseconds currentTime = Clock::GetMonotonicMilliseconds();
-    Clock::MonotonicMilliseconds awakenTime        = currentTime + kMaxTimeout;
+    const Clock::Timestamp currentTime = SystemClock().GetMonotonicTimestamp();
+    Clock::Timestamp awakenTime        = currentTime + kDefaultMinSleepPeriod;
 
-    Timer * timer = mTimerList.Earliest();
-    if (timer && Clock::IsEarlier(timer->AwakenTime(), awakenTime))
+    TimerList::Node * timer = mTimerList.Earliest();
+    if (timer && timer->AwakenTime() < awakenTime)
     {
         awakenTime = timer->AwakenTime();
     }
 
-    const Clock::MonotonicMilliseconds sleepTime = (awakenTime > currentTime) ? (awakenTime - currentTime) : 0;
-    MillisecondsToTimeval(sleepTime, mNextTimeout);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__ && !__MBED__
-    chip::Mdns::GetMdnsTimeout(mNextTimeout);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+    const Clock::Timestamp sleepTime = (awakenTime > currentTime) ? (awakenTime - currentTime) : Clock::kZero;
+    Clock::ToTimeval(sleepTime, mNextTimeout);
 
     mMaxFd = -1;
     FD_ZERO(&mSelected.mReadSet);
@@ -388,9 +372,9 @@ void LayerImplSelect::HandleEvents()
 {
     assertChipStackLockedByCurrentThread();
 
-    if (mSelectResult < 0)
+    if (!IsSelectResultValid())
     {
-        ChipLogError(DeviceLayer, "select failed: %s\n", ErrorStr(System::MapErrorPOSIX(errno)));
+        ChipLogError(DeviceLayer, "select failed: %s\n", ErrorStr(CHIP_ERROR_POSIX(errno)));
         return;
     }
 
@@ -400,11 +384,11 @@ void LayerImplSelect::HandleEvents()
 
     // Obtain the list of currently expired timers. Any new timers added by timer callback are NOT handled on this pass,
     // since that could result in infinite handling of new timers blocking any other progress.
-    Timer::List expiredTimers(mTimerList.ExtractEarlier(1 + Clock::GetMonotonicMilliseconds()));
-    Timer * timer = nullptr;
+    TimerList expiredTimers = mTimerList.ExtractEarlier(Clock::Timeout(1) + SystemClock().GetMonotonicTimestamp());
+    TimerList::Node * timer = nullptr;
     while ((timer = expiredTimers.PopEarliest()) != nullptr)
     {
-        timer->HandleComplete();
+        mTimerPool.Invoke(timer);
     }
 
     for (auto & w : mSocketWatchPool)
@@ -419,20 +403,16 @@ void LayerImplSelect::HandleEvents()
         }
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__ && !__MBED__
-    chip::Mdns::HandleMdnsTimeout();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
-
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     mHandleSelectThread = PTHREAD_NULL;
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-void LayerImplSelect::HandleTimerComplete(Timer * timer)
+void LayerImplSelect::HandleTimerComplete(TimerList::Node * timer)
 {
     mTimerList.Remove(timer);
-    timer->HandleComplete();
+    mTimerPool.Invoke(timer);
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 

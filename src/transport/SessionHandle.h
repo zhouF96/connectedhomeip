@@ -17,67 +17,39 @@
 
 #pragma once
 
+#include <access/SubjectDescriptor.h>
+#include <lib/support/ReferenceCountedHandle.h>
+
 namespace chip {
 
-class SecureSessionMgr;
+namespace Transport {
+class Session;
+} // namespace Transport
 
+class SessionHolder;
+
+/** @brief
+ *    Non-copyable session reference. All SessionHandles are created within SessionManager. SessionHandle is not
+ *    reference *counted, hence it is not allowed to store SessionHandle anywhere except for function arguments and
+ *    return values. SessionHandle is short-lived as it is only available as stack variable, so it is never dangling. */
 class SessionHandle
 {
 public:
-    SessionHandle(NodeId peerNodeId, FabricIndex fabric) : mPeerNodeId(peerNodeId), mFabric(fabric) {}
+    SessionHandle(Transport::Session & session) : mSession(session) {}
+    ~SessionHandle() {}
 
-    SessionHandle(NodeId peerNodeId, uint16_t localKeyId, uint16_t peerKeyId, FabricIndex fabric) :
-        mPeerNodeId(peerNodeId), mFabric(fabric)
-    {
-        mLocalKeyId.SetValue(localKeyId);
-        mPeerKeyId.SetValue(peerKeyId);
-    }
+    SessionHandle(const SessionHandle &) = delete;
+    SessionHandle operator=(const SessionHandle &) = delete;
+    SessionHandle(SessionHandle &&)                = default;
+    SessionHandle & operator=(SessionHandle &&) = delete;
 
-    bool HasFabricIndex() const { return (mFabric != Transport::kUndefinedFabricIndex); }
-    FabricIndex GetFabricIndex() const { return mFabric; }
-    void SetFabricIndex(FabricIndex fabricId) { mFabric = fabricId; }
+    bool operator==(const SessionHandle & that) const { return &mSession.Get() == &that.mSession.Get(); }
 
-    bool operator==(const SessionHandle & that) const
-    {
-        // TODO: Temporarily keep the old logic, check why only those two fields are used in comparison.
-        return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId;
-    }
-
-    bool MatchIncomingSession(const SessionHandle & that) const
-    {
-
-        if (that.GetLocalKeyId().HasValue())
-        {
-            return mLocalKeyId == that.mLocalKeyId;
-        }
-        else
-        {
-            // TODO: For unencrypted session, temporarily still rely on the old match logic in MatchExchange, need to update to
-            // match peer’s HW address (BLE) or peer’s IP/Port (for IP).
-            return true;
-        }
-    }
-
-    NodeId GetPeerNodeId() const { return mPeerNodeId; }
-    const Optional<uint16_t> & GetPeerKeyId() const { return mPeerKeyId; }
-    const Optional<uint16_t> & GetLocalKeyId() const { return mLocalKeyId; }
-
-    // TODO: currently SessionHandle is not able to identify a unauthenticated session, create an empty handle for it
-    static SessionHandle TemporaryUnauthenticatedSession()
-    {
-        return SessionHandle(kPlaceholderNodeId, Transport::kUndefinedFabricIndex);
-    }
+    Transport::Session * operator->() const { return mSession.operator->(); }
 
 private:
-    friend class SecureSessionMgr;
-    NodeId mPeerNodeId;
-    Optional<uint16_t> mLocalKeyId;
-    Optional<uint16_t> mPeerKeyId;
-    // TODO: Re-evaluate the storing of Fabric ID in SessionHandle
-    //       The Fabric ID will not be available for PASE and group sessions. So need
-    //       to identify an approach that'll allow looking up the corresponding information for
-    //       such sessions.
-    FabricIndex mFabric;
+    friend class SessionHolder;
+    ReferenceCountedHandle<Transport::Session> mSession;
 };
 
 } // namespace chip

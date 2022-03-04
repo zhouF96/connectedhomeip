@@ -46,6 +46,14 @@ public:
     constexpr explicit Span(T (&databuf)[N]) : Span(databuf, N)
     {}
 
+    template <size_t N>
+    constexpr Span & operator=(T (&databuf)[N])
+    {
+        mDataBuf = databuf;
+        mDataLen = N;
+        return (*this);
+    }
+
     // Allow implicit construction from a Span over a type that matches our
     // type, up to const-ness.
     template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
@@ -65,7 +73,6 @@ public:
     constexpr pointer begin() { return data(); }
     constexpr pointer end() { return data() + size(); }
 
-    // Allow data_equal for spans that are over the same type up to const-ness.
     template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
     bool data_equal(const Span<U> & other) const
     {
@@ -81,12 +88,48 @@ public:
         return Span(mDataBuf + offset, length);
     }
 
+    Span SubSpan(size_t offset) const
+    {
+        VerifyOrDie(offset <= mDataLen);
+        return Span(mDataBuf + offset, mDataLen - offset);
+    }
+
     // Allow reducing the size of a span.
     void reduce_size(size_t new_size)
     {
         VerifyOrDie(new_size <= size());
         mDataLen = new_size;
     }
+
+    // Allow creating ByteSpans and CharSpans from ZCL octet strings, so we
+    // don't have to reinvent it various places.
+    template <class U,
+              typename = std::enable_if_t<std::is_same<uint8_t, std::remove_const_t<U>>::value &&
+                                          (std::is_same<const uint8_t, T>::value || std::is_same<const char, T>::value)>>
+    static Span fromZclString(U * bytes)
+    {
+        size_t length = bytes[0];
+        // Treat 0xFF (aka "null string") as zero-length.
+        if (length == 0xFF)
+        {
+            length = 0;
+        }
+        // Need reinterpret_cast if we're a CharSpan.
+        return Span(reinterpret_cast<T *>(&bytes[1]), length);
+    }
+
+    // Allow creating CharSpans from a character string.
+    template <class U, typename = std::enable_if_t<std::is_same<T, const U>::value && std::is_same<const char, T>::value>>
+    static Span fromCharString(U * chars)
+    {
+        return Span(chars, strlen(chars));
+    }
+
+    // operator== explicitly not implemented on Span, because its meaning
+    // (equality of data, or pointing to the same buffer and same length) is
+    // ambiguous.  Use data_equal if testing for equality of data.
+    template <typename U>
+    bool operator==(const Span<U> & other) const = delete;
 
 private:
     pointer mDataBuf;
@@ -157,6 +200,14 @@ public:
         return (size() == other.size() && (empty() || (memcmp(data(), other.data(), size() * sizeof(T)) == 0)));
     }
 
+    // operator== explicitly not implemented on FixedSpan, because its meaning
+    // (equality of data, or pointing to the same buffer and same length) is
+    // ambiguous.  Use data_equal if testing for equality of data.
+    template <typename U>
+    bool operator==(const Span<U> & other) const = delete;
+    template <typename U, size_t M>
+    bool operator==(const FixedSpan<U, M> & other) const = delete;
+
 private:
     pointer mDataBuf;
 };
@@ -200,6 +251,7 @@ using MutableByteSpan = Span<uint8_t>;
 template <size_t N>
 using FixedByteSpan = FixedSpan<const uint8_t, N>;
 
+using CharSpan        = Span<const char>;
 using MutableCharSpan = Span<char>;
 
 inline CHIP_ERROR CopySpanToMutableSpan(ByteSpan span_to_copy, MutableByteSpan & out_buf)

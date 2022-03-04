@@ -48,6 +48,8 @@ extern "C" {
 using namespace ::chip;
 using namespace ::chip::Ble;
 
+#define BLE_SERVICE_DATA_SIZE 10
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -80,7 +82,10 @@ wiced_result_t BLEManagerImpl::BLEManagerCallback(wiced_bt_management_evt_t even
 
             ChipDeviceEvent bleEvent;
             bleEvent.Type = DeviceEventType::kP6BLEEnabledEvt;
-            PlatformMgr().PostEvent(&bleEvent);
+            if (PlatformMgr().PostEvent(&bleEvent) != CHIP_NO_ERROR)
+            {
+                return WICED_BT_ERROR;
+            }
         }
         break;
     }
@@ -93,7 +98,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     CHIP_ERROR err;
 
     // Initialize the CHIP BleLayer.
-    err = BleLayer::Init(this, this, &SystemLayer);
+    err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
     SuccessOrExit(err);
 
     // Configure platform specific settings for Bluetooth
@@ -238,7 +243,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         {
             ChipDeviceEvent _event;
             _event.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
-            PlatformMgr().PostEvent(&_event);
+            PlatformMgr().PostEventOrDie(&_event);
         }
         break;
 
@@ -251,8 +256,8 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
                             PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
         break;
 
-    case DeviceEventType::kCHIPoBLEIndicateConfirm:
-        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
+    case DeviceEventType::kCHIPoBLENotifyConfirm:
+        HandleIndicationConfirmation(event->CHIPoBLENotifyConfirm.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
         break;
 
     case DeviceEventType::kCHIPoBLEConnectionError:
@@ -339,17 +344,25 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     VerifyOrExit(conState != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
 
 #ifdef BLE_DEBUG
-    ChipLogDetail(DeviceLayer, "Sending indication for CHIPoBLE TX characteristic (con %u, len %u)", conId, dataLen);
+    ChipLogDetail(DeviceLayer, "Sending notification for CHIPoBLE TX characteristic (con %u, len %u)", conId, dataLen);
 #endif
 
-    // Send a indication for the CHIPoBLE TX characteristic to the client containing the supplied data.
-    gatt_err = wiced_bt_gatt_send_indication((uint16_t) conId, HDLC_CHIP_SERVICE_CHAR_C2_VALUE, dataLen, data->Start());
+    // Send a notification for the CHIPoBLE TX characteristic to the client containing the supplied data.
+    gatt_err = wiced_bt_gatt_send_notification((uint16_t) conId, HDLC_CHIP_SERVICE_CHAR_C2_VALUE, dataLen, data->Start());
 
 exit:
     if (gatt_err != WICED_BT_GATT_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "BLEManagerImpl::SendIndication() failed: %ld", gatt_err);
+        ChipLogError(DeviceLayer, "BLEManagerImpl::SendNotification() failed: %ld", gatt_err);
         return false;
+    }
+    else
+    {
+        // Post an event to the CHIP queue.
+        ChipDeviceEvent event;
+        event.Type                        = DeviceEventType::kCHIPoBLENotifyConfirm;
+        event.CHIPoBLENotifyConfirm.ConId = conId;
+        err                               = PlatformMgr().PostEvent(&event);
     }
     return err == CHIP_NO_ERROR;
 }
@@ -428,7 +441,7 @@ void BLEManagerImpl::DriveBLEState(void)
                 ChipDeviceEvent advChange;
                 advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
                 advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Started;
-                PlatformMgr().PostEvent(&advChange);
+                err                                        = PlatformMgr().PostEvent(&advChange);
             }
         }
     }
@@ -553,13 +566,18 @@ wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceWrite(uint16_t conn_id, 
                 event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
                 event.CHIPoBLEWriteReceived.ConId = conn_id;
                 event.CHIPoBLEWriteReceived.Data  = buf;
-                PlatformMgr().PostEvent(&event);
+                CHIP_ERROR status                 = PlatformMgr().PostEvent(&event);
+                if (status != CHIP_NO_ERROR)
+                {
+                    result = WICED_BT_GATT_INTERNAL_ERROR;
+                }
                 buf = NULL;
             }
         }
         else
         {
             ChipLogError(DeviceLayer, "BLEManagerImpl: Out of buffers during CHIPoBLE RX");
+            result = WICED_BT_GATT_NO_RESOURCES;
         }
     }
     else
@@ -584,7 +602,10 @@ wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceWrite(uint16_t conn_id, 
             event.Type = (app_chip_service_char_tx_client_char_config[0] != 0) ? DeviceEventType::kCHIPoBLESubscribe
                                                                                : DeviceEventType::kCHIPoBLEUnsubscribe;
             event.CHIPoBLESubscribe.ConId = conn_id;
-            PlatformMgr().PostEvent(&event);
+            if (PlatformMgr().PostEvent(&event) != CHIP_NO_ERROR)
+            {
+                return WICED_BT_GATT_INTERNAL_ERROR;
+            }
         }
 
         ChipLogProgress(DeviceLayer, "CHIPoBLE %s received",
@@ -601,24 +622,6 @@ wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceMtuReq(wiced_bt_gatt_att
 {
     p_data->data.mtu = p_conn->Mtu;
 
-    return WICED_BT_GATT_SUCCESS;
-}
-
-/*
- * Process GATT Indication Confirm from the client
- */
-wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceIndCfm(uint16_t conn_id, uint16_t handle)
-{
-#ifdef BLE_DEBUG
-    ChipLogDetail(DeviceLayer, "GATT Ind Cfm received con:%04x handle:%d", conn_id, handle);
-#endif
-    if (handle == HDLC_CHIP_SERVICE_CHAR_C2_VALUE)
-    {
-        ChipDeviceEvent event;
-        event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
-        event.CHIPoBLEIndicateConfirm.ConId = conn_id;
-        PlatformMgr().PostEvent(&event);
-    }
     return WICED_BT_GATT_SUCCESS;
 }
 
@@ -642,10 +645,6 @@ wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceRequestEvent(wiced_bt_ga
 
     case GATTS_REQ_TYPE_MTU:
         result = HandleGattServiceMtuReq(p_request, p_conn);
-        break;
-
-    case GATTS_REQ_TYPE_CONF:
-        result = HandleGattServiceIndCfm(p_request->conn_id, p_request->data.handle);
         break;
 
     default:
@@ -691,7 +690,10 @@ wiced_bt_gatt_status_t BLEManagerImpl::HandleGattConnectEvent(wiced_bt_gatt_conn
         ChipLogProgress(DeviceLayer, "BLE GATT connection closed (con %u, reason %u)", p_conn_status->conn_id,
                         p_conn_status->reason);
 
-        PlatformMgr().PostEvent(&event);
+        if (PlatformMgr().PostEvent(&event) != CHIP_NO_ERROR)
+        {
+            return WICED_BT_GATT_INTERNAL_ERROR;
+        }
 
         // Arrange to re-enable connectable advertising in case it was disabled due to the
         // maximum connection limit being reached.
@@ -787,8 +789,10 @@ void BLEManagerImpl::SetAdvertisingData(void)
     ChipBLEDeviceIdentificationInfo mDeviceIdInfo;
     uint16_t deviceDiscriminator = 0;
     uint8_t localDeviceNameLen;
-    uint8_t service_data[9];
+    uint8_t service_data[BLE_SERVICE_DATA_SIZE];
     uint8_t * p = service_data;
+
+    static_assert(BLE_SERVICE_DATA_SIZE == sizeof(ChipBLEDeviceIdentificationInfo) + 2, "BLE Service Data Size is incorrect");
 
     // Initialize the CHIP BLE Device Identification Information block that will be sent as payload
     // within the BLE service advertisement data.
@@ -819,7 +823,7 @@ void BLEManagerImpl::SetAdvertisingData(void)
         localDeviceNameLen = strlen(sInstance.mDeviceName);
     }
 
-    /* First element is the advertisment flags */
+    /* First element is the advertisement flags */
     adv_elem[num_elem].advert_type = BTM_BLE_ADVERT_TYPE_FLAG;
     adv_elem[num_elem].len         = sizeof(uint8_t);
     adv_elem[num_elem].p_data      = &flag;
@@ -838,6 +842,7 @@ void BLEManagerImpl::SetAdvertisingData(void)
     UINT8_TO_STREAM(p, mDeviceIdInfo.DeviceVendorId[1]);
     UINT8_TO_STREAM(p, mDeviceIdInfo.DeviceProductId[0]);
     UINT8_TO_STREAM(p, mDeviceIdInfo.DeviceProductId[1]);
+    UINT8_TO_STREAM(p, 0); // Additional Data Flag
 
     adv_elem[num_elem].advert_type = BTM_BLE_ADVERT_TYPE_NAME_COMPLETE;
     adv_elem[num_elem].len         = localDeviceNameLen;

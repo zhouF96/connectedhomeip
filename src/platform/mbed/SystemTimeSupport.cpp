@@ -30,74 +30,116 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include "platform/mbed_rtc_time.h"
+#include "platform/mbed_thread.h"
+#include "platform/mbed_wait_api.h"
 #include <Kernel.h>
+#include <drivers/LowPowerTimer.h>
 
 namespace chip {
 namespace System {
-namespace Platform {
 namespace Clock {
+
+namespace Internal {
+ClockImpl gClockImpl;
+} // namespace Internal
+
+namespace {
+mbed::LowPowerTimer timer()
+{
+    static mbed::LowPowerTimer t;
+    t.start();
+    return t;
+}
+} // namespace
+
+extern "C" uint64_t get_clock_monotonic()
+{
+    return timer().elapsed_time().count();
+}
 
 // Platform-specific function for getting monotonic system time in microseconds.
 // Returns elapsed time in microseconds since an arbitrary, platform-defined epoch.
-uint64_t GetMonotonicMicroseconds()
+Microseconds64 ClockImpl::GetMonotonicMicroseconds64()
 {
-    return rtos::Kernel::get_ms_count() * kMicrosecondsPerMillisecond;
+    return Microseconds64(get_clock_monotonic());
 }
 
 // Platform-specific function for getting monotonic system time in milliseconds.
 // Return elapsed time in milliseconds since an arbitrary, platform-defined epoch.
-uint64_t GetMonotonicMilliseconds()
+Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
 {
-    return rtos::Kernel::get_ms_count();
+    return std::chrono::duration_cast<Milliseconds64>(GetMonotonicMicroseconds64());
 }
 
-// Platform-specific function for getting the current real (civil) time in microsecond Unix time format,
-// where |curTime| argument is the current time, expressed as Unix time scaled to microseconds.
-// Returns CHIP_NO_ERROR if the method succeeded.
-CHIP_ERROR GetUnixTimeMicroseconds(uint64_t & curTime)
+CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & aCurTime)
 {
     struct timeval tv;
-    int res = gettimeofday(&tv, NULL);
-    if (res != 0)
+    if (gettimeofday(&tv, nullptr) != 0)
     {
-        return CHIP_ERROR_INCORRECT_STATE;
+        return CHIP_ERROR_INTERNAL;
     }
     if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
     {
         return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
-    curTime = (tv.tv_sec * kMicrosecondsPerSecond) + tv.tv_usec;
+    if (tv.tv_usec < 0)
+    {
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
+    }
+    static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative tv_sec values!");
+    aCurTime = Clock::Microseconds64((static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000000)) + static_cast<uint64_t>(tv.tv_usec));
     return CHIP_NO_ERROR;
 }
 
-// Platform-specific function for setting the current real (civil) time
-// where |newCurTime| is the  new current time, expressed as Unix time scaled to microseconds.
-// Returns CHIP_NO_ERROR if the method succeeded.
-CHIP_ERROR SetUnixTimeMicroseconds(uint64_t newCurTime)
+CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Clock::Milliseconds64 & aCurTime)
 {
     struct timeval tv;
-    tv.tv_sec  = static_cast<time_t>(newCurTime / kMicrosecondsPerSecond);
-    tv.tv_usec = static_cast<long>(newCurTime % kMicrosecondsPerSecond);
-    int res    = settimeofday(&tv, NULL);
-    if (res != 0)
+    if (gettimeofday(&tv, nullptr) != 0)
     {
-        return CHIP_ERROR_INCORRECT_STATE;
+        return CHIP_ERROR_INTERNAL;
     }
-#if CHIP_PROGRESS_LOGGING
+    if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
     {
-        uint16_t year;
-        uint8_t month, dayOfMonth, hour, minute, second;
-        SecondsSinceUnixEpochToCalendarTime((uint32_t) tv.tv_sec, year, month, dayOfMonth, hour, minute, second);
-        ChipLogProgress(DeviceLayer,
-                        "Real time clock set to %" PRId64 " (%04" PRIu16 "/%02" PRIu8 "/%02" PRIu8 " %02" PRIu8 ":%02" PRIu8
-                        ":%02" PRIu8 " UTC)",
-                        tv.tv_sec, year, month, dayOfMonth, hour, minute, second);
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
-#endif // CHIP_PROGRESS_LOGGING
+    if (tv.tv_usec < 0)
+    {
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
+    }
+    static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative tv_sec values!");
+    aCurTime =
+        Clock::Milliseconds64((static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000)) + (static_cast<uint64_t>(tv.tv_usec) / 1000));
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClockImpl::SetClock_RealTime(Clock::Microseconds64 aNewCurTime)
+{
+    struct timeval tv;
+    tv.tv_sec  = static_cast<time_t>(aNewCurTime.count() / UINT64_C(1000000));
+    tv.tv_usec = static_cast<long>(aNewCurTime.count() % UINT64_C(1000000));
+    if (settimeofday(&tv, nullptr) != 0)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    const time_t timep = tv.tv_sec;
+    struct tm calendar;
+    localtime_r(&timep, &calendar);
+    ChipLogProgress(DeviceLayer, "Real time clock set to %lld (%04" PRId16 "/%02d/%02d %02d:%02d:%02d UTC)", tv.tv_sec,
+                    calendar.tm_year, calendar.tm_mon, calendar.tm_mday, calendar.tm_hour, calendar.tm_min, calendar.tm_sec);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR InitClock_RealTime()
+{
+    Clock::Microseconds64 curTime =
+        Clock::Microseconds64((static_cast<uint64_t>(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD) * UINT64_C(1000000)));
+    // Use CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD as the initial value of RealTime.
+    // Then the RealTime obtained from GetClock_RealTime will be always valid.
+    return System::SystemClock().SetClock_RealTime(curTime);
 }
 
 } // namespace Clock
-} // namespace Platform
 } // namespace System
 } // namespace chip

@@ -47,6 +47,11 @@
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #endif
+#ifdef SL_WIFI
+#include "wfx_host_events.h"
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/EFR32/NetworkCommissioningWiFiDriver.h>
+#endif
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
@@ -59,6 +64,11 @@
 #define APP_FUNCTION_BUTTON &sl_button_btn0
 #define APP_LOCK_BUTTON &sl_button_btn1
 
+using namespace chip;
+using namespace chip::TLV;
+using namespace ::chip::Credentials;
+using namespace ::chip::DeviceLayer;
+
 namespace {
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
@@ -68,18 +78,24 @@ QueueHandle_t sAppEventQueue;
 LEDWidget sStatusLED;
 LEDWidget sLockLED;
 
-bool sIsThreadProvisioned     = false;
-bool sIsThreadEnabled         = false;
-bool sHaveBLEConnections      = false;
-bool sHaveServiceConnectivity = false;
+#ifdef SL_WIFI
+bool sIsWiFiProvisioned = false;
+bool sIsWiFiEnabled     = false;
+bool sIsWiFiAttached    = false;
+
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::SlWiFiDriver::GetInstance()));
+#endif
+
+#if CHIP_ENABLE_OPENTHREAD
+bool sIsThreadProvisioned = false;
+bool sIsThreadEnabled     = false;
+#endif
+bool sHaveBLEConnections = false;
 
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
 } // namespace
-
-using namespace chip::TLV;
-using namespace ::chip::Credentials;
-using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
 
@@ -99,11 +115,25 @@ CHIP_ERROR AppTask::StartAppTask()
 
 CHIP_ERROR AppTask::Init()
 {
-    // Init ZCL Data Model
-    InitServer();
+#ifdef SL_WIFI
+    /*
+     * Wait for the WiFi to be initialized
+     */
+    EFR32_LOG("APP: Wait WiFi Init");
+    while (!wfx_hw_ready())
+    {
+        vTaskDelay(10);
+    }
+    EFR32_LOG("APP: Done WiFi Init");
+    /* We will init server when we get IP */
 
+    sWiFiNetworkCommissioningInstance.Init();
+#endif
+
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     // Create FreeRTOS sw timer for Function Selection.
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
@@ -118,7 +148,7 @@ CHIP_ERROR AppTask::Init()
         appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
 
-    EFR32_LOG("Current Firmware Version: %s", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING);
+    EFR32_LOG("Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
     CHIP_ERROR err = BoltLockMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
@@ -134,7 +164,7 @@ CHIP_ERROR AppTask::Init()
 
     sLockLED.Init(LOCK_STATE_LED);
     sLockLED.Set(!BoltLockMgr().IsUnlocked());
-    UpdateClusterState();
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -186,10 +216,16 @@ void AppTask::AppTaskMain(void * pvParameter)
         // when the CHIP task is busy (e.g. with a long crypto operation).
         if (PlatformMgr().TryLockChipStack())
         {
-            sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
-            sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
-            sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
+#ifdef SL_WIFI
+            sIsWiFiProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
+            sIsWiFiEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
+            sIsWiFiAttached    = ConnectivityMgr().IsWiFiStationConnected();
+#endif
+#if CHIP_ENABLE_OPENTHREAD
+            sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
+            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
+#endif
+            sHaveBLEConnections = (ConnectivityMgr().NumBLEConnections() != 0);
             PlatformMgr().UnlockChipStack();
         }
 
@@ -207,24 +243,16 @@ void AppTask::AppTaskMain(void * pvParameter)
         // Otherwise, blink the LED ON for a very short time.
         if (sAppTask.mFunction != kFunction_FactoryReset)
         {
-            // Consider the system to be "fully connected" if it has service
-            // connectivity
-            if (sHaveServiceConnectivity)
-            {
-                sStatusLED.Set(true);
-            }
-            else if (sIsThreadProvisioned && sIsThreadEnabled)
+#if CHIP_ENABLE_OPENTHREAD
+            if (sIsThreadProvisioned && sIsThreadEnabled)
+#else
+            if (sIsWiFiProvisioned && sIsWiFiEnabled && !sIsWiFiAttached)
+#endif
             {
                 sStatusLED.Blink(950, 50);
             }
-            else if (sHaveBLEConnections)
-            {
-                sStatusLED.Blink(100, 100);
-            }
-            else
-            {
-                sStatusLED.Blink(50, 950);
-            }
+            else if (sHaveBLEConnections) { sStatusLED.Blink(100, 100); }
+            else { sStatusLED.Blink(50, 950); }
         }
 
         sStatusLED.Animate();
@@ -335,7 +363,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     {
         // Actually trigger Factory Reset
         sAppTask.mFunction = kFunction_NoneSelected;
-        ConfigurationMgr().InitiateFactoryReset();
+        chip::Server::GetInstance().ScheduleFactoryReset();
     }
 }
 
@@ -364,16 +392,17 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             sAppTask.CancelTimer();
             sAppTask.mFunction = kFunction_NoneSelected;
 
+#ifdef SL_WIFI
+            if (!ConnectivityMgr().IsWiFiStationProvisioned())
+#else
             if (!ConnectivityMgr().IsThreadProvisioned())
+#endif
             {
                 // Enable BLE advertisements
                 ConnectivityMgr().SetBLEAdvertisingEnabled(true);
                 ConnectivityMgr().SetBLEAdvertisingMode(ConnectivityMgr().kFastAdvertising);
             }
-            else
-            {
-                EFR32_LOG("Network is already provisioned, Ble advertissement not enabled");
-            }
+            else { EFR32_LOG("Network is already provisioned, Ble advertissement not enabled"); }
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {
@@ -463,7 +492,7 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
 
     if (sAppTask.mSyncClusterToButtonAction)
     {
-        UpdateClusterState();
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
         sAppTask.mSyncClusterToButtonAction = false;
     }
 }
@@ -518,7 +547,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
 }
 
-void AppTask::UpdateClusterState(void)
+void AppTask::UpdateClusterState(intptr_t context)
 {
     uint8_t newValue = !BoltLockMgr().IsUnlocked();
 

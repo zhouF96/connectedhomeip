@@ -22,33 +22,30 @@
  * Instruments cc13xx_cc26xx platform.
  */
 
-#ifndef BLEManager_IMPL_H
-#define BLEManager_IMPL_H
-
 #pragma once
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include "FreeRTOS.h"
 #include <queue.h>
 #include <task.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <icall.h>
 #include <icall_ble_api.h>
 
 #include "hal_types.h"
 
-#include "chipOBleProfile.h"
 #include "ti_ble_config.h"
 #include "ti_drivers_config.h"
 
 #ifdef __cplusplus
 }
 #endif
+
+#include "chipOBleProfile.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -73,6 +70,8 @@ using namespace chip::Ble;
 #define CHIPOBLE_SCANRES_SIZE_NO_NAME (6)
 
 #define CHIPOBLE_ADV_DATA_MAX_SIZE (GAP_DEVICE_NAME_LEN + CHIPOBLE_SCANRES_SIZE_NO_NAME)
+
+#define CHIPOBLE_DEVICE_DESC_LENGTH (4)
 
 // How often to read current current RPA (in ms)
 #define READ_RPA_EVT_PERIOD 3000
@@ -208,6 +207,7 @@ private:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
+    CHIP_ERROR _Shutdown() { return CHIP_NO_ERROR; }
     CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
     CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool _IsAdvertisingEnabled(void);
@@ -367,5 +367,3 @@ inline BleLayer * BLEManagerImpl::_GetBleLayer()
 } // namespace chip
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
-#endif // BLEManager_IMPL_H

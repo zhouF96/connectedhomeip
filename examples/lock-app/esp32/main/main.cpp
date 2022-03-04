@@ -28,7 +28,9 @@
 #include "freertos/task.h"
 #include "nvs_flash.h"
 #include "shell_extension/launch.h"
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Server.h>
+#include <platform/ESP32/NetworkCommissioningDriver.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -53,6 +55,28 @@ using namespace ::chip::DeviceLayer;
 static const char * TAG = "lock-app";
 
 static DeviceCallbacks EchoCallbacks;
+
+namespace {
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
+} // namespace
+
+static void InitServer(intptr_t context)
+{
+    chip::Server::GetInstance().Init();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
+    sWiFiNetworkCommissioningInstance.Init();
+
+    ESP_LOGI(TAG, "------------------------Starting App Task---------------------------");
+    CHIP_ERROR error = GetAppTask().StartAppTask();
+    if (error != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed: %s", ErrorStr(error));
+    }
+}
 
 extern "C" void app_main()
 {
@@ -85,15 +109,5 @@ extern "C" void app_main()
         return;
     }
 
-    InitServer();
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-
-    ESP_LOGI(TAG, "------------------------Starting App Task---------------------------");
-    error = GetAppTask().StartAppTask();
-    if (error != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "GetAppTask().Init() failed: %s", ErrorStr(error));
-    }
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }

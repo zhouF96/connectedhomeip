@@ -41,6 +41,7 @@
 
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
+#include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/SafePointerCast.h>
@@ -96,6 +97,7 @@ static void _logSSLError()
     unsigned long ssl_err_code = ERR_get_error();
     while (ssl_err_code != 0)
     {
+#if CHIP_ERROR_LOGGING
         const char * err_str_lib     = ERR_lib_error_string(ssl_err_code);
         const char * err_str_routine = ERR_func_error_string(ssl_err_code);
         const char * err_str_reason  = ERR_reason_error_string(ssl_err_code);
@@ -103,6 +105,7 @@ static void _logSSLError()
         {
             ChipLogError(Crypto, " ssl err  %s %s %s\n", err_str_lib, err_str_routine, err_str_reason);
         }
+#endif // CHIP_ERROR_LOGGING
         ssl_err_code = ERR_get_error();
     }
 }
@@ -132,8 +135,35 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     int result               = 1;
     const EVP_CIPHER * type  = nullptr;
 
+    // Placeholder location for avoiding null params for plaintexts when
+    // size is zero.
+    uint8_t placeholder_empty_plaintext = 0;
+
+    // Ciphertext block to hold a finalized ciphertext block if output
+    // `ciphertext` buffer is nullptr or plaintext_length is zero (i.e.
+    // we are only doing auth and don't care about output).
+    uint8_t placeholder_ciphertext[kAES_CCM256_Block_Length];
+    bool ciphertext_was_null = (ciphertext == nullptr);
+
+    if (plaintext_length == 0)
+    {
+        if (plaintext == nullptr)
+        {
+            plaintext = &placeholder_empty_plaintext;
+        }
+        // Make sure we have at least 1 full block size buffer for the
+        // extraction of final block (required by OpenSSL EVP_EncryptFinal_ex)
+        if (ciphertext_was_null)
+        {
+            ciphertext = &placeholder_ciphertext[0];
+        }
+    }
+
+    VerifyOrExit((key_length == kAES_CCM128_Key_Length) || (key_length == kAES_CCM256_Key_Length),
+                 error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit((plaintext_length != 0) || ciphertext_was_null, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(plaintext != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(plaintext_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(ciphertext != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidKeyLength(key_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(iv != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -142,8 +172,9 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     VerifyOrExit(tag != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    // 16 bytes key for AES-CCM-128
-    type = (key_length == 16) ? EVP_aes_128_ccm() : EVP_aes_256_ccm();
+    // TODO: Remove support for AES-256 since not in 1.0
+    // Determine crypto type by key length
+    type = (key_length == kAES_CCM128_Key_Length) ? EVP_aes_128_ccm() : EVP_aes_256_ccm();
 
     context = EVP_CIPHER_CTX_new();
     VerifyOrExit(context != nullptr, error = CHIP_ERROR_INTERNAL);
@@ -182,14 +213,13 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     result = EVP_EncryptUpdate(context, Uint8::to_uchar(ciphertext), &bytesWritten, Uint8::to_const_uchar(plaintext),
                                static_cast<int>(plaintext_length));
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(bytesWritten >= 0, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit((ciphertext_was_null && bytesWritten == 0) || (bytesWritten >= 0), error = CHIP_ERROR_INTERNAL);
     ciphertext_length = static_cast<unsigned int>(bytesWritten);
 
     // Finalize encryption
     result = EVP_EncryptFinal_ex(context, ciphertext + ciphertext_length, &bytesWritten);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(bytesWritten >= 0, error = CHIP_ERROR_INTERNAL);
-    ciphertext_length += static_cast<unsigned int>(bytesWritten);
+    VerifyOrExit(bytesWritten >= 0 && bytesWritten <= static_cast<int>(plaintext_length), error = CHIP_ERROR_INTERNAL);
 
     // Get tag
     VerifyOrExit(CanCastTo<int>(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -216,8 +246,34 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
     int result               = 1;
     const EVP_CIPHER * type  = nullptr;
 
+    // Placeholder location for avoiding null params for ciphertext when
+    // size is zero.
+    uint8_t placeholder_empty_ciphertext = 0;
+
+    // Plaintext block to hold a finalized plaintext block if output
+    // `plaintext` buffer is nullptr or ciphertext_length is zero (i.e.
+    // we are only doing auth and don't care about output).
+    uint8_t placeholder_plaintext[kAES_CCM256_Block_Length];
+    bool plaintext_was_null = (plaintext == nullptr);
+
+    if (ciphertext_length == 0)
+    {
+        if (ciphertext == nullptr)
+        {
+            ciphertext = &placeholder_empty_ciphertext;
+        }
+        // Make sure we have at least 1 full block size buffer for the
+        // extraction of final block (required by OpenSSL EVP_DecryptFinal_ex)
+        if (plaintext_was_null)
+        {
+            plaintext = &placeholder_plaintext[0];
+        }
+    }
+
+    VerifyOrExit((key_length == kAES_CCM128_Key_Length) || (key_length == kAES_CCM256_Key_Length),
+                 error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(ciphertext != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(ciphertext_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(plaintext != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(tag != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -225,8 +281,9 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
     VerifyOrExit(iv != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(iv_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    // 16 bytes key for AES-CCM-128
-    type = (key_length == 16) ? EVP_aes_128_ccm() : EVP_aes_256_ccm();
+    // TODO: Remove support for AES-256 since not in 1.0
+    // Determine crypto type by key length
+    type = (key_length == kAES_CCM128_Key_Length) ? EVP_aes_128_ccm() : EVP_aes_256_ccm();
 
     context = EVP_CIPHER_CTX_new();
     VerifyOrExit(context != nullptr, error = CHIP_ERROR_INTERNAL);
@@ -256,6 +313,7 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
     VerifyOrExit(CanCastTo<int>(ciphertext_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     result = EVP_DecryptUpdate(context, nullptr, &bytesOutput, nullptr, static_cast<int>(ciphertext_length));
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(bytesOutput <= static_cast<int>(ciphertext_length), error = CHIP_ERROR_INTERNAL);
 
     // Pass in aad
     if (aad_length > 0 && aad != nullptr)
@@ -263,12 +321,17 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
         VerifyOrExit(CanCastTo<int>(aad_length), error = CHIP_ERROR_INVALID_ARGUMENT);
         result = EVP_DecryptUpdate(context, nullptr, &bytesOutput, Uint8::to_const_uchar(aad), static_cast<int>(aad_length));
         VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+        VerifyOrExit(bytesOutput <= static_cast<int>(aad_length), error = CHIP_ERROR_INTERNAL);
     }
 
     // Pass in ciphertext. We wont get anything if validation fails.
     VerifyOrExit(CanCastTo<int>(ciphertext_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     result = EVP_DecryptUpdate(context, Uint8::to_uchar(plaintext), &bytesOutput, Uint8::to_const_uchar(ciphertext),
                                static_cast<int>(ciphertext_length));
+    if (plaintext_was_null)
+    {
+        VerifyOrExit(bytesOutput <= static_cast<int>(sizeof(placeholder_plaintext)), error = CHIP_ERROR_INTERNAL);
+    }
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -473,8 +536,8 @@ CHIP_ERROR PBKDF2_sha256::pbkdf2_sha256(const uint8_t * password, size_t plen, c
     VerifyOrExit(password != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(plen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(salt != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(slen >= kMin_Salt_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(slen <= kMax_Salt_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(slen >= kSpake2p_Min_PBKDF_Salt_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(slen <= kSpake2p_Max_PBKDF_Salt_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(output != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -944,7 +1007,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
     }
 
 exit:
-    memset(privkey, 0, sizeof(privkey));
+    ClearSecretData(privkey, sizeof(privkey));
     _logSSLError();
     return error;
 }
@@ -1002,7 +1065,6 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     ec_key       = nullptr;
 
 exit:
-
     if (ec_key != nullptr)
     {
         EC_KEY_free(ec_key);
@@ -1142,6 +1204,11 @@ exit:
         X509_REQ_free(x509_req);
     }
 
+    if (ec_key != nullptr)
+    {
+        EC_KEY_free(ec_key);
+    }
+
     _logSSLError();
     return error;
 }
@@ -1229,8 +1296,10 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal()
     return CHIP_NO_ERROR;
 }
 
-void Spake2p_P256_SHA256_HKDF_HMAC::FreeImpl()
+void Spake2p_P256_SHA256_HKDF_HMAC::Clear()
 {
+    VerifyOrReturn(state != CHIP_SPAKE2P_STATE::PREINIT);
+
     Spake2p_Context * const context = to_inner_spake2p_context(&mSpake2pContext);
 
     if (context->curve != nullptr)
@@ -1255,12 +1324,18 @@ void Spake2p_P256_SHA256_HKDF_HMAC::FreeImpl()
     free_bn(xy);
     free_bn(tempbn);
     free_bn(order);
+
+    state = CHIP_SPAKE2P_STATE::PREINIT;
 }
 
-CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out)
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len,
+                                              MutableByteSpan & out_span)
 {
     HMAC_sha hmac;
-    return hmac.HMAC_SHA256(key, key_len, in, in_len, out, kSHA256_Hash_Length);
+    VerifyOrReturnError(out_span.size() >= kSHA256_Hash_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorOnFailure(hmac.HMAC_SHA256(key, key_len, in, in_len, out_span.data(), kSHA256_Hash_Length));
+    out_span = out_span.SubSpan(0, kSHA256_Hash_Length);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::MacVerify(const uint8_t * key, size_t key_len, const uint8_t * mac, size_t mac_len,
@@ -1269,9 +1344,11 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::MacVerify(const uint8_t * key, size_t 
     VerifyOrReturnError(mac_len == kSHA256_Hash_Length, CHIP_ERROR_INVALID_ARGUMENT);
 
     uint8_t computed_mac[kSHA256_Hash_Length];
-    ReturnErrorOnFailure(Mac(key, key_len, in, in_len, computed_mac));
+    MutableByteSpan computed_mac_span{ computed_mac };
+    ReturnErrorOnFailure(Mac(key, key_len, in, in_len, computed_mac_span));
+    VerifyOrReturnError(computed_mac_span.size() == mac_len, CHIP_ERROR_INTERNAL);
 
-    VerifyOrReturnError(CRYPTO_memcmp(mac, computed_mac, mac_len) == 0, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(CRYPTO_memcmp(mac, computed_mac_span.data(), computed_mac_span.size()) == 0, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
 }
@@ -1586,7 +1663,8 @@ exit:
 }
 
 CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t rootCertificateLen, const uint8_t * caCertificate,
-                                    size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen)
+                                    size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen,
+                                    CertificateChainValidationResult & result)
 {
     CHIP_ERROR err             = CHIP_NO_ERROR;
     int status                 = 0;
@@ -1596,38 +1674,47 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     X509 * x509CACertificate   = nullptr;
     X509 * x509LeafCertificate = nullptr;
 
+    result = CertificateChainValidationResult::kInternalFrameworkError;
+
+    VerifyOrReturnError(rootCertificate != nullptr && rootCertificateLen != 0,
+                        (result = CertificateChainValidationResult::kRootArgumentInvalid, CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(caCertificate != nullptr && caCertificateLen != 0,
+                        (result = CertificateChainValidationResult::kICAArgumentInvalid, CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(leafCertificate != nullptr && leafCertificateLen != 0,
+                        (result = CertificateChainValidationResult::kLeafArgumentInvalid, CHIP_ERROR_INVALID_ARGUMENT));
+
     store = X509_STORE_new();
-    VerifyOrExit(store != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(store != nullptr, (result = CertificateChainValidationResult::kNoMemory, err = CHIP_ERROR_NO_MEMORY));
 
     verifyCtx = X509_STORE_CTX_new();
-    VerifyOrExit(verifyCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(verifyCtx != nullptr, (result = CertificateChainValidationResult::kNoMemory, err = CHIP_ERROR_NO_MEMORY));
 
     x509RootCertificate = d2i_X509(NULL, &rootCertificate, static_cast<long>(rootCertificateLen));
-    VerifyOrExit(x509RootCertificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(x509RootCertificate != nullptr,
+                 (result = CertificateChainValidationResult::kRootFormatInvalid, err = CHIP_ERROR_INTERNAL));
 
     status = X509_STORE_add_cert(store, x509RootCertificate);
-    VerifyOrExit(status == 1, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(status == 1, (result = CertificateChainValidationResult::kInternalFrameworkError, err = CHIP_ERROR_INTERNAL));
 
-    if (caCertificate != nullptr && caCertificateLen != 0)
-    {
-        x509CACertificate = d2i_X509(NULL, &caCertificate, static_cast<long>(caCertificateLen));
-        VerifyOrExit(x509CACertificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    x509CACertificate = d2i_X509(NULL, &caCertificate, static_cast<long>(caCertificateLen));
+    VerifyOrExit(x509CACertificate != nullptr,
+                 (result = CertificateChainValidationResult::kICAFormatInvalid, err = CHIP_ERROR_INTERNAL));
 
-        status = X509_STORE_add_cert(store, x509CACertificate);
-        VerifyOrExit(status == 1, err = CHIP_ERROR_INTERNAL);
-    }
+    status = X509_STORE_add_cert(store, x509CACertificate);
+    VerifyOrExit(status == 1, (result = CertificateChainValidationResult::kInternalFrameworkError, err = CHIP_ERROR_INTERNAL));
 
     x509LeafCertificate = d2i_X509(NULL, &leafCertificate, static_cast<long>(leafCertificateLen));
-    VerifyOrExit(x509LeafCertificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(x509LeafCertificate != nullptr,
+                 (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));
 
     status = X509_STORE_CTX_init(verifyCtx, store, x509LeafCertificate, NULL);
-    VerifyOrExit(status == 1, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(status == 1, (result = CertificateChainValidationResult::kInternalFrameworkError, err = CHIP_ERROR_INTERNAL));
 
-    // TODO: If any specific error occurs here, it should be flagged accordingly
     status = X509_verify_cert(verifyCtx);
-    VerifyOrExit(status == 1, err = CHIP_ERROR_CERT_NOT_TRUSTED);
+    VerifyOrExit(status == 1, (result = CertificateChainValidationResult::kChainInvalid, err = CHIP_ERROR_CERT_NOT_TRUSTED));
 
-    err = CHIP_NO_ERROR;
+    err    = CHIP_NO_ERROR;
+    result = CertificateChainValidationResult::kSuccess;
 
 exit:
     X509_free(x509LeafCertificate);
@@ -1637,6 +1724,80 @@ exit:
     X509_STORE_free(store);
 
     return err;
+}
+
+CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & referenceCertificate, const ByteSpan & toBeEvaluatedCertificate)
+{
+    CHIP_ERROR error                                = CHIP_NO_ERROR;
+    X509 * x509ReferenceCertificate                 = nullptr;
+    X509 * x509toBeEvaluatedCertificate             = nullptr;
+    const unsigned char * pReferenceCertificate     = referenceCertificate.data();
+    const unsigned char * pToBeEvaluatedCertificate = toBeEvaluatedCertificate.data();
+    ASN1_TIME * refNotBeforeTime                    = nullptr;
+    ASN1_TIME * tbeNotBeforeTime                    = nullptr;
+    ASN1_TIME * tbeNotAfterTime                     = nullptr;
+    // int result                                      = 0;
+
+    VerifyOrReturnError(!referenceCertificate.empty() && !toBeEvaluatedCertificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    x509ReferenceCertificate = d2i_X509(NULL, &pReferenceCertificate, static_cast<long>(referenceCertificate.size()));
+    VerifyOrExit(x509ReferenceCertificate != nullptr, error = CHIP_ERROR_NO_MEMORY);
+
+    x509toBeEvaluatedCertificate = d2i_X509(NULL, &pToBeEvaluatedCertificate, static_cast<long>(toBeEvaluatedCertificate.size()));
+    VerifyOrExit(x509toBeEvaluatedCertificate != nullptr, error = CHIP_ERROR_NO_MEMORY);
+
+    refNotBeforeTime = X509_get_notBefore(x509ReferenceCertificate);
+    tbeNotBeforeTime = X509_get_notBefore(x509toBeEvaluatedCertificate);
+    tbeNotAfterTime  = X509_get_notAfter(x509toBeEvaluatedCertificate);
+    VerifyOrExit(refNotBeforeTime && tbeNotBeforeTime && tbeNotAfterTime, error = CHIP_ERROR_INTERNAL);
+
+    // TODO: Handle PAA/PAI re-issue and enable below time validations
+    // result = ASN1_TIME_compare(refNotBeforeTime, tbeNotBeforeTime);
+    // check if referenceCertificate is issued at or after tbeCertificate's notBefore timestamp
+    // VerifyOrExit(result >= 0, error = CHIP_ERROR_CERT_EXPIRED);
+
+    // result = ASN1_TIME_compare(refNotBeforeTime, tbeNotAfterTime);
+    // check if referenceCertificate is issued at or before tbeCertificate's notAfter timestamp
+    // VerifyOrExit(result <= 0, error = CHIP_ERROR_CERT_EXPIRED);
+
+exit:
+    X509_free(x509ReferenceCertificate);
+    X509_free(x509toBeEvaluatedCertificate);
+
+    return error;
+}
+
+CHIP_ERROR IsCertificateValidAtCurrentTime(const ByteSpan & certificate)
+{
+    CHIP_ERROR error                   = CHIP_NO_ERROR;
+    X509 * x509Certificate             = nullptr;
+    const unsigned char * pCertificate = certificate.data();
+    ASN1_TIME * time                   = nullptr;
+    int result                         = 0;
+
+    VerifyOrReturnError(!certificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    x509Certificate = d2i_X509(NULL, &pCertificate, static_cast<long>(certificate.size()));
+    VerifyOrExit(x509Certificate != nullptr, error = CHIP_ERROR_NO_MEMORY);
+
+    time = X509_get_notBefore(x509Certificate);
+    VerifyOrExit(time, error = CHIP_ERROR_INTERNAL);
+
+    result = X509_cmp_current_time(time);
+    // check if certificate's notBefore timestamp is earlier than or equal to current time.
+    VerifyOrExit(result == -1, error = CHIP_ERROR_CERT_EXPIRED);
+
+    time = X509_get_notAfter(x509Certificate);
+    VerifyOrExit(time, error = CHIP_ERROR_INTERNAL);
+
+    result = X509_cmp_current_time(time);
+    // check if certificate's notAfter timestamp is later than current time.
+    VerifyOrExit(result == 1, error = CHIP_ERROR_CERT_EXPIRED);
+
+exit:
+    X509_free(x509Certificate);
+
+    return error;
 }
 
 CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256PublicKey & pubkey)
@@ -1670,22 +1831,27 @@ exit:
     return err;
 }
 
-CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & akid)
+namespace {
+
+CHIP_ERROR ExtractKIDFromX509Cert(bool isSKID, const ByteSpan & certificate, MutableByteSpan & kid)
 {
     CHIP_ERROR err                       = CHIP_NO_ERROR;
     X509 * x509certificate               = nullptr;
     const unsigned char * pCertificate   = certificate.data();
     const unsigned char ** ppCertificate = &pCertificate;
-    const ASN1_OCTET_STRING * akidString = nullptr;
+    const ASN1_OCTET_STRING * kidString  = nullptr;
 
     x509certificate = d2i_X509(NULL, ppCertificate, static_cast<long>(certificate.size()));
     VerifyOrExit(x509certificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    akidString = X509_get0_authority_key_id(x509certificate);
+    kidString = isSKID ? X509_get0_subject_key_id(x509certificate) : X509_get0_authority_key_id(x509certificate);
+    VerifyOrExit(kidString != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(kidString->length <= static_cast<int>(kid.size()), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrExit(CanCastTo<size_t>(kidString->length), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrExit(akidString->length == static_cast<int>(akid.size()), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    memcpy(kid.data(), kidString->data, static_cast<size_t>(kidString->length));
 
-    memcpy(akid.data(), akidString->data, static_cast<size_t>(akidString->length));
+    kid.reduce_size(static_cast<size_t>(kidString->length));
 
 exit:
     X509_free(x509certificate);
@@ -1693,18 +1859,32 @@ exit:
     return err;
 }
 
-CHIP_ERROR ExtractVIDFromX509Cert(const ByteSpan & certificate, VendorId & vid)
-{
-    CHIP_ERROR err                     = CHIP_NO_ERROR;
-    X509 * x509certificate             = nullptr;
-    const unsigned char * pCertificate = certificate.data();
-    constexpr char vidNeedle[]         = "1.3.6.1.4.1.37244.2.1"; // Matter VID OID - taken from Spec
-    constexpr size_t vidNeedleSize     = sizeof(vidNeedle);
-    char buff[vidNeedleSize]           = { 0 };
-    X509_NAME * subject                = nullptr;
-    int x509EntryCountIdx              = 0;
+} // namespace
 
-    vid = VendorId::NotSpecified;
+CHIP_ERROR ExtractSKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & skid)
+{
+    return ExtractKIDFromX509Cert(true, certificate, skid);
+}
+
+CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & akid)
+{
+    return ExtractKIDFromX509Cert(false, certificate, akid);
+}
+
+namespace {
+
+CHIP_ERROR ExtractDNAttributeFromX509Cert(const char * oidString, const ByteSpan & certificate, uint16_t & id)
+{
+    CHIP_ERROR err                            = CHIP_NO_ERROR;
+    X509 * x509certificate                    = nullptr;
+    const unsigned char * pCertificate        = certificate.data();
+    size_t oidStringSize                      = strlen(oidString) + 1;
+    constexpr size_t sOidStringSize           = 22;
+    char dnAttributeOidString[sOidStringSize] = { 0 };
+    X509_NAME * subject                       = nullptr;
+    int x509EntryCountIdx                     = 0;
+
+    VerifyOrReturnError(oidStringSize == sOidStringSize, CHIP_ERROR_INVALID_ARGUMENT);
 
     x509certificate = d2i_X509(NULL, &pCertificate, static_cast<long>(certificate.size()));
     VerifyOrExit(x509certificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
@@ -1718,27 +1898,47 @@ CHIP_ERROR ExtractVIDFromX509Cert(const ByteSpan & certificate, VendorId & vid)
         VerifyOrExit(name_entry != nullptr, err = CHIP_ERROR_INTERNAL);
         ASN1_OBJECT * object = X509_NAME_ENTRY_get_object(name_entry);
         VerifyOrExit(object != nullptr, err = CHIP_ERROR_INTERNAL);
-        VerifyOrExit(OBJ_obj2txt(buff, sizeof(buff), object, 0) != 0, err = CHIP_ERROR_INTERNAL);
+        VerifyOrExit(OBJ_obj2txt(dnAttributeOidString, sizeof(dnAttributeOidString), object, 0) != 0, err = CHIP_ERROR_INTERNAL);
 
-        if (strncmp(vidNeedle, buff, vidNeedleSize) == 0)
+        if (strncmp(oidString, dnAttributeOidString, sizeof(dnAttributeOidString)) == 0)
         {
             ASN1_STRING * data_entry = X509_NAME_ENTRY_get_data(name_entry);
             VerifyOrExit(data_entry != nullptr, err = CHIP_ERROR_INTERNAL);
             unsigned char * str = ASN1_STRING_data(data_entry);
             VerifyOrExit(str != nullptr, err = CHIP_ERROR_INTERNAL);
 
-            vid = static_cast<VendorId>(strtoul(reinterpret_cast<const char *>(str), NULL, 16));
+            VerifyOrExit(ArgParser::ParseInt(reinterpret_cast<const char *>(str), id, 16), err = CHIP_ERROR_INTERNAL);
             break;
         }
     }
 
     // returning CHIP_ERROR_KEY_NOT_FOUND to indicate VID is not present in the certificate.
-    VerifyOrReturnError(x509EntryCountIdx < X509_NAME_entry_count(subject), CHIP_ERROR_KEY_NOT_FOUND);
+    VerifyOrExit(x509EntryCountIdx < X509_NAME_entry_count(subject), err = CHIP_ERROR_KEY_NOT_FOUND);
 
 exit:
     X509_free(x509certificate);
 
     return err;
+}
+
+} // namespace
+
+CHIP_ERROR ExtractDNAttributeFromX509Cert(MatterOid matterOid, const ByteSpan & certificate, uint16_t & id)
+{
+    constexpr char vidOidString[] = "1.3.6.1.4.1.37244.2.1"; // Matter VID OID - taken from Spec
+    constexpr char pidOidString[] = "1.3.6.1.4.1.37244.2.2"; // Matter PID OID - taken from Spec
+
+    switch (matterOid)
+    {
+    case MatterOid::kVendorId:
+        id = VendorId::NotSpecified;
+        return ExtractDNAttributeFromX509Cert(vidOidString, certificate, id);
+    case MatterOid::kProductId:
+        id = 0; // PID not specified value
+        return ExtractDNAttributeFromX509Cert(pidOidString, certificate, id);
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 }
 
 } // namespace Crypto

@@ -17,39 +17,60 @@
  */
 
 #include "ApplicationLauncherManager.h"
-#include <app/clusters/application-launcher-server/application-launcher-server.h>
-#include <app/util/af.h>
-#include <app/util/basic-types.h>
 
 using namespace std;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::ApplicationLauncher;
+using namespace chip::Uint8;
 
-CHIP_ERROR ApplicationLauncherManager::Init()
+CHIP_ERROR ApplicationLauncherManager::HandleGetCatalogList(AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    SuccessOrExit(err);
-exit:
-    return err;
+    std::list<uint16_t> catalogList = { 123, 456 };
+    return aEncoder.EncodeList([catalogList](const auto & encoder) -> CHIP_ERROR {
+        for (const auto & catalog : catalogList)
+        {
+            ReturnErrorOnFailure(encoder.Encode(catalog));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
-vector<uint16_t> ApplicationLauncherManager::proxyGetApplicationList()
+void ApplicationLauncherManager::HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const ByteSpan & data,
+                                                 const ApplicationType & application)
 {
-    vector<uint16_t> applications;
-    applications.push_back(123);
-    applications.push_back(456);
-    return applications;
+    ChipLogProgress(Zcl, "ApplicationLauncherManager::HandleLaunchApp");
+
+    // TODO: Insert code here
+    LauncherResponseType response;
+    const char * buf = "data";
+    response.data    = ByteSpan(from_const_char(buf), strlen(buf));
+    response.status  = StatusEnum::kSuccess;
+    helper.Success(response);
 }
 
-ApplicationLauncherResponse applicationLauncherClusterLaunchApp(ApplicationLauncherApp application, std::string data)
+void ApplicationLauncherManager::HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper,
+                                               const ApplicationType & application)
 {
-    // TODO: Insert your code
-    ApplicationLauncherResponse response;
-    const char * testData = "data";
-    response.data         = (uint8_t *) testData;
-    response.status       = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
-    // TODO: Update once storing a structure attribute is supported
-    // emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_LAUNCH_CLUSTER_ID, ZCL_APPLICATION_LAUNCHER_CURRENT_APP_APPLICATION_ID,
-    //                             (uint8_t *) &application, ZCL_STRUCT_ATTRIBUTE_TYPE);
+    ChipLogProgress(Zcl, "ApplicationLauncherManager::HandleStopApp");
 
-    return response;
+    // TODO: Insert code here
+    LauncherResponseType response;
+    const char * buf = "data";
+    response.data    = ByteSpan(from_const_char(buf), strlen(buf));
+    response.status  = StatusEnum::kSuccess;
+    helper.Success(response);
+}
+
+void ApplicationLauncherManager::HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper,
+                                               const ApplicationType & application)
+{
+    ChipLogProgress(Zcl, "ApplicationLauncherManager::HandleHideApp");
+
+    // TODO: Insert code here
+    LauncherResponseType response;
+    const char * buf = "data";
+    response.data    = ByteSpan(from_const_char(buf), strlen(buf));
+    response.status  = StatusEnum::kSuccess;
+    helper.Success(response);
 }

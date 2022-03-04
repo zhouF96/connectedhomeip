@@ -184,7 +184,7 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
         ChipDeviceEvent chip_event;
         chip_event.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
         chip_event.CHIPoBLEAdvertisingChange.Result = kActivity_Started;
-        PlatformMgrImpl().PostEvent(&chip_event);
+        PlatformMgrImpl().PostEventOrDie(&chip_event);
 
         PlatformMgr().ScheduleWork(ble_manager.DriveBLEState, 0);
     }
@@ -202,13 +202,13 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
         ChipLogDetail(DeviceLayer, "GAP %s", __FUNCTION__);
 
         BLEManagerImpl & ble_manager = BLEMgrImpl();
-        ble_manager.mFlags.Set(ble_manager.kFlag_Advertising);
+        ble_manager.mFlags.Clear(ble_manager.kFlag_Advertising);
 
         // Post a CHIPoBLEAdvertisingChange(Stopped) event.
         ChipDeviceEvent chip_event;
         chip_event.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
         chip_event.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
-        PlatformMgrImpl().PostEvent(&chip_event);
+        PlatformMgrImpl().PostEventOrDie(&chip_event);
 
         if (event.isConnected())
         {
@@ -305,7 +305,7 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
             chip_event.CHIPoBLEConnectionError.Reason = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
             break;
         }
-        PlatformMgrImpl().PostEvent(&chip_event);
+        PlatformMgrImpl().PostEventOrDie(&chip_event);
 
         ChipLogProgress(DeviceLayer, "BLE connection terminated, mbed-os reason: %d", reason.value());
         ChipLogProgress(DeviceLayer, "Current number of connections: %" PRIu16 "/%d", ble_manager.NumConnections(),
@@ -397,7 +397,7 @@ struct CHIPService : public ble::GattServer::EventHandler
             chip_event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
             chip_event.CHIPoBLEWriteReceived.ConId = params->connHandle;
             chip_event.CHIPoBLEWriteReceived.Data  = std::move(buf).UnsafeRelease();
-            PlatformMgrImpl().PostEvent(&chip_event);
+            PlatformMgrImpl().PostEventOrDie(&chip_event);
         }
         else
         {
@@ -420,10 +420,11 @@ struct CHIPService : public ble::GattServer::EventHandler
     {
         ChipLogDetail(DeviceLayer, "GATT %s, connHandle=%d, attHandle=%d", __FUNCTION__, params.connHandle, params.attHandle);
 
-        // FIXME: ACK hack
-#if (defined(MBED_CONF_APP_USE_GATT_INDICATION_ACK_HACK) && (MBED_CONF_APP_USE_GATT_INDICATION_ACK_HACK != 0))
+        // Note: This is applicable to both notification and indication: If a
+        // notification is sent then onDataSent is called as soon as the data
+        // has been pushed into the Bluetooth controller. For indication, onDataSent
+        // is called when the confirmation has been received.
         onConfirmationReceived(params);
-#endif
     }
 
     void onDataWritten(const GattWriteCallbackParams & params) override
@@ -447,7 +448,7 @@ struct CHIPService : public ble::GattServer::EventHandler
             ChipDeviceEvent chip_event;
             chip_event.Type                    = DeviceEventType::kCHIPoBLESubscribe;
             chip_event.CHIPoBLESubscribe.ConId = params.connHandle;
-            PlatformMgrImpl().PostEvent(&chip_event);
+            PlatformMgrImpl().PostEventOrDie(&chip_event);
         }
     }
 
@@ -460,7 +461,7 @@ struct CHIPService : public ble::GattServer::EventHandler
             ChipDeviceEvent chip_event;
             chip_event.Type                      = DeviceEventType::kCHIPoBLEUnsubscribe;
             chip_event.CHIPoBLEUnsubscribe.ConId = params.connHandle;
-            PlatformMgrImpl().PostEvent(&chip_event);
+            PlatformMgrImpl().PostEventOrDie(&chip_event);
         }
     }
 
@@ -473,7 +474,7 @@ struct CHIPService : public ble::GattServer::EventHandler
             ChipDeviceEvent chip_event;
             chip_event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
             chip_event.CHIPoBLEIndicateConfirm.ConId = params.connHandle;
-            PlatformMgrImpl().PostEvent(&chip_event);
+            PlatformMgrImpl().PostEventOrDie(&chip_event);
         }
     }
 
@@ -569,18 +570,22 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mFlags       = BitFlags<Flags>(CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART ? kFlag_AdvertisingEnabled : 0);
     mGAPConns    = 0;
 
-    ble::BLE & ble_interface = ble::BLE::Instance();
+    if (!mInitialized)
+    {
+        ble::BLE & ble_interface = ble::BLE::Instance();
 
-    ble_interface.gap().setEventHandler(&sMbedGapEventHandler);
-    ReturnErrorOnFailure(sCHIPService.init(ble_interface));
+        ble_interface.gap().setEventHandler(&sMbedGapEventHandler);
+        ReturnErrorOnFailure(sCHIPService.init(ble_interface));
 
-    ble_interface.onEventsToProcess(FunctionPointerWithContext<ble::BLE::OnEventsToProcessCallbackContext *>{
-        [](ble::BLE::OnEventsToProcessCallbackContext * context) { PlatformMgr().ScheduleWork(DoBLEProcessing, 0); } });
+        ble_interface.onEventsToProcess(FunctionPointerWithContext<ble::BLE::OnEventsToProcessCallbackContext *>{
+            [](ble::BLE::OnEventsToProcessCallbackContext * context) { PlatformMgr().ScheduleWork(DoBLEProcessing, 0); } });
 
-    mbed_err = ble_interface.init([](ble::BLE::InitializationCompleteCallbackContext * context) {
-        BLEMgrImpl().HandleInitComplete(context->error == BLE_ERROR_NONE);
-    });
-    VerifyOrReturnError(mbed_err == BLE_ERROR_NONE, CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
+        mbed_err = ble_interface.init([](ble::BLE::InitializationCompleteCallbackContext * context) {
+            BLEMgrImpl().HandleInitComplete(context->error == BLE_ERROR_NONE);
+        });
+        VerifyOrReturnError(mbed_err == BLE_ERROR_NONE, CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
+        mInitialized = true;
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -621,13 +626,13 @@ void BLEManagerImpl::HandleInitComplete(bool no_error)
         /*const Passkey_t passkey        */ nullptr,
         /*bool signing                   */ true,
         /*const char *dbFilepath         */ nullptr);
-    VerifyOrExit(mbed_err == BLE_ERROR_NONE, CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
+    VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
 
     mbed_err = security_mgr.setPairingRequestAuthorisation(true);
     VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
     security_mgr.setSecurityManagerEventHandler(&sSecurityManagerEventHandler);
 
-    err = BleLayer::Init(this, this, &SystemLayer);
+    err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
     SuccessOrExit(err);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 #if _BLEMGRIMPL_USE_LEDS
@@ -640,6 +645,7 @@ exit:
         ChipLogError(DeviceLayer, "BLEManager init error: %s ", ErrorStr(err));
         ChipLogError(DeviceLayer, "Disabling CHIPoBLE service.");
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
+        mInitialized = false;
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 }
@@ -787,7 +793,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
 
     mbed_err = gap.startAdvertising(ble::LEGACY_ADVERTISING_HANDLE);
-    VerifyOrExit(mbed_err == BLE_ERROR_NONE, CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
+    VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
 
     ChipLogDetail(DeviceLayer, "Advertising started, type: 0x%x (%sconnectable), interval: [%lu:%lu] ms, device name: %s)",
                   adv_params.getType().value(), connectable ? "" : "non-", adv_params.getMinPrimaryInterval().valueInMs(),
@@ -814,7 +820,7 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
         return err;
     }
     mbed_err = gap.stopAdvertising(ble::LEGACY_ADVERTISING_HANDLE);
-    VerifyOrExit(mbed_err == BLE_ERROR_NONE, CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
+    VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
 
 exit:
     if (mbed_err != BLE_ERROR_NONE)
@@ -926,7 +932,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         ChipLogDetail(DeviceLayer, "_OnPlatformEvent kCHIPoBLESubscribe");
         HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
         connEstEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
-        PlatformMgrImpl().PostEvent(&connEstEvent);
+        PlatformMgrImpl().PostEventOrDie(&connEstEvent);
     }
     break;
 
@@ -1028,7 +1034,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
                   conId, att_handle, pBuf->DataLength());
 
     mbed_err = gatt_server.write(att_handle, pBuf->Start(), pBuf->DataLength(), false);
-    VerifyOrExit(mbed_err == BLE_ERROR_NONE, CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
+    VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
 
 exit:
     if (mbed_err != BLE_ERROR_NONE)

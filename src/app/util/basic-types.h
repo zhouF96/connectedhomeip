@@ -23,31 +23,14 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
-// Pull in NodeId
-#include <lib/core/NodeId.h>
-
-// Pull in VendorId
-#include <lib/core/CHIPVendorIdentifiers.hpp>
+// Pull in core types
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
-typedef uint8_t ActionId;
-typedef uint32_t AttributeId;
-typedef uint32_t ClusterId;
-typedef uint32_t CommandId;
-typedef uint32_t DataVersion;
-typedef uint32_t DeviceTypeId;
-typedef uint16_t EndpointId;
-typedef uint32_t EventId;
-typedef uint64_t EventNumber;
-typedef uint64_t FabricId;
-typedef uint8_t FabricIndex;
-typedef uint32_t FieldId;
-typedef uint16_t GroupId;
-typedef uint16_t ListIndex;
-typedef uint32_t TransactionId;
-typedef uint32_t StatusCode;
+
 typedef uint8_t Percent;
 typedef uint16_t Percent100ths;
+
 } // namespace chip

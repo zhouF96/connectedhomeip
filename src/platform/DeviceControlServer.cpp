@@ -20,19 +20,12 @@
  *          Provides the implementation of the DeviceControlServer object.
  */
 
-#include <platform/internal/DeviceControlServer.h>
+#include <platform/DeviceControlServer.h>
 
 #include <platform/ConfigurationManager.h>
 
 namespace chip {
 namespace DeviceLayer {
-namespace Internal {
-
-void HandleArmFailSafe(System::Layer * layer, void * aAppState)
-{
-    DeviceControlServer * server = reinterpret_cast<DeviceControlServer *>(aAppState);
-    server->CommissioningFailedTimerComplete();
-}
 
 DeviceControlServer DeviceControlServer::sInstance;
 
@@ -41,45 +34,25 @@ DeviceControlServer & DeviceControlServer::DeviceControlSvr()
     return sInstance;
 }
 
-void DeviceControlServer::CommissioningFailedTimerComplete()
+CHIP_ERROR DeviceControlServer::CommissioningComplete(NodeId peerNodeId, FabricIndex accessingFabricIndex)
 {
+    VerifyOrReturnError(CHIP_NO_ERROR == mFailSafeContext.DisarmFailSafe(), CHIP_ERROR_INTERNAL);
     ChipDeviceEvent event;
-    event.Type                         = DeviceEventType::kCommissioningComplete;
-    event.CommissioningComplete.status = CHIP_ERROR_TIMEOUT;
-    PlatformMgr().PostEvent(&event);
+    event.Type                                  = DeviceEventType::kCommissioningComplete;
+    event.CommissioningComplete.PeerNodeId      = peerNodeId;
+    event.CommissioningComplete.PeerFabricIndex = accessingFabricIndex;
+    event.CommissioningComplete.Status          = CHIP_NO_ERROR;
+    return PlatformMgr().PostEvent(&event);
 }
 
-CHIP_ERROR DeviceControlServer::ArmFailSafe(uint16_t expiryLengthSeconds)
-{
-    uint32_t timerMs = expiryLengthSeconds * 1000;
-    SystemLayer.StartTimer(timerMs, HandleArmFailSafe, this);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceControlServer::DisarmFailSafe()
-{
-    SystemLayer.CancelTimer(HandleArmFailSafe, this);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceControlServer::CommissioningComplete()
-{
-    VerifyOrReturnError(CHIP_NO_ERROR == DisarmFailSafe(), CHIP_ERROR_INTERNAL);
-    ChipDeviceEvent event;
-    event.Type                         = DeviceEventType::kCommissioningComplete;
-    event.CommissioningComplete.status = CHIP_NO_ERROR;
-    PlatformMgr().PostEvent(&event);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceControlServer::SetRegulatoryConfig(uint8_t location, const char * countryCode, uint64_t breadcrumb)
+CHIP_ERROR DeviceControlServer::SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode, uint64_t breadcrumb)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     err = ConfigurationMgr().StoreRegulatoryLocation(location);
     SuccessOrExit(err);
 
-    err = ConfigurationMgr().StoreCountryCode(countryCode, strlen(countryCode));
+    err = ConfigurationMgr().StoreCountryCode(countryCode.data(), countryCode.size());
     SuccessOrExit(err);
 
     err = ConfigurationMgr().StoreBreadcrumb(breadcrumb);
@@ -96,7 +69,7 @@ exit:
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceControlServer::EnableNetworkForOperational(ByteSpan networkID)
+CHIP_ERROR DeviceControlServer::ConnectNetworkForOperational(ByteSpan networkID)
 {
     ChipDeviceEvent event;
     event.Type = DeviceEventType::kOperationalNetworkEnabled;
@@ -106,6 +79,5 @@ CHIP_ERROR DeviceControlServer::EnableNetworkForOperational(ByteSpan networkID)
     return CHIP_NO_ERROR;
 }
 
-} // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

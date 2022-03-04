@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <algorithm>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/CHIPCert.h>
 #include <lib/core/CHIPTLV.h>
@@ -31,6 +32,7 @@ namespace Controller {
 constexpr const char kOperationalCredentialsIssuerKeypairStorage[]             = "ExampleOpCredsCAKey";
 constexpr const char kOperationalCredentialsIntermediateIssuerKeypairStorage[] = "ExampleOpCredsICAKey";
 constexpr const char kOperationalCredentialsRootCertificateStorage[]           = "ExampleCARootCert";
+constexpr const char kOperationalCredentialsIntermediateCertificateStorage[]   = "ExampleCAIntermediateCert";
 
 using namespace Credentials;
 using namespace Crypto;
@@ -40,6 +42,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
 {
     using namespace ASN1;
     ASN1UniversalTime effectiveTime;
+    CHIP_ERROR err;
 
     // Initializing the default start validity to start of 2021. The default validity duration is 10 years.
     CHIP_ZERO_AT(effectiveTime);
@@ -49,16 +52,23 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
     ReturnErrorOnFailure(ASN1ToChipEpochTime(effectiveTime, mNow));
 
     Crypto::P256SerializedKeypair serializedKey;
-    uint16_t keySize = static_cast<uint16_t>(sizeof(serializedKey));
+    uint16_t keySize = static_cast<uint16_t>(serializedKey.Capacity());
 
-    if (storage.SyncGetKeyValue(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize) != CHIP_NO_ERROR)
+    PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIssuerKeypairStorage, key,
+                      err = storage.SyncGetKeyValue(key, serializedKey.Bytes(), keySize));
+    serializedKey.SetLength(keySize);
+
+    if (err != CHIP_NO_ERROR)
     {
+        ChipLogProgress(Controller, "Couldn't get %s from storage: %s", kOperationalCredentialsIssuerKeypairStorage, ErrorStr(err));
         // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
         ReturnErrorOnFailure(mIssuer.Initialize());
         ReturnErrorOnFailure(mIssuer.Serialize(serializedKey));
 
-        keySize = static_cast<uint16_t>(sizeof(serializedKey));
-        ReturnErrorOnFailure(storage.SyncSetKeyValue(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize));
+        keySize = static_cast<uint16_t>(serializedKey.Capacity());
+
+        PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIssuerKeypairStorage, key,
+                          ReturnErrorOnFailure(storage.SyncSetKeyValue(key, serializedKey.Bytes(), keySize)));
     }
     else
     {
@@ -66,17 +76,24 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
         ReturnErrorOnFailure(mIssuer.Deserialize(serializedKey));
     }
 
-    keySize = static_cast<uint16_t>(sizeof(serializedKey));
+    keySize = static_cast<uint16_t>(serializedKey.Capacity());
 
-    if (storage.SyncGetKeyValue(kOperationalCredentialsIntermediateIssuerKeypairStorage, &serializedKey, keySize) != CHIP_NO_ERROR)
+    PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateIssuerKeypairStorage, key,
+                      err = storage.SyncGetKeyValue(key, serializedKey.Bytes(), keySize));
+    serializedKey.SetLength(keySize);
+
+    if (err != CHIP_NO_ERROR)
     {
+        ChipLogProgress(Controller, "Couldn't get %s from storage: %s", kOperationalCredentialsIntermediateIssuerKeypairStorage,
+                        ErrorStr(err));
         // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
         ReturnErrorOnFailure(mIntermediateIssuer.Initialize());
         ReturnErrorOnFailure(mIntermediateIssuer.Serialize(serializedKey));
 
-        keySize = static_cast<uint16_t>(sizeof(serializedKey));
-        ReturnErrorOnFailure(
-            storage.SyncSetKeyValue(kOperationalCredentialsIntermediateIssuerKeypairStorage, &serializedKey, keySize));
+        keySize = static_cast<uint16_t>(serializedKey.Capacity());
+
+        PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateIssuerKeypairStorage, key,
+                          ReturnErrorOnFailure(storage.SyncSetKeyValue(key, serializedKey.Bytes(), keySize)));
     }
     else
     {
@@ -94,33 +111,59 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
                                                                                 MutableByteSpan & rcac, MutableByteSpan & icac,
                                                                                 MutableByteSpan & noc)
 {
-    ChipLogProgress(Controller, "Generating NOC");
-    X509CertRequestParams noc_request = { 1, mIntermediateIssuerId, mNow, mNow + mValidity, true, fabricId, true, nodeId };
-    ReturnErrorOnFailure(
-        NewNodeOperationalX509Cert(noc_request, CertificateIssuerLevel::kIssuerIsIntermediateCA, pubkey, mIntermediateIssuer, noc));
+    ChipDN noc_dn;
+    // TODO: Is there a way to make this code less error-prone for consumers?
+    // The consumer doesn't need to know the exact OID value.
+    noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipFabricId, fabricId);
+    noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipNodeId, nodeId);
+    // TODO: Add support for the CASE Authenticated Tags attributes
+    ChipDN icac_dn;
+    icac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipICAId, mIntermediateIssuerId);
+    ChipDN rcac_dn;
+    rcac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipRootId, mIssuerId);
 
-    ChipLogProgress(Controller, "Generating ICAC");
-    X509CertRequestParams icac_request = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
-    ReturnErrorOnFailure(NewICAX509Cert(icac_request, mIntermediateIssuerId, mIntermediateIssuer.Pubkey(), mIssuer, icac));
+    ChipLogProgress(Controller, "Generating NOC");
+    X509CertRequestParams noc_request = { 1, mNow, mNow + mValidity, noc_dn, icac_dn };
+    ReturnErrorOnFailure(NewNodeOperationalX509Cert(noc_request, pubkey, mIntermediateIssuer, noc));
+
+    uint16_t icacBufLen = static_cast<uint16_t>(std::min(icac.size(), static_cast<size_t>(UINT16_MAX)));
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateCertificateStorage, key,
+                      err = mStorage->SyncGetKeyValue(key, icac.data(), icacBufLen));
+    if (err == CHIP_NO_ERROR)
+    {
+        // Found root certificate in the storage.
+        icac.reduce_size(icacBufLen);
+    }
+    else
+    {
+        ChipLogProgress(Controller, "Generating ICAC");
+        X509CertRequestParams icac_request = { 0, mNow, mNow + mValidity, icac_dn, rcac_dn };
+        ReturnErrorOnFailure(NewICAX509Cert(icac_request, mIntermediateIssuer.Pubkey(), mIssuer, icac));
+
+        VerifyOrReturnError(CanCastTo<uint16_t>(icac.size()), CHIP_ERROR_INTERNAL);
+        PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateCertificateStorage, key,
+                          err = mStorage->SyncSetKeyValue(key, icac.data(), static_cast<uint16_t>(icac.size())));
+    }
 
     uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcac.size(), static_cast<size_t>(UINT16_MAX)));
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
+    PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsRootCertificateStorage, key,
                       err = mStorage->SyncGetKeyValue(key, rcac.data(), rcacBufLen));
     if (err == CHIP_NO_ERROR)
     {
         // Found root certificate in the storage.
         rcac.reduce_size(rcacBufLen);
-        return CHIP_NO_ERROR;
     }
+    else
+    {
+        ChipLogProgress(Controller, "Generating RCAC");
+        X509CertRequestParams rcac_request = { 0, mNow, mNow + mValidity, rcac_dn, rcac_dn };
+        ReturnErrorOnFailure(NewRootX509Cert(rcac_request, mIssuer, rcac));
 
-    ChipLogProgress(Controller, "Generating RCAC");
-    X509CertRequestParams rcac_request = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
-    ReturnErrorOnFailure(NewRootX509Cert(rcac_request, mIssuer, rcac));
-
-    VerifyOrReturnError(CanCastTo<uint16_t>(rcac.size()), CHIP_ERROR_INTERNAL);
-    PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
-                      err = mStorage->SyncSetKeyValue(key, rcac.data(), static_cast<uint16_t>(rcac.size())));
+        VerifyOrReturnError(CanCastTo<uint16_t>(rcac.size()), CHIP_ERROR_INTERNAL);
+        PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsRootCertificateStorage, key,
+                          err = mStorage->SyncSetKeyValue(key, rcac.data(), static_cast<uint16_t>(rcac.size())));
+    }
 
     return err;
 }
@@ -152,7 +195,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
     }
 
     VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
-    VerifyOrReturnError(reader.GetTag() == AnonymousTag, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    VerifyOrReturnError(reader.GetTag() == AnonymousTag(), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
 
     TLVType containerType;
     ReturnErrorOnFailure(reader.EnterContainer(containerType));
@@ -179,7 +222,8 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
     ReturnErrorOnFailure(GenerateNOCChainAfterValidation(assignedId, mNextFabricId, pubkey, rcacSpan, icacSpan, nocSpan));
 
     ChipLogProgress(Controller, "Providing certificate chain to the commissioner");
-    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, nocSpan, icacSpan, rcacSpan);
+    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, nocSpan, icacSpan, rcacSpan, Optional<AesCcm128KeySpan>(),
+                        Optional<NodeId>());
     return CHIP_NO_ERROR;
 }
 

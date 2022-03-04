@@ -23,8 +23,12 @@
 namespace chip {
 namespace app {
 
-EmberAfStatus ToEmberAfStatus(Protocols::InteractionModel::ProtocolCode code);
-Protocols::InteractionModel::ProtocolCode ToInteractionModelProtocolCode(EmberAfStatus code);
+inline EmberAfStatus ToEmberAfStatus(Protocols::InteractionModel::Status code)
+{
+    return static_cast<EmberAfStatus>(code);
+}
+
+Protocols::InteractionModel::Status ToInteractionModelStatus(EmberAfStatus code);
 
 } // namespace app
 } // namespace chip

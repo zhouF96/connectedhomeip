@@ -21,6 +21,7 @@
 
 #include "AppEvent.h"
 #include "LightingManager.h"
+#include <DFUManager.h>
 
 class AppTask
 {
@@ -30,6 +31,8 @@ public:
     void PostLightingActionRequest(LightingManager::Action_t aAction);
     void PostEvent(AppEvent * aEvent);
     void UpdateClusterState(void);
+
+    void ButtonEventHandler(uint32_t id, bool pushed);
 
 private:
     friend AppTask & GetAppTask(void);
@@ -50,6 +53,7 @@ private:
     void LightingButtonPressEventHandler(void);
     void FunctionButtonPressEventHandler(void);
     void FunctionButtonReleaseEventHandler(void);
+    void SliderEventHandler(int slider_pos);
     void TimerEventHandler(void);
 
     void StartTimer(uint32_t aTimeoutInMs);
@@ -58,6 +62,7 @@ private:
     {
         kFunction_NoneSelected   = 0,
         kFunction_SoftwareUpdate = 0,
+        kFunction_StartBleAdv    = 1,
         kFunction_FactoryReset,
 
         kFunction_Invalid

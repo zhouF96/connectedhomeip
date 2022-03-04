@@ -45,17 +45,14 @@ namespace DeviceLayer {
             BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId)
         {
             bool found = false;
-            CBUUID * serviceId = nil;
-            CBUUID * characteristicId = nil;
+
+            if (NULL == svcId || NULL == charId) {
+                return found;
+            }
+
+            CBUUID * serviceId = [UUIDHelper GetShortestServiceUUID:svcId];
+            CBUUID * characteristicId = [CBUUID UUIDWithData:[NSData dataWithBytes:charId->bytes length:sizeof(charId->bytes)]];
             CBPeripheral * peripheral = (__bridge CBPeripheral *) connObj;
-
-            if (NULL != svcId) {
-                serviceId = [UUIDHelper GetShortestServiceUUID:svcId];
-            }
-
-            if (NULL != charId) {
-                characteristicId = [CBUUID UUIDWithData:[NSData dataWithBytes:charId->bytes length:sizeof(charId->bytes)]];
-            }
 
             for (CBService * service in peripheral.services) {
                 if ([service.UUID.data isEqualToData:serviceId.data]) {
@@ -76,16 +73,14 @@ namespace DeviceLayer {
             BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId)
         {
             bool found = false;
-            CBUUID * serviceId = nil;
-            CBUUID * characteristicId = nil;
-            CBPeripheral * peripheral = (__bridge CBPeripheral *) connObj;
+            if (NULL == svcId || NULL == charId) {
+                return found;
+            }
 
-            if (NULL != svcId) {
-                serviceId = [UUIDHelper GetShortestServiceUUID:svcId];
-            }
-            if (NULL != charId) {
-                characteristicId = [CBUUID UUIDWithData:[NSData dataWithBytes:charId->bytes length:sizeof(charId->bytes)]];
-            }
+            CBUUID * serviceId = [UUIDHelper GetShortestServiceUUID:svcId];
+            CBUUID * characteristicId = characteristicId = [CBUUID UUIDWithData:[NSData dataWithBytes:charId->bytes
+                                                                                               length:sizeof(charId->bytes)]];
+            CBPeripheral * peripheral = (__bridge CBPeripheral *) connObj;
 
             for (CBService * service in peripheral.services) {
                 if ([service.UUID.data isEqualToData:serviceId.data]) {
@@ -114,7 +109,16 @@ namespace DeviceLayer {
             return true;
         }
 
-        uint16_t BlePlatformDelegateImpl::GetMTU(BLE_CONNECTION_OBJECT connObj) const { return 0; }
+        uint16_t BlePlatformDelegateImpl::GetMTU(BLE_CONNECTION_OBJECT connObj) const
+        {
+            CBPeripheral * peripheral = (__bridge CBPeripheral *) connObj;
+
+            // The negotiated mtu length is a property of the peripheral.
+            uint16_t mtuLength = [[peripheral valueForKey:@"mtuLength"] unsignedShortValue];
+            ChipLogProgress(Ble, "ATT MTU = %u", mtuLength);
+
+            return mtuLength;
+        }
 
         bool BlePlatformDelegateImpl::SendIndication(
             BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId, PacketBufferHandle pBuf)
@@ -126,20 +130,14 @@ namespace DeviceLayer {
             BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId, PacketBufferHandle pBuf)
         {
             bool found = false;
-            CBUUID * serviceId = nil;
-            CBUUID * characteristicId = nil;
-            NSData * data = nil;
-            CBPeripheral * peripheral = (__bridge CBPeripheral *) connObj;
+            if (NULL == svcId || NULL == charId || pBuf.IsNull()) {
+                return found;
+            }
 
-            if (NULL != svcId) {
-                serviceId = [UUIDHelper GetShortestServiceUUID:svcId];
-            }
-            if (NULL != charId) {
-                characteristicId = [CBUUID UUIDWithData:[NSData dataWithBytes:charId->bytes length:sizeof(charId->bytes)]];
-            }
-            if (!pBuf.IsNull()) {
-                data = [NSData dataWithBytes:pBuf->Start() length:pBuf->DataLength()];
-            }
+            CBUUID * serviceId = [UUIDHelper GetShortestServiceUUID:svcId];
+            CBUUID * characteristicId = [CBUUID UUIDWithData:[NSData dataWithBytes:charId->bytes length:sizeof(charId->bytes)]];
+            NSData * data = [NSData dataWithBytes:pBuf->Start() length:pBuf->DataLength()];
+            CBPeripheral * peripheral = (__bridge CBPeripheral *) connObj;
 
             for (CBService * service in peripheral.services) {
                 if ([service.UUID.data isEqualToData:serviceId.data]) {

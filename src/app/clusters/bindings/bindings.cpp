@@ -20,124 +20,205 @@
  * @brief Implementation for the Binding Server Cluster
  ***************************************************************************/
 
-#include <app/util/af.h>
-
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/clusters/bindings/BindingManager.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/binding-table.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using TargetStructType         = Binding::Structs::TargetStruct::Type;
+using DecodableBindingListType = Binding::Attributes::Binding::TypeInfo::DecodableType;
 
-EmberStatus prepareBinding(EmberBindingTableEntry & binding, NodeId nodeId, GroupId groupId, EndpointId endpointId,
-                           ClusterId clusterId)
+// TODO: add binding table to the persistent storage
+namespace {
+
+class BindingTableAccess : public AttributeAccessInterface
 {
-    if (groupId && nodeId)
+public:
+    // Register for the Binding cluster on all endpoints.
+    BindingTableAccess() : AttributeAccessInterface(NullOptional, Binding::Id) {}
+
+    CHIP_ERROR Read(const ConcreteReadAttributePath & path, AttributeValueEncoder & encoder) override;
+    CHIP_ERROR Write(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder) override;
+
+private:
+    CHIP_ERROR ReadBindingTable(EndpointId endpoint, AttributeValueEncoder & encoder);
+    CHIP_ERROR WriteBindingTable(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder);
+};
+
+BindingTableAccess gAttrAccess;
+
+bool IsValidBinding(const TargetStructType & entry)
+{
+    return (!entry.group.HasValue() && entry.endpoint.HasValue() && entry.node.HasValue()) ||
+        (!entry.endpoint.HasValue() && !entry.node.HasValue() && entry.group.HasValue());
+}
+
+CHIP_ERROR CheckValidBindingList(const DecodableBindingListType & bindingList, FabricIndex accessingFabricIndex)
+{
+    size_t listSize = 0;
+    auto iter       = bindingList.begin();
+    while (iter.Next())
     {
-        return EMBER_BAD_ARGUMENT;
+        VerifyOrReturnError(IsValidBinding(iter.GetValue()), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        listSize++;
     }
+    ReturnErrorOnFailure(iter.GetStatus());
 
-    binding.clusterId    = clusterId;
-    binding.local        = emberAfCurrentCommand()->apsFrame->destinationEndpoint;
-    binding.networkIndex = 0;
-
-    if (groupId)
+    // Check binding table size
+    uint8_t oldListSize = 0;
+    for (const auto & entry : BindingTable::GetInstance())
     {
-        binding.type    = EMBER_MULTICAST_BINDING;
-        binding.groupId = groupId;
-        binding.remote  = 0;
+        if (entry.fabricIndex == accessingFabricIndex)
+        {
+            oldListSize++;
+        }
+    }
+    ReturnErrorCodeIf(BindingTable::GetInstance().Size() - oldListSize + listSize > EMBER_BINDING_TABLE_SIZE,
+                      CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
+    return CHIP_NO_ERROR;
+}
+
+void AddBindingEntry(const TargetStructType & entry, EndpointId localEndpoint)
+{
+    EmberBindingTableEntry bindingEntry;
+
+    if (entry.group.HasValue())
+    {
+        bindingEntry = EmberBindingTableEntry::ForGroup(entry.fabricIndex, entry.group.Value(), localEndpoint, entry.cluster);
     }
     else
     {
-        binding.type   = EMBER_UNICAST_BINDING;
-        binding.nodeId = nodeId;
-        binding.remote = endpointId;
-    }
-
-    return EMBER_SUCCESS;
-}
-
-EmberStatus getBindingIndex(EmberBindingTableEntry & newEntry, uint8_t * bindingIndex)
-{
-    EmberBindingTableEntry currentEntry;
-    for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
-    {
-        emberGetBinding(i, &currentEntry);
-        if (currentEntry.type != EMBER_UNUSED_BINDING && currentEntry == newEntry)
+        bindingEntry = EmberBindingTableEntry::ForNode(entry.fabricIndex, entry.node.Value(), localEndpoint, entry.endpoint.Value(),
+                                                       entry.cluster);
+        CHIP_ERROR err = BindingManager::GetInstance().UnicastBindingCreated(entry.fabricIndex, entry.node.Value());
+        if (err != CHIP_NO_ERROR)
         {
-            *bindingIndex = i;
-            return EMBER_SUCCESS;
+            ChipLogProgress(
+                Zcl, "Binding: Failed to create session for unicast binding to device " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                ChipLogValueX64(entry.node.Value()), err.Format());
         }
     }
+    BindingTable::GetInstance().Add(bindingEntry);
 
-    return EMBER_NOT_FOUND;
+    BindingManager::GetInstance().NotifyBindingAdded(bindingEntry);
 }
 
-EmberStatus getUnusedBindingIndex(uint8_t * bindingIndex)
+CHIP_ERROR BindingTableAccess::Read(const ConcreteReadAttributePath & path, AttributeValueEncoder & encoder)
 {
-    EmberBindingTableEntry currentEntry;
-    for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
+    switch (path.mAttributeId)
     {
-        emberGetBinding(i, &currentEntry);
-        if (currentEntry.type == EMBER_UNUSED_BINDING)
+    case Binding::Attributes::Binding::Id:
+        return ReadBindingTable(path.mEndpointId, encoder);
+    default:
+        break;
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BindingTableAccess::ReadBindingTable(EndpointId endpoint, AttributeValueEncoder & encoder)
+{
+    return encoder.EncodeList([&](const auto & subEncoder) {
+        for (const EmberBindingTableEntry & entry : BindingTable::GetInstance())
         {
-            *bindingIndex = i;
-            return EMBER_SUCCESS;
+            if (entry.type == EMBER_UNICAST_BINDING)
+            {
+                Binding::Structs::TargetStruct::Type value = {
+                    .fabricIndex = entry.fabricIndex,
+                    .node        = MakeOptional(entry.nodeId),
+                    .group       = NullOptional,
+                    .endpoint    = MakeOptional(entry.remote),
+                    .cluster     = entry.clusterId,
+                };
+                ReturnErrorOnFailure(subEncoder.Encode(value));
+            }
+            else if (entry.type == EMBER_MULTICAST_BINDING)
+            {
+                Binding::Structs::TargetStruct::Type value = {
+                    .fabricIndex = entry.fabricIndex,
+                    .node        = NullOptional,
+                    .group       = MakeOptional(entry.groupId),
+                    .endpoint    = NullOptional,
+                    .cluster     = entry.clusterId,
+                };
+                ReturnErrorOnFailure(subEncoder.Encode(value));
+            }
         }
-    }
-
-    return EMBER_NOT_FOUND;
+        return CHIP_NO_ERROR;
+    });
 }
 
-bool emberAfBindingClusterBindCallback(EndpointId endpoint, app::CommandHandler * commandObj, NodeId nodeId, GroupId groupId,
-                                       EndpointId endpointId, ClusterId clusterId)
+CHIP_ERROR BindingTableAccess::Write(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder)
 {
-    ChipLogDetail(Zcl, "RX: BindCallback");
-
-    EmberBindingTableEntry bindingEntry;
-    if (prepareBinding(bindingEntry, nodeId, groupId, endpointId, clusterId) != EMBER_SUCCESS)
+    switch (path.mAttributeId)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_MALFORMED_COMMAND);
-        return true;
+    case Binding::Attributes::Binding::Id:
+        return WriteBindingTable(path, decoder);
+    default:
+        break;
     }
-
-    uint8_t bindingIndex;
-    if (getBindingIndex(bindingEntry, &bindingIndex) != EMBER_NOT_FOUND)
-    {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_DUPLICATE_EXISTS);
-        return true;
-    }
-
-    if (getUnusedBindingIndex(&bindingIndex) != EMBER_SUCCESS)
-    {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INSUFFICIENT_SPACE);
-        return true;
-    }
-
-    emberSetBinding(bindingIndex, &bindingEntry);
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-    return true;
+    return CHIP_NO_ERROR;
 }
 
-bool emberAfBindingClusterUnbindCallback(EndpointId endpoint, app::CommandHandler * commandObj, NodeId nodeId, GroupId groupId,
-                                         EndpointId endpointId, ClusterId clusterId)
+CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder)
 {
-    ChipLogDetail(Zcl, "RX: UnbindCallback");
-
-    EmberBindingTableEntry bindingEntry;
-    if (prepareBinding(bindingEntry, nodeId, groupId, endpointId, clusterId) != EMBER_SUCCESS)
+    FabricIndex accessingFabricIndex = decoder.AccessingFabricIndex();
+    if (!path.IsListOperation() || path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_MALFORMED_COMMAND);
-        return true;
-    }
+        DecodableBindingListType newBindingList;
 
-    uint8_t bindingIndex;
-    if (getBindingIndex(bindingEntry, &bindingIndex) != EMBER_SUCCESS)
+        ReturnErrorOnFailure(decoder.Decode(newBindingList));
+        ReturnErrorOnFailure(CheckValidBindingList(newBindingList, accessingFabricIndex));
+
+        // Clear all entries for the current accessing fabric
+        auto bindingTableIter = BindingTable::GetInstance().begin();
+        while (bindingTableIter != BindingTable::GetInstance().end())
+        {
+            if (bindingTableIter->fabricIndex == accessingFabricIndex)
+            {
+                if (bindingTableIter->type == EMBER_UNICAST_BINDING)
+                {
+                    BindingManager::GetInstance().UnicastBindingRemoved(bindingTableIter.GetIndex());
+                }
+                bindingTableIter = BindingTable::GetInstance().RemoveAt(bindingTableIter);
+            }
+            else
+            {
+                ++bindingTableIter;
+            }
+        }
+
+        // Add new entries
+        auto iter = newBindingList.begin();
+        while (iter.Next())
+        {
+            AddBindingEntry(iter.GetValue(), path.mEndpointId);
+        }
+        return CHIP_NO_ERROR;
+    }
+    else if (path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_NOT_FOUND);
-        return true;
+        TargetStructType target;
+        ReturnErrorOnFailure(decoder.Decode(target));
+        if (!IsValidBinding(target))
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+        AddBindingEntry(target, path.mEndpointId);
+        return CHIP_NO_ERROR;
     }
+    return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
+}
+} // namespace
 
-    emberDeleteBinding(bindingIndex);
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-    return true;
+void MatterBindingPluginServerInitCallback()
+{
+    registerAttributeAccessOverride(&gAttrAccess);
 }

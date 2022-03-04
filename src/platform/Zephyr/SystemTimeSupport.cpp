@@ -32,47 +32,38 @@
 
 namespace chip {
 namespace System {
-namespace Platform {
 namespace Clock {
 
-static uint64_t sBootTimeUS = 0;
+namespace Internal {
+ClockImpl gClockImpl;
+} // namespace Internal
 
-uint64_t GetMonotonicMicroseconds(void)
+Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
 {
-    return k_ticks_to_us_floor64(k_uptime_ticks());
+    return Microseconds64(k_ticks_to_us_floor64(k_uptime_ticks()));
 }
 
-uint64_t GetMonotonicMilliseconds(void)
+Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
 {
-    return k_uptime_get();
+    return Milliseconds64(k_uptime_get());
 }
 
-CHIP_ERROR GetUnixTimeMicroseconds(uint64_t & curTime)
+CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & aCurTime)
 {
-    if (sBootTimeUS == 0)
-    {
-        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
-    }
-    curTime = sBootTimeUS + GetMonotonicMicroseconds();
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR SetUnixTimeMicroseconds(uint64_t newCurTime)
+CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Clock::Milliseconds64 & aCurTime)
 {
-    uint64_t timeSinceBootUS = GetMonotonicMicroseconds();
-    if (newCurTime > timeSinceBootUS)
-    {
-        sBootTimeUS = newCurTime - timeSinceBootUS;
-    }
-    else
-    {
-        sBootTimeUS = 0;
-    }
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ClockImpl::SetClock_RealTime(Clock::Microseconds64 aNewCurTime)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 } // namespace Clock
-} // namespace Platform
 } // namespace System
 } // namespace chip
 

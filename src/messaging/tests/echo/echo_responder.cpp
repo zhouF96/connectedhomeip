@@ -45,6 +45,7 @@ chip::Protocols::Echo::EchoServer gEchoServer;
 chip::TransportMgr<chip::Transport::UDP> gUDPManager;
 chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
 chip::SecurePairingUsingTestSecret gTestPairing;
+chip::SessionHolder gSession;
 
 // Callback handler when a CHIP EchoRequest is received.
 void HandleEchoRequestReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle && payload)
@@ -60,8 +61,6 @@ int main(int argc, char * argv[])
     chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
     bool useTCP      = false;
     bool disableEcho = false;
-
-    chip::Transport::FabricTable fabrics;
 
     const chip::FabricIndex gFabricIndex = 0;
 
@@ -85,20 +84,25 @@ int main(int argc, char * argv[])
 
     if (useTCP)
     {
-        err = gTCPManager.Init(
-            chip::Transport::TcpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
+        err = gTCPManager.Init(chip::Transport::TcpListenParameters(chip::DeviceLayer::TCPEndPointManager())
+#if INET_CONFIG_ENABLE_IPV4
+                                   .SetAddressType(chip::Inet::IPAddressType::kIPv4)
+#else
+                                   .SetAddressType(chip::Inet::IPAddressType::kIPv6)
+#endif
+        );
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer, &gTCPManager, &fabrics, &gMessageCounterManager);
+        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTCPManager, &gMessageCounterManager, &gStorage);
         SuccessOrExit(err);
     }
     else
     {
-        err = gUDPManager.Init(
-            chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
+        err = gUDPManager.Init(chip::Transport::UdpListenParameters(chip::DeviceLayer::UDPEndPointManager())
+                                   .SetAddressType(chip::Inet::IPAddressType::kIPv6));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer, &gUDPManager, &fabrics, &gMessageCounterManager);
+        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gUDPManager, &gMessageCounterManager, &gStorage);
         SuccessOrExit(err);
     }
 
@@ -114,8 +118,8 @@ int main(int argc, char * argv[])
         SuccessOrExit(err);
     }
 
-    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, chip::SecureSession::SessionRole::kResponder,
-                                     gFabricIndex);
+    err = gSessionManager.NewPairing(gSession, peer, chip::kTestControllerNodeId, &gTestPairing,
+                                     chip::CryptoContext::SessionRole::kResponder, gFabricIndex);
     SuccessOrExit(err);
 
     if (!disableEcho)
@@ -139,6 +143,8 @@ exit:
     {
         gEchoServer.Shutdown();
     }
+
+    gUDPManager.Close();
 
     ShutdownChip();
 

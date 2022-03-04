@@ -62,7 +62,9 @@ CONFIG: ConfigDescription = {
     **memdf.collector.elftools.CONFIG,
     **memdf.collector.readelf.CONFIG,
     'collect.method': {
-        'help': 'Method of input processing',
+        'help':
+            'Method of input processing: one of'
+            ' elftools, readelf, bloaty, csv, tsv, su.',
         'metavar': 'METHOD',
         'choices': ['elftools', 'readelf', 'bloaty', 'csv', 'tsv', 'su'],
         'default': 'elftools',
@@ -283,6 +285,12 @@ def postprocess_collected(config: Config, dfs: DFs) -> None:
                     config, dfs[c.name], column)
                 dfs[c.name] = memdf.select.select_configured_column(
                     config, dfs[c.name], column)
+
+    for df in dfs.values():
+        if demangle := set((c for c in df.columns if c.endswith('symbol'))):
+            df.attrs['demangle'] = demangle
+        if hexify := set((c for c in df.columns if c.endswith('address'))):
+            df.attrs['hexify'] = hexify
 
 
 FileReader = Callable[[Config, str, str], DFs]

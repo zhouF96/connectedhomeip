@@ -30,7 +30,7 @@ from __future__ import print_function
 
 import struct
 from collections import Mapping, Sequence, OrderedDict
-
+from enum import Enum
 
 TLV_TYPE_SIGNED_INTEGER = 0x00
 TLV_TYPE_UNSIGNED_INTEGER = 0x04
@@ -112,6 +112,17 @@ TagControls = {
 }
 
 
+class uint(int):
+    '''
+    NewType will not return a class until Python 3.10, as Python 3.10 is not widely used, we still need to construct a class so it can work as a type.
+    '''
+
+    def __init__(self, val: int):
+        if (val < 0):
+            raise TypeError(
+                'expecting positive value, got negative value of %d instead' % val)
+
+
 class TLVWriter(object):
     def __init__(self, encoding=None, implicitProfile=None):
         self._encoding = encoding if encoding is not None else bytearray()
@@ -175,13 +186,14 @@ class TLVWriter(object):
         """
         if val is None:
             self.putNull(tag)
+        elif isinstance(val, Enum):
+            self.putUnsignedInt(tag, val)
         elif isinstance(val, bool):
             self.putBool(tag, val)
+        elif isinstance(val, uint):
+            self.putUnsignedInt(tag, val)
         elif isinstance(val, int):
-            if val < 0:
-                self.putSignedInt(tag, val)
-            else:
-                self.putUnsignedInt(tag, val)
+            self.putSignedInt(tag, val)
         elif isinstance(val, float):
             self.putFloat(tag, val)
         elif isinstance(val, str):
@@ -372,12 +384,14 @@ class TLVWriter(object):
                     controlByte |= TLV_TAG_CONTROL_COMMON_PROFILE_4Bytes
                     return struct.pack("<BL", controlByte, tagNum)
             else:
+                vendorId = (profile >> 16) & 0xFFFF
+                profileNum = (profile >> 0) & 0xFFFF
                 if tagNum <= UINT16_MAX:
                     controlByte |= TLV_TAG_CONTROL_FULLY_QUALIFIED_6Bytes
-                    return struct.pack("<BLH", controlByte, profile, tagNum)
+                    return struct.pack("<BHHH", controlByte, vendorId, profileNum, tagNum)
                 else:
                     controlByte |= TLV_TAG_CONTROL_FULLY_QUALIFIED_8Bytes
-                    return struct.pack("<BLL", controlByte, profile, tagNum)
+                    return struct.pack("<BHHL", controlByte, vendorId, profileNum, profile, tagNum)
         raise ValueError("Invalid object given for TLV tag")
 
     @staticmethod
@@ -478,16 +492,18 @@ class TLVReader(object):
             decoding["tagLen"] = 4
             self._bytesRead += 4
         elif decoding["tagControl"] == "Fully Qualified 6-byte":
-            (profile,) = struct.unpack(
-                "<L", tlv[self._bytesRead: self._bytesRead + 4])
+            (vendorId, profileNum) = struct.unpack(
+                "<HH", tlv[self._bytesRead: self._bytesRead + 4])
+            profile = (vendorId << 16) | profileNum
             (tag,) = struct.unpack(
                 "<H", tlv[self._bytesRead + 4: self._bytesRead + 6])
             decoding["profileTag"] = (profile, tag)
             decoding["tagLen"] = 2
             self._bytesRead += 6
         elif decoding["tagControl"] == "Fully Qualified 8-byte":
-            (profile,) = struct.unpack(
-                "<L", tlv[self._bytesRead: self._bytesRead + 4])
+            (vendorId, profileNum) = struct.unpack(
+                "<HH", tlv[self._bytesRead: self._bytesRead + 4])
+            profile = (vendorId << 16) | profileNum
             (tag,) = struct.unpack(
                 "<L", tlv[self._bytesRead + 4: self._bytesRead + 8])
             decoding["profileTag"] = (profile, tag)
@@ -553,6 +569,7 @@ class TLVReader(object):
             (decoding["value"],) = struct.unpack(
                 "<B", tlv[self._bytesRead: self._bytesRead + 1]
             )
+            decoding["value"] = uint(decoding["value"])
             self._bytesRead += 1
         elif decoding["type"] == "Signed Integer 1-byte value":
             (decoding["value"],) = struct.unpack(
@@ -563,6 +580,7 @@ class TLVReader(object):
             (decoding["value"],) = struct.unpack(
                 "<H", tlv[self._bytesRead: self._bytesRead + 2]
             )
+            decoding["value"] = uint(decoding["value"])
             self._bytesRead += 2
         elif decoding["type"] == "Signed Integer 2-byte value":
             (decoding["value"],) = struct.unpack(
@@ -573,6 +591,7 @@ class TLVReader(object):
             (decoding["value"],) = struct.unpack(
                 "<L", tlv[self._bytesRead: self._bytesRead + 4]
             )
+            decoding["value"] = uint(decoding["value"])
             self._bytesRead += 4
         elif decoding["type"] == "Signed Integer 4-byte value":
             (decoding["value"],) = struct.unpack(
@@ -583,6 +602,7 @@ class TLVReader(object):
             (decoding["value"],) = struct.unpack(
                 "<Q", tlv[self._bytesRead: self._bytesRead + 8]
             )
+            decoding["value"] = uint(decoding["value"])
             self._bytesRead += 8
         elif decoding["type"] == "Signed Integer 8-byte value":
             (decoding["value"],) = struct.unpack(

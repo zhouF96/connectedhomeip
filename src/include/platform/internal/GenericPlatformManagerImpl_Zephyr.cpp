@@ -32,13 +32,24 @@
 // from which the GenericPlatformManagerImpl_Zephyr<> template inherits.
 #include <platform/internal/GenericPlatformManagerImpl.cpp>
 
+#include <system/SystemError.h>
 #include <system/SystemLayer.h>
+
+#include <sys/reboot.h>
 
 #define DEFAULT_MIN_SLEEP_PERIOD (60 * 60 * 24 * 30) // Month [sec]
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
+
+namespace {
+System::LayerSocketsLoop & SystemLayerSocketsLoop()
+{
+    return static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer());
+}
+
+} // anonymous namespace
 
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
 template class GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>;
@@ -52,6 +63,8 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_InitChipStack(void)
 
     k_msgq_init(&mChipEventQueue, reinterpret_cast<char *>(&mChipEventRingBuffer), sizeof(ChipDeviceEvent),
                 CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE);
+
+    mShouldRunEventLoop = false;
 
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
     err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
@@ -80,7 +93,7 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::_UnlockChipStack(void)
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StartChipTimer(uint32_t aMilliseconds)
+CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StartChipTimer(System::Clock::Timeout delay)
 {
     // Let Systemlayer.PrepareEvents() handle timers.
     return CHIP_NO_ERROR;
@@ -89,26 +102,35 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StartChipTimer(uint32_
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StopEventLoopTask(void)
 {
-    VerifyOrDieWithMsg(false, DeviceLayer, "StopEventLoopTask is not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    mShouldRunEventLoop = false;
+    return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_Shutdown(void)
 {
+#if CONFIG_REBOOT
+    sys_reboot(SYS_REBOOT_WARM);
+    return CHIP_NO_ERROR;
+#else
     return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
 }
 
 template <class ImplClass>
-void GenericPlatformManagerImpl_Zephyr<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
+CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
 {
     // For some reasons mentioned in https://github.com/zephyrproject-rtos/zephyr/issues/22301
     // k_msgq_put takes `void*` instead of `const void*`. Nonetheless, it should be safe to
     // const_cast here and there are components in Zephyr itself which do the same.
-    if (k_msgq_put(&mChipEventQueue, const_cast<ChipDeviceEvent *>(event), K_NO_WAIT) == 0)
-        SystemLayer.Signal(); // Trigger wake on CHIP thread
-    else
+    int status = k_msgq_put(&mChipEventQueue, const_cast<ChipDeviceEvent *>(event), K_NO_WAIT);
+    if (status != 0)
+    {
         ChipLogError(DeviceLayer, "Failed to post event to CHIP Platform event queue");
+        return System::MapErrorZephyr(status);
+    }
+    SystemLayerSocketsLoop().Signal(); // Trigger wake on CHIP thread
+    return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
@@ -125,20 +147,27 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::_RunEventLoop(void)
 {
     Impl()->LockChipStack();
 
-    SystemLayer.EventLoopBegins();
-    while (true)
+    if (mShouldRunEventLoop)
     {
-        SystemLayer.PrepareEvents();
+        ChipLogError(DeviceLayer, "Error trying to run the event loop while it is already running");
+        return;
+    }
+    mShouldRunEventLoop = true;
+
+    SystemLayerSocketsLoop().EventLoopBegins();
+    while (mShouldRunEventLoop)
+    {
+        SystemLayerSocketsLoop().PrepareEvents();
 
         Impl()->UnlockChipStack();
-        SystemLayer.WaitForEvents();
+        SystemLayerSocketsLoop().WaitForEvents();
         Impl()->LockChipStack();
 
-        SystemLayer.HandleEvents();
+        SystemLayerSocketsLoop().HandleEvents();
 
         ProcessDeviceEvents();
     }
-    SystemLayer.EventLoopEnds();
+    SystemLayerSocketsLoop().EventLoopEnds();
 
     Impl()->UnlockChipStack();
 }
@@ -153,7 +182,10 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::EventLoopTaskMain(void * this
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StartEventLoopTask(void)
 {
-    const auto tid = k_thread_create(&mChipThread, mChipThreadStack, K_THREAD_STACK_SIZEOF(mChipThreadStack), EventLoopTaskMain,
+    if (!mChipThreadStack)
+        return CHIP_ERROR_WELL_UNINITIALIZED;
+
+    const auto tid = k_thread_create(&mChipThread, mChipThreadStack, CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE, EventLoopTaskMain,
                                      this, nullptr, nullptr, CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY, 0, K_NO_WAIT);
 
 #ifdef CONFIG_THREAD_NAME

@@ -15,11 +15,15 @@
 #
 """Data frame selection utilities."""
 
+import numpy as np  # type: ignore
+
 import memdf.name
 import memdf.util.pretty
 import memdf.util.config
 
 from memdf import Config, ConfigDescription, DF
+
+from typing import Mapping, Optional
 
 
 def split_size(config: Config, key: str) -> None:
@@ -47,7 +51,7 @@ def get_limit(config: Config, column: str, name: str) -> int:
     return config.getl([column, 'limit', name], config.get('report.limit', 0))
 
 
-def postprocess_selections(config: Config, key: str) -> None:
+def postprocess_selections(config: Config, key: str, info: Mapping) -> None:
     """Resolve select/ignore command options."""
     split_size(config, key)
     choice, select = key.split('.')
@@ -128,14 +132,18 @@ def synthesize_region(config: Config, df: DF, column: str) -> DF:
     return df
 
 
+def groupby_region(df: DF):
+    return df[(df['size'] > 0) | (df['region'] != memdf.name.UNKNOWN)]
+
+
 SYNTHESIZE = {
-    'region': synthesize_region,
+    'region': (synthesize_region, groupby_region),
 }
 
 
 def synthesize_column(config: Config, df: DF, column: str) -> DF:
     if column not in df.columns:
-        SYNTHESIZE[column](config, df, column)
+        SYNTHESIZE[column][0](config, df, column)
     return df
 
 
@@ -151,4 +159,13 @@ def select_configured_column(config: Config, df: DF, column: str) -> DF:
 def select_configured(config: Config, df: DF, columns=SELECTION_CHOICES) -> DF:
     for column in columns:
         df = select_configured_column(config, df, column)
+    return df
+
+
+def groupby(config: Config, df: DF, by: Optional[str] = None):
+    if not by:
+        by = config['report.by']
+    df = df[[by, 'size']].groupby(by).aggregate(np.sum).reset_index()
+    if by in SYNTHESIZE:
+        df = SYNTHESIZE[by][1](df)
     return df
