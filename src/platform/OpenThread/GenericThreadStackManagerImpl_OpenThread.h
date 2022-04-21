@@ -70,6 +70,11 @@ public:
     otInstance * OTInstance() const;
     static void OnOpenThreadStateChange(uint32_t flags, void * context);
     inline void OverrunErrorTally(void);
+    void
+    SetNetworkStatusChangeCallback(NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
+    {
+        mpStatusChangeCallback = statusChangeCallback;
+    }
 
 protected:
     // ===== Methods that implement the ThreadStackManager abstract interface.
@@ -82,9 +87,10 @@ protected:
 
     bool _IsThreadProvisioned(void);
     bool _IsThreadAttached(void);
-    CHIP_ERROR _GetThreadProvision(ByteSpan & netInfo);
+    CHIP_ERROR _GetThreadProvision(Thread::OperationalDataset & dataset);
     CHIP_ERROR _SetThreadProvision(ByteSpan netInfo);
-    CHIP_ERROR _AttachToThreadNetwork(ByteSpan netInfo, NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
+    CHIP_ERROR _AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
+                                      NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
     void _OnThreadAttachFinished(void);
     void _ErasePersistentInfo(void);
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType(void);
@@ -92,6 +98,7 @@ protected:
     CHIP_ERROR _StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback);
     static void _OnNetworkScanFinished(otActiveScanResult * aResult, void * aContext);
     void _OnNetworkScanFinished(otActiveScanResult * aResult);
+    void _UpdateNetworkStatus();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     CHIP_ERROR _GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig);
@@ -143,11 +150,11 @@ private:
     // ===== Private members for use by this class only.
 
     otInstance * mOTInst;
-    uint64_t mOverrunCount                    = 0;
-    Thread::OperationalDataset mActiveDataset = {};
+    uint64_t mOverrunCount = 0;
 
     NetworkCommissioning::ThreadDriver::ScanCallback * mpScanCallback;
     NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
+    NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     ConnectivityManager::SEDPollingConfig mPollingConfig;

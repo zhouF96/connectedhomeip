@@ -57,12 +57,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
-                jobject newElement_0_fabricIndex;
-                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
-                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
-                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
-                                                                              newElement_0_fabricIndexCtorSignature.c_str(),
-                                                                              entry_0.fabricIndex, newElement_0_fabricIndex);
                 jobject newElement_0_privilege;
                 std::string newElement_0_privilegeClassName     = "java/lang/Integer";
                 std::string newElement_0_privilegeCtorSignature = "(I)V";
@@ -171,6 +165,12 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         chip::JniReferences::GetInstance().AddToList(newElement_0_targets, newElement_NaN);
                     }
                 }
+                jobject newElement_0_fabricIndex;
+                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
+                                                                              newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                              entry_0.fabricIndex, newElement_0_fabricIndex);
 
                 jclass accessControlEntryStructClass;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -182,7 +182,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
                 jmethodID accessControlEntryStructCtor = env->GetMethodID(
                     accessControlEntryStructClass, "<init>",
-                    "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/ArrayList;Ljava/util/ArrayList;)V");
+                    "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/ArrayList;Ljava/util/ArrayList;Ljava/lang/Integer;)V");
                 if (accessControlEntryStructCtor == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$AccessControlClusterAccessControlEntry constructor");
@@ -190,8 +190,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 newElement_0 =
-                    env->NewObject(accessControlEntryStructClass, accessControlEntryStructCtor, newElement_0_fabricIndex,
-                                   newElement_0_privilege, newElement_0_authMode, newElement_0_subjects, newElement_0_targets);
+                    env->NewObject(accessControlEntryStructClass, accessControlEntryStructCtor, newElement_0_privilege,
+                                   newElement_0_authMode, newElement_0_subjects, newElement_0_targets, newElement_0_fabricIndex);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -212,17 +212,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
+                jobject newElement_0_data;
+                jbyteArray newElement_0_dataByteArray = env->NewByteArray(static_cast<jsize>(entry_0.data.size()));
+                env->SetByteArrayRegion(newElement_0_dataByteArray, 0, static_cast<jsize>(entry_0.data.size()),
+                                        reinterpret_cast<const jbyte *>(entry_0.data.data()));
+                newElement_0_data = newElement_0_dataByteArray;
                 jobject newElement_0_fabricIndex;
                 std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
                 std::string newElement_0_fabricIndexCtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
                                                                               newElement_0_fabricIndexCtorSignature.c_str(),
                                                                               entry_0.fabricIndex, newElement_0_fabricIndex);
-                jobject newElement_0_data;
-                jbyteArray newElement_0_dataByteArray = env->NewByteArray(static_cast<jsize>(entry_0.data.size()));
-                env->SetByteArrayRegion(newElement_0_dataByteArray, 0, static_cast<jsize>(entry_0.data.size()),
-                                        reinterpret_cast<const jbyte *>(entry_0.data.data()));
-                newElement_0_data = newElement_0_dataByteArray;
 
                 jclass extensionEntryStructClass;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -233,21 +233,66 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
                 jmethodID extensionEntryStructCtor =
-                    env->GetMethodID(extensionEntryStructClass, "<init>", "(Ljava/lang/Integer;[B)V");
+                    env->GetMethodID(extensionEntryStructClass, "<init>", "([BLjava/lang/Integer;)V");
                 if (extensionEntryStructCtor == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$AccessControlClusterExtensionEntry constructor");
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(extensionEntryStructClass, extensionEntryStructCtor, newElement_0_fabricIndex,
-                                              newElement_0_data);
+                newElement_0 = env->NewObject(extensionEntryStructClass, extensionEntryStructCtor, newElement_0_data,
+                                              newElement_0_fabricIndex);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::SubjectsPerAccessControlEntry::Id: {
+            using TypeInfo = Attributes::SubjectsPerAccessControlEntry::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                           cppValue, value);
+            return value;
+        }
+        case Attributes::TargetsPerAccessControlEntry::Id: {
+            using TypeInfo = Attributes::TargetsPerAccessControlEntry::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                           cppValue, value);
+            return value;
+        }
+        case Attributes::AccessControlEntriesPerFabric::Id: {
+            using TypeInfo = Attributes::AccessControlEntriesPerFabric::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                           cppValue, value);
+            return value;
+        }
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -270,8 +315,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -343,8 +388,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::AccountLogin;
         switch (aPath.mAttributeId)
         {
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -367,8 +412,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -485,8 +530,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -509,8 +554,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -727,8 +772,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -751,8 +796,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -930,8 +975,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -954,8 +999,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -1095,8 +1140,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                           cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -1119,8 +1164,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -1252,8 +1297,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                           cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -1276,8 +1321,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -1598,8 +1643,50 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             value = env->NewStringUTF(std::string(cppValue.data(), cppValue.size()).c_str());
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::CapabilityMinima::Id: {
+            using TypeInfo = Attributes::CapabilityMinima::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            jobject value_caseSessionsPerFabric;
+            std::string value_caseSessionsPerFabricClassName     = "java/lang/Integer";
+            std::string value_caseSessionsPerFabricCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+                value_caseSessionsPerFabricClassName.c_str(), value_caseSessionsPerFabricCtorSignature.c_str(),
+                cppValue.caseSessionsPerFabric, value_caseSessionsPerFabric);
+            jobject value_subscriptionsPerFabric;
+            std::string value_subscriptionsPerFabricClassName     = "java/lang/Integer";
+            std::string value_subscriptionsPerFabricCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+                value_subscriptionsPerFabricClassName.c_str(), value_subscriptionsPerFabricCtorSignature.c_str(),
+                cppValue.subscriptionsPerFabric, value_subscriptionsPerFabric);
+
+            jclass capabilityMinimaStructStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipStructs$BasicClusterCapabilityMinimaStruct", capabilityMinimaStructStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipStructs$BasicClusterCapabilityMinimaStruct");
+                return nullptr;
+            }
+            jmethodID capabilityMinimaStructStructCtor =
+                env->GetMethodID(capabilityMinimaStructStructClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
+            if (capabilityMinimaStructStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipStructs$BasicClusterCapabilityMinimaStruct constructor");
+                return nullptr;
+            }
+
+            value = env->NewObject(capabilityMinimaStructStructClass, capabilityMinimaStructStructCtor, value_caseSessionsPerFabric,
+                                   value_subscriptionsPerFabric);
+            return value;
+        }
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -1622,8 +1709,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -1740,8 +1827,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                           cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -1764,8 +1851,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -1853,12 +1940,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
-                jobject newElement_0_fabricIndex;
-                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
-                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
-                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
-                                                                              newElement_0_fabricIndexCtorSignature.c_str(),
-                                                                              entry_0.fabricIndex, newElement_0_fabricIndex);
                 jobject newElement_0_node;
                 if (!entry_0.node.HasValue())
                 {
@@ -1921,6 +2002,12 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         newElement_0_clusterInsideOptional);
                     chip::JniReferences::GetInstance().CreateOptional(newElement_0_clusterInsideOptional, newElement_0_cluster);
                 }
+                jobject newElement_0_fabricIndex;
+                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
+                                                                              newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                              entry_0.fabricIndex, newElement_0_fabricIndex);
 
                 jclass targetStructStructClass;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -1932,21 +2019,22 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
                 jmethodID targetStructStructCtor = env->GetMethodID(
                     targetStructStructClass, "<init>",
-                    "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V");
+                    "(Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/lang/Integer;)V");
                 if (targetStructStructCtor == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$BindingClusterTargetStruct constructor");
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(targetStructStructClass, targetStructStructCtor, newElement_0_fabricIndex,
-                                              newElement_0_node, newElement_0_group, newElement_0_endpoint, newElement_0_cluster);
+                newElement_0 =
+                    env->NewObject(targetStructStructClass, targetStructStructCtor, newElement_0_node, newElement_0_group,
+                                   newElement_0_endpoint, newElement_0_cluster, newElement_0_fabricIndex);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -1969,8 +2057,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -2057,8 +2145,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                        value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -2081,8 +2169,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -2310,8 +2398,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             value = env->NewStringUTF(std::string(cppValue.data(), cppValue.size()).c_str());
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -2334,8 +2422,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -2599,8 +2687,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             value = env->NewStringUTF(std::string(cppValue.data(), cppValue.size()).c_str());
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -2623,8 +2711,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -2948,8 +3036,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -2972,8 +3060,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -3822,8 +3910,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -3846,8 +3934,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -3955,8 +4043,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -3979,8 +4067,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -4174,8 +4262,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -4198,8 +4286,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -4271,8 +4359,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::DiagnosticLogs;
         switch (aPath.mAttributeId)
         {
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -4295,8 +4383,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -4502,6 +4590,21 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                           cppValue, value);
             return value;
         }
+        case Attributes::NumberOfHolidaySchedulesSupported::Id: {
+            using TypeInfo = Attributes::NumberOfHolidaySchedulesSupported::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                          cppValue, value);
+            return value;
+        }
         case Attributes::MaxPINCodeLength::Id: {
             using TypeInfo = Attributes::MaxPINCodeLength::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -4631,7 +4734,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue, value);
+                                                                           cppValue.Raw(), value);
             return value;
         }
         case Attributes::EnableOneTouchLocking::Id: {
@@ -4679,8 +4782,38 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                           cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::UserCodeTemporaryDisableTime::Id: {
+            using TypeInfo = Attributes::UserCodeTemporaryDisableTime::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                          cppValue, value);
+            return value;
+        }
+        case Attributes::RequirePINforRemoteOperation::Id: {
+            using TypeInfo = Attributes::RequirePINforRemoteOperation::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Boolean";
+            std::string valueCtorSignature = "(Z)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<bool>(valueClassName.c_str(), valueCtorSignature.c_str(), cppValue,
+                                                                       value);
+            return value;
+        }
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -4703,8 +4836,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -4941,8 +5074,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                           cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -4965,8 +5098,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -5194,8 +5327,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -5218,8 +5351,285 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Long";
+                std::string newElement_0CtorSignature = "(J)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::AttributeList::Id: {
+            using TypeInfo = Attributes::AttributeList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Long";
+                std::string newElement_0CtorSignature = "(J)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Long";
+            std::string valueCtorSignature = "(J)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                           cppValue, value);
+            return value;
+        }
+        case Attributes::ClusterRevision::Id: {
+            using TypeInfo = Attributes::ClusterRevision::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                           cppValue, value);
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::FanControl::Id: {
+        using namespace app::Clusters::FanControl;
+        switch (aPath.mAttributeId)
+        {
+        case Attributes::FanMode::Id: {
+            using TypeInfo = Attributes::FanMode::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                          cppValue, value);
+            return value;
+        }
+        case Attributes::FanModeSequence::Id: {
+            using TypeInfo = Attributes::FanModeSequence::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                          cppValue, value);
+            return value;
+        }
+        case Attributes::PercentSetting::Id: {
+            using TypeInfo = Attributes::PercentSetting::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                          cppValue, value);
+            return value;
+        }
+        case Attributes::PercentCurrent::Id: {
+            using TypeInfo = Attributes::PercentCurrent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                          cppValue, value);
+            return value;
+        }
+        case Attributes::SpeedMax::Id: {
+            using TypeInfo = Attributes::SpeedMax::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                          cppValue, value);
+            return value;
+        }
+        case Attributes::SpeedSetting::Id: {
+            using TypeInfo = Attributes::SpeedSetting::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                          cppValue, value);
+            return value;
+        }
+        case Attributes::SpeedCurrent::Id: {
+            using TypeInfo = Attributes::SpeedCurrent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                          cppValue, value);
+            return value;
+        }
+        case Attributes::RockSupport::Id: {
+            using TypeInfo = Attributes::RockSupport::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                          cppValue, value);
+            return value;
+        }
+        case Attributes::RockSetting::Id: {
+            using TypeInfo = Attributes::RockSetting::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                          cppValue, value);
+            return value;
+        }
+        case Attributes::WindSupport::Id: {
+            using TypeInfo = Attributes::WindSupport::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                          cppValue, value);
+            return value;
+        }
+        case Attributes::WindSetting::Id: {
+            using TypeInfo = Attributes::WindSetting::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                          cppValue, value);
+            return value;
+        }
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Long";
+                std::string newElement_0CtorSignature = "(J)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -5349,8 +5759,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -5373,8 +5783,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -5527,8 +5937,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -5551,8 +5961,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -5706,8 +6116,23 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                           static_cast<uint8_t>(cppValue), value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::SupportsConcurrentConnection::Id: {
+            using TypeInfo = Attributes::SupportsConcurrentConnection::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Boolean";
+            std::string valueCtorSignature = "(Z)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<bool>(valueClassName.c_str(), valueCtorSignature.c_str(), cppValue,
+                                                                       value);
+            return value;
+        }
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -5730,8 +6155,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -6056,8 +6481,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -6080,8 +6505,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -6169,12 +6594,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
-                jobject newElement_0_fabricIndex;
-                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
-                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
-                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
-                                                                              newElement_0_fabricIndexCtorSignature.c_str(),
-                                                                              entry_0.fabricIndex, newElement_0_fabricIndex);
                 jobject newElement_0_groupId;
                 std::string newElement_0_groupIdClassName     = "java/lang/Integer";
                 std::string newElement_0_groupIdCtorSignature = "(I)V";
@@ -6187,6 +6606,12 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_groupKeySetIDClassName.c_str(),
                                                                                newElement_0_groupKeySetIDCtorSignature.c_str(),
                                                                                entry_0.groupKeySetID, newElement_0_groupKeySetID);
+                jobject newElement_0_fabricIndex;
+                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
+                                                                              newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                              entry_0.fabricIndex, newElement_0_fabricIndex);
 
                 jclass groupKeyMapStructStructClass;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -6205,8 +6630,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(groupKeyMapStructStructClass, groupKeyMapStructStructCtor, newElement_0_fabricIndex,
-                                              newElement_0_groupId, newElement_0_groupKeySetID);
+                newElement_0 = env->NewObject(groupKeyMapStructStructClass, groupKeyMapStructStructCtor, newElement_0_groupId,
+                                              newElement_0_groupKeySetID, newElement_0_fabricIndex);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -6227,12 +6652,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
-                jobject newElement_0_fabricIndex;
-                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
-                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
-                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
-                                                                              newElement_0_fabricIndexCtorSignature.c_str(),
-                                                                              entry_0.fabricIndex, newElement_0_fabricIndex);
                 jobject newElement_0_groupId;
                 std::string newElement_0_groupIdClassName     = "java/lang/Integer";
                 std::string newElement_0_groupIdCtorSignature = "(I)V";
@@ -6265,6 +6684,12 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         env->NewStringUTF(std::string(entry_0.groupName.Value().data(), entry_0.groupName.Value().size()).c_str());
                     chip::JniReferences::GetInstance().CreateOptional(newElement_0_groupNameInsideOptional, newElement_0_groupName);
                 }
+                jobject newElement_0_fabricIndex;
+                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
+                                                                              newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                              entry_0.fabricIndex, newElement_0_fabricIndex);
 
                 jclass groupInfoMapStructStructClass;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -6277,15 +6702,15 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
                 jmethodID groupInfoMapStructStructCtor =
                     env->GetMethodID(groupInfoMapStructStructClass, "<init>",
-                                     "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/ArrayList;Ljava/util/Optional;)V");
+                                     "(Ljava/lang/Integer;Ljava/util/ArrayList;Ljava/util/Optional;Ljava/lang/Integer;)V");
                 if (groupInfoMapStructStructCtor == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$GroupKeyManagementClusterGroupInfoMapStruct constructor");
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(groupInfoMapStructStructClass, groupInfoMapStructStructCtor, newElement_0_fabricIndex,
-                                              newElement_0_groupId, newElement_0_endpoints, newElement_0_groupName);
+                newElement_0 = env->NewObject(groupInfoMapStructStructClass, groupInfoMapStructStructCtor, newElement_0_groupId,
+                                              newElement_0_endpoints, newElement_0_groupName, newElement_0_fabricIndex);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -6320,8 +6745,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -6344,8 +6769,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -6432,8 +6857,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                           cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -6456,8 +6881,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -6559,8 +6984,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                           cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -6583,8 +7008,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -6759,8 +7184,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -6783,8 +7208,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -6856,8 +7281,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::KeypadInput;
         switch (aPath.mAttributeId)
         {
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -6880,8 +7305,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -7198,8 +7623,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -7222,8 +7647,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -7343,8 +7768,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -7367,8 +7792,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -7416,8 +7841,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::LowPower;
         switch (aPath.mAttributeId)
         {
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -7440,8 +7865,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -7585,8 +8010,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                           cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -7609,8 +8034,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -7855,8 +8280,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -7879,8 +8304,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -7952,8 +8377,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::ModeSelect;
         switch (aPath.mAttributeId)
         {
-        case Attributes::CurrentMode::Id: {
-            using TypeInfo = Attributes::CurrentMode::TypeInfo;
+        case Attributes::Description::Id: {
+            using TypeInfo = Attributes::Description::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -7961,10 +8386,29 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+            value = env->NewStringUTF(std::string(cppValue.data(), cppValue.size()).c_str());
+            return value;
+        }
+        case Attributes::StandardNamespace::Id: {
+            using TypeInfo = Attributes::StandardNamespace::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                               cppValue.Value(), value);
+            }
             return value;
         }
         case Attributes::SupportedModes::Id: {
@@ -8019,8 +8463,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::OnMode::Id: {
-            using TypeInfo = Attributes::OnMode::TypeInfo;
+        case Attributes::CurrentMode::Id: {
+            using TypeInfo = Attributes::CurrentMode::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -8043,14 +8487,21 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                              cppValue.Value(), value);
+            }
             return value;
         }
-        case Attributes::Description::Id: {
-            using TypeInfo = Attributes::Description::TypeInfo;
+        case Attributes::OnMode::Id: {
+            using TypeInfo = Attributes::OnMode::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -8058,11 +8509,21 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = env->NewStringUTF(std::string(cppValue.data(), cppValue.size()).c_str());
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                              cppValue.Value(), value);
+            }
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -8085,8 +8546,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -8131,6 +8592,21 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Long";
+            std::string valueCtorSignature = "(J)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -8333,8 +8809,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -8357,8 +8833,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -8486,12 +8962,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
-                jobject newElement_0_fabricIndex;
-                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
-                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
-                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
-                                                                              newElement_0_fabricIndexCtorSignature.c_str(),
-                                                                              entry_0.fabricIndex, newElement_0_fabricIndex);
                 jobject newElement_0_providerNodeID;
                 std::string newElement_0_providerNodeIDClassName     = "java/lang/Long";
                 std::string newElement_0_providerNodeIDCtorSignature = "(J)V";
@@ -8504,6 +8974,12 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_endpointClassName.c_str(),
                                                                                newElement_0_endpointCtorSignature.c_str(),
                                                                                entry_0.endpoint, newElement_0_endpoint);
+                jobject newElement_0_fabricIndex;
+                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
+                                                                              newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                              entry_0.fabricIndex, newElement_0_fabricIndex);
 
                 jclass providerLocationStructClass;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -8515,15 +8991,15 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
                 jmethodID providerLocationStructCtor = env->GetMethodID(
-                    providerLocationStructClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;)V");
+                    providerLocationStructClass, "<init>", "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;)V");
                 if (providerLocationStructCtor == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$OtaSoftwareUpdateRequestorClusterProviderLocation constructor");
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(providerLocationStructClass, providerLocationStructCtor, newElement_0_fabricIndex,
-                                              newElement_0_providerNodeID, newElement_0_endpoint);
+                newElement_0 = env->NewObject(providerLocationStructClass, providerLocationStructCtor, newElement_0_providerNodeID,
+                                              newElement_0_endpoint, newElement_0_fabricIndex);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -8674,8 +9150,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                           cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -8698,8 +9174,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -8840,14 +9316,21 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                              static_cast<uint8_t>(cppValue.Value()), value);
+            }
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -8870,8 +9353,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -8988,8 +9471,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                           cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -9012,8 +9495,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -9101,12 +9584,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
-                jobject newElement_0_fabricIndex;
-                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
-                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
-                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
-                                                                              newElement_0_fabricIndexCtorSignature.c_str(),
-                                                                              entry_0.fabricIndex, newElement_0_fabricIndex);
                 jobject newElement_0_noc;
                 jbyteArray newElement_0_nocByteArray = env->NewByteArray(static_cast<jsize>(entry_0.noc.size()));
                 env->SetByteArrayRegion(newElement_0_nocByteArray, 0, static_cast<jsize>(entry_0.noc.size()),
@@ -9124,6 +9601,12 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                             reinterpret_cast<const jbyte *>(entry_0.icac.Value().data()));
                     newElement_0_icac = newElement_0_icacByteArray;
                 }
+                jobject newElement_0_fabricIndex;
+                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
+                                                                              newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                              entry_0.fabricIndex, newElement_0_fabricIndex);
 
                 jclass NOCStructStructClass;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -9133,15 +9616,15 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     ChipLogError(Zcl, "Could not find class ChipStructs$OperationalCredentialsClusterNOCStruct");
                     return nullptr;
                 }
-                jmethodID NOCStructStructCtor = env->GetMethodID(NOCStructStructClass, "<init>", "(Ljava/lang/Integer;[B[B)V");
+                jmethodID NOCStructStructCtor = env->GetMethodID(NOCStructStructClass, "<init>", "([B[BLjava/lang/Integer;)V");
                 if (NOCStructStructCtor == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$OperationalCredentialsClusterNOCStruct constructor");
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(NOCStructStructClass, NOCStructStructCtor, newElement_0_fabricIndex, newElement_0_noc,
-                                              newElement_0_icac);
+                newElement_0 = env->NewObject(NOCStructStructClass, NOCStructStructCtor, newElement_0_noc, newElement_0_icac,
+                                              newElement_0_fabricIndex);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -9162,12 +9645,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
-                jobject newElement_0_fabricIndex;
-                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
-                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
-                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
-                                                                              newElement_0_fabricIndexCtorSignature.c_str(),
-                                                                              entry_0.fabricIndex, newElement_0_fabricIndex);
                 jobject newElement_0_rootPublicKey;
                 jbyteArray newElement_0_rootPublicKeyByteArray =
                     env->NewByteArray(static_cast<jsize>(entry_0.rootPublicKey.size()));
@@ -9194,6 +9671,12 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                                entry_0.nodeId, newElement_0_nodeId);
                 jobject newElement_0_label;
                 newElement_0_label = env->NewStringUTF(std::string(entry_0.label.data(), entry_0.label.size()).c_str());
+                jobject newElement_0_fabricIndex;
+                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
+                                                                              newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                              entry_0.fabricIndex, newElement_0_fabricIndex);
 
                 jclass fabricDescriptorStructClass;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -9206,16 +9689,16 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
                 jmethodID fabricDescriptorStructCtor = env->GetMethodID(
                     fabricDescriptorStructClass, "<init>",
-                    "(Ljava/lang/Integer;[BLjava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;)V");
+                    "([BLjava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/Integer;)V");
                 if (fabricDescriptorStructCtor == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$OperationalCredentialsClusterFabricDescriptor constructor");
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(fabricDescriptorStructClass, fabricDescriptorStructCtor, newElement_0_fabricIndex,
-                                              newElement_0_rootPublicKey, newElement_0_vendorId, newElement_0_fabricId,
-                                              newElement_0_nodeId, newElement_0_label);
+                newElement_0 = env->NewObject(fabricDescriptorStructClass, fabricDescriptorStructCtor, newElement_0_rootPublicKey,
+                                              newElement_0_vendorId, newElement_0_fabricId, newElement_0_nodeId, newElement_0_label,
+                                              newElement_0_fabricIndex);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -9289,8 +9772,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                           cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -9313,8 +9796,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -9527,8 +10010,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                           cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -9551,8 +10034,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -9663,8 +10146,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -9687,8 +10170,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -9884,10 +10367,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                              cppValue.Value(), value);
+            }
             return value;
         }
         case Attributes::MaxSpeed::Id: {
@@ -9899,10 +10389,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                               cppValue.Value(), value);
+            }
             return value;
         }
         case Attributes::MaxFlow::Id: {
@@ -9914,10 +10411,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                               cppValue.Value(), value);
+            }
             return value;
         }
         case Attributes::MinConstPressure::Id: {
@@ -9929,10 +10433,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                              cppValue.Value(), value);
+            }
             return value;
         }
         case Attributes::MaxConstPressure::Id: {
@@ -9944,10 +10455,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                              cppValue.Value(), value);
+            }
             return value;
         }
         case Attributes::MinCompPressure::Id: {
@@ -9959,10 +10477,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                              cppValue.Value(), value);
+            }
             return value;
         }
         case Attributes::MaxCompPressure::Id: {
@@ -9974,10 +10499,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                              cppValue.Value(), value);
+            }
             return value;
         }
         case Attributes::MinConstSpeed::Id: {
@@ -9989,10 +10521,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                               cppValue.Value(), value);
+            }
             return value;
         }
         case Attributes::MaxConstSpeed::Id: {
@@ -10004,10 +10543,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                               cppValue.Value(), value);
+            }
             return value;
         }
         case Attributes::MinConstFlow::Id: {
@@ -10019,10 +10565,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                               cppValue.Value(), value);
+            }
             return value;
         }
         case Attributes::MaxConstFlow::Id: {
@@ -10034,10 +10587,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                               cppValue.Value(), value);
+            }
             return value;
         }
         case Attributes::MinConstTemp::Id: {
@@ -10049,10 +10609,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                              cppValue.Value(), value);
+            }
             return value;
         }
         case Attributes::MaxConstTemp::Id: {
@@ -10064,10 +10631,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                              cppValue.Value(), value);
+            }
             return value;
         }
         case Attributes::PumpStatus::Id: {
@@ -10097,7 +10671,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+                                                                          static_cast<uint8_t>(cppValue), value);
             return value;
         }
         case Attributes::EffectiveControlMode::Id: {
@@ -10112,7 +10686,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+                                                                          static_cast<uint8_t>(cppValue), value);
             return value;
         }
         case Attributes::Capacity::Id: {
@@ -10124,10 +10698,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                              cppValue.Value(), value);
+            }
             return value;
         }
         case Attributes::Speed::Id: {
@@ -10139,10 +10720,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                               cppValue.Value(), value);
+            }
             return value;
         }
         case Attributes::LifetimeRunningHours::Id: {
@@ -10176,10 +10764,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Long";
-            std::string valueCtorSignature = "(J)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Long";
+                std::string valueCtorSignature = "(J)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                               cppValue.Value(), value);
+            }
             return value;
         }
         case Attributes::LifetimeEnergyConsumed::Id: {
@@ -10216,7 +10811,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+                                                                          static_cast<uint8_t>(cppValue), value);
             return value;
         }
         case Attributes::ControlMode::Id: {
@@ -10231,7 +10826,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+                                                                          static_cast<uint8_t>(cppValue), value);
             return value;
         }
         case Attributes::AlarmMask::Id: {
@@ -10249,8 +10844,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -10273,8 +10868,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -10421,8 +11016,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -10445,8 +11040,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -10593,8 +11188,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                           cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -10617,8 +11212,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -10800,8 +11395,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -10824,8 +11419,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -10957,8 +11552,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                           cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -10981,8 +11576,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -11131,8 +11726,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                           cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -11155,8 +11750,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -11237,10 +11832,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                              cppValue.Value(), value);
+            }
             return value;
         }
         case Attributes::MinMeasuredValue::Id: {
@@ -11252,10 +11854,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                              cppValue.Value(), value);
+            }
             return value;
         }
         case Attributes::MaxMeasuredValue::Id: {
@@ -11267,10 +11876,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                              cppValue.Value(), value);
+            }
             return value;
         }
         case Attributes::Tolerance::Id: {
@@ -11364,7 +11980,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+                                                                          cppValue.Raw(), value);
             return value;
         }
         case Attributes::Bitmap16::Id: {
@@ -11379,7 +11995,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue, value);
+                                                                           cppValue.Raw(), value);
             return value;
         }
         case Attributes::Bitmap32::Id: {
@@ -11394,7 +12010,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Long";
             std::string valueCtorSignature = "(J)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue, value);
+                                                                           cppValue.Raw(), value);
             return value;
         }
         case Attributes::Bitmap64::Id: {
@@ -11409,7 +12025,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Long";
             std::string valueCtorSignature = "(J)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue, value);
+                                                                           cppValue.Raw(), value);
             return value;
         }
         case Attributes::Int8u::Id: {
@@ -12576,6 +13192,214 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
+        case Attributes::ListFabricScoped::Id: {
+            using TypeInfo = Attributes::ListFabricScoped::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                jobject newElement_0_fabricSensitiveInt8u;
+                std::string newElement_0_fabricSensitiveInt8uClassName     = "java/lang/Integer";
+                std::string newElement_0_fabricSensitiveInt8uCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0_fabricSensitiveInt8uClassName.c_str(), newElement_0_fabricSensitiveInt8uCtorSignature.c_str(),
+                    entry_0.fabricSensitiveInt8u, newElement_0_fabricSensitiveInt8u);
+                jobject newElement_0_optionalFabricSensitiveInt8u;
+                if (!entry_0.optionalFabricSensitiveInt8u.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_optionalFabricSensitiveInt8u);
+                }
+                else
+                {
+                    jobject newElement_0_optionalFabricSensitiveInt8uInsideOptional;
+                    std::string newElement_0_optionalFabricSensitiveInt8uInsideOptionalClassName     = "java/lang/Integer";
+                    std::string newElement_0_optionalFabricSensitiveInt8uInsideOptionalCtorSignature = "(I)V";
+                    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                        newElement_0_optionalFabricSensitiveInt8uInsideOptionalClassName.c_str(),
+                        newElement_0_optionalFabricSensitiveInt8uInsideOptionalCtorSignature.c_str(),
+                        entry_0.optionalFabricSensitiveInt8u.Value(), newElement_0_optionalFabricSensitiveInt8uInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_optionalFabricSensitiveInt8uInsideOptional,
+                                                                      newElement_0_optionalFabricSensitiveInt8u);
+                }
+                jobject newElement_0_nullableFabricSensitiveInt8u;
+                if (entry_0.nullableFabricSensitiveInt8u.IsNull())
+                {
+                    newElement_0_nullableFabricSensitiveInt8u = nullptr;
+                }
+                else
+                {
+                    std::string newElement_0_nullableFabricSensitiveInt8uClassName     = "java/lang/Integer";
+                    std::string newElement_0_nullableFabricSensitiveInt8uCtorSignature = "(I)V";
+                    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                        newElement_0_nullableFabricSensitiveInt8uClassName.c_str(),
+                        newElement_0_nullableFabricSensitiveInt8uCtorSignature.c_str(),
+                        entry_0.nullableFabricSensitiveInt8u.Value(), newElement_0_nullableFabricSensitiveInt8u);
+                }
+                jobject newElement_0_nullableOptionalFabricSensitiveInt8u;
+                if (!entry_0.nullableOptionalFabricSensitiveInt8u.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_nullableOptionalFabricSensitiveInt8u);
+                }
+                else
+                {
+                    jobject newElement_0_nullableOptionalFabricSensitiveInt8uInsideOptional;
+                    if (entry_0.nullableOptionalFabricSensitiveInt8u.Value().IsNull())
+                    {
+                        newElement_0_nullableOptionalFabricSensitiveInt8uInsideOptional = nullptr;
+                    }
+                    else
+                    {
+                        std::string newElement_0_nullableOptionalFabricSensitiveInt8uInsideOptionalClassName = "java/lang/Integer";
+                        std::string newElement_0_nullableOptionalFabricSensitiveInt8uInsideOptionalCtorSignature = "(I)V";
+                        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                            newElement_0_nullableOptionalFabricSensitiveInt8uInsideOptionalClassName.c_str(),
+                            newElement_0_nullableOptionalFabricSensitiveInt8uInsideOptionalCtorSignature.c_str(),
+                            entry_0.nullableOptionalFabricSensitiveInt8u.Value().Value(),
+                            newElement_0_nullableOptionalFabricSensitiveInt8uInsideOptional);
+                    }
+                    chip::JniReferences::GetInstance().CreateOptional(
+                        newElement_0_nullableOptionalFabricSensitiveInt8uInsideOptional,
+                        newElement_0_nullableOptionalFabricSensitiveInt8u);
+                }
+                jobject newElement_0_fabricSensitiveCharString;
+                newElement_0_fabricSensitiveCharString = env->NewStringUTF(
+                    std::string(entry_0.fabricSensitiveCharString.data(), entry_0.fabricSensitiveCharString.size()).c_str());
+                jobject newElement_0_fabricSensitiveStruct;
+                jobject newElement_0_fabricSensitiveStruct_a;
+                std::string newElement_0_fabricSensitiveStruct_aClassName     = "java/lang/Integer";
+                std::string newElement_0_fabricSensitiveStruct_aCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0_fabricSensitiveStruct_aClassName.c_str(),
+                    newElement_0_fabricSensitiveStruct_aCtorSignature.c_str(), entry_0.fabricSensitiveStruct.a,
+                    newElement_0_fabricSensitiveStruct_a);
+                jobject newElement_0_fabricSensitiveStruct_b;
+                std::string newElement_0_fabricSensitiveStruct_bClassName     = "java/lang/Boolean";
+                std::string newElement_0_fabricSensitiveStruct_bCtorSignature = "(Z)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
+                    newElement_0_fabricSensitiveStruct_bClassName.c_str(),
+                    newElement_0_fabricSensitiveStruct_bCtorSignature.c_str(), entry_0.fabricSensitiveStruct.b,
+                    newElement_0_fabricSensitiveStruct_b);
+                jobject newElement_0_fabricSensitiveStruct_c;
+                std::string newElement_0_fabricSensitiveStruct_cClassName     = "java/lang/Integer";
+                std::string newElement_0_fabricSensitiveStruct_cCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0_fabricSensitiveStruct_cClassName.c_str(),
+                    newElement_0_fabricSensitiveStruct_cCtorSignature.c_str(),
+                    static_cast<uint8_t>(entry_0.fabricSensitiveStruct.c), newElement_0_fabricSensitiveStruct_c);
+                jobject newElement_0_fabricSensitiveStruct_d;
+                jbyteArray newElement_0_fabricSensitiveStruct_dByteArray =
+                    env->NewByteArray(static_cast<jsize>(entry_0.fabricSensitiveStruct.d.size()));
+                env->SetByteArrayRegion(newElement_0_fabricSensitiveStruct_dByteArray, 0,
+                                        static_cast<jsize>(entry_0.fabricSensitiveStruct.d.size()),
+                                        reinterpret_cast<const jbyte *>(entry_0.fabricSensitiveStruct.d.data()));
+                newElement_0_fabricSensitiveStruct_d = newElement_0_fabricSensitiveStruct_dByteArray;
+                jobject newElement_0_fabricSensitiveStruct_e;
+                newElement_0_fabricSensitiveStruct_e = env->NewStringUTF(
+                    std::string(entry_0.fabricSensitiveStruct.e.data(), entry_0.fabricSensitiveStruct.e.size()).c_str());
+                jobject newElement_0_fabricSensitiveStruct_f;
+                std::string newElement_0_fabricSensitiveStruct_fClassName     = "java/lang/Integer";
+                std::string newElement_0_fabricSensitiveStruct_fCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0_fabricSensitiveStruct_fClassName.c_str(),
+                    newElement_0_fabricSensitiveStruct_fCtorSignature.c_str(), entry_0.fabricSensitiveStruct.f.Raw(),
+                    newElement_0_fabricSensitiveStruct_f);
+                jobject newElement_0_fabricSensitiveStruct_g;
+                std::string newElement_0_fabricSensitiveStruct_gClassName     = "java/lang/Float";
+                std::string newElement_0_fabricSensitiveStruct_gCtorSignature = "(F)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<float>(
+                    newElement_0_fabricSensitiveStruct_gClassName.c_str(),
+                    newElement_0_fabricSensitiveStruct_gCtorSignature.c_str(), entry_0.fabricSensitiveStruct.g,
+                    newElement_0_fabricSensitiveStruct_g);
+                jobject newElement_0_fabricSensitiveStruct_h;
+                std::string newElement_0_fabricSensitiveStruct_hClassName     = "java/lang/Double";
+                std::string newElement_0_fabricSensitiveStruct_hCtorSignature = "(D)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<double>(
+                    newElement_0_fabricSensitiveStruct_hClassName.c_str(),
+                    newElement_0_fabricSensitiveStruct_hCtorSignature.c_str(), entry_0.fabricSensitiveStruct.h,
+                    newElement_0_fabricSensitiveStruct_h);
+
+                jclass simpleStructStructClass;
+                err = chip::JniReferences::GetInstance().GetClassRef(
+                    env, "chip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct", simpleStructStructClass);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterSimpleStruct");
+                    return nullptr;
+                }
+                jmethodID simpleStructStructCtor =
+                    env->GetMethodID(simpleStructStructClass, "<init>",
+                                     "(Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Integer;[BLjava/lang/String;Ljava/lang/"
+                                     "Integer;Ljava/lang/Float;Ljava/lang/Double;)V");
+                if (simpleStructStructCtor == nullptr)
+                {
+                    ChipLogError(Zcl, "Could not find ChipStructs$TestClusterClusterSimpleStruct constructor");
+                    return nullptr;
+                }
+
+                newElement_0_fabricSensitiveStruct =
+                    env->NewObject(simpleStructStructClass, simpleStructStructCtor, newElement_0_fabricSensitiveStruct_a,
+                                   newElement_0_fabricSensitiveStruct_b, newElement_0_fabricSensitiveStruct_c,
+                                   newElement_0_fabricSensitiveStruct_d, newElement_0_fabricSensitiveStruct_e,
+                                   newElement_0_fabricSensitiveStruct_f, newElement_0_fabricSensitiveStruct_g,
+                                   newElement_0_fabricSensitiveStruct_h);
+                jobject newElement_0_fabricSensitiveInt8uList;
+                chip::JniReferences::GetInstance().CreateArrayList(newElement_0_fabricSensitiveInt8uList);
+
+                auto iter_newElement_0_fabricSensitiveInt8uList_NaN = entry_0.fabricSensitiveInt8uList.begin();
+                while (iter_newElement_0_fabricSensitiveInt8uList_NaN.Next())
+                {
+                    auto & entry_NaN = iter_newElement_0_fabricSensitiveInt8uList_NaN.GetValue();
+                    jobject newElement_NaN;
+                    std::string newElement_NaNClassName     = "java/lang/Integer";
+                    std::string newElement_NaNCtorSignature = "(I)V";
+                    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                        newElement_NaNClassName.c_str(), newElement_NaNCtorSignature.c_str(), entry_NaN, newElement_NaN);
+                    chip::JniReferences::GetInstance().AddToList(newElement_0_fabricSensitiveInt8uList, newElement_NaN);
+                }
+                jobject newElement_0_fabricIndex;
+                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
+                                                                              newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                              entry_0.fabricIndex, newElement_0_fabricIndex);
+
+                jclass testFabricScopedStructClass;
+                err = chip::JniReferences::GetInstance().GetClassRef(
+                    env, "chip/devicecontroller/ChipStructs$TestClusterClusterTestFabricScoped", testFabricScopedStructClass);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterTestFabricScoped");
+                    return nullptr;
+                }
+                jmethodID testFabricScopedStructCtor = env->GetMethodID(
+                    testFabricScopedStructClass, "<init>",
+                    "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/lang/Integer;Ljava/util/Optional;Ljava/lang/String;Lchip/"
+                    "devicecontroller/ChipStructs$TestClusterClusterSimpleStruct;Ljava/util/ArrayList;Ljava/lang/Integer;)V");
+                if (testFabricScopedStructCtor == nullptr)
+                {
+                    ChipLogError(Zcl, "Could not find ChipStructs$TestClusterClusterTestFabricScoped constructor");
+                    return nullptr;
+                }
+
+                newElement_0 = env->NewObject(
+                    testFabricScopedStructClass, testFabricScopedStructCtor, newElement_0_fabricSensitiveInt8u,
+                    newElement_0_optionalFabricSensitiveInt8u, newElement_0_nullableFabricSensitiveInt8u,
+                    newElement_0_nullableOptionalFabricSensitiveInt8u, newElement_0_fabricSensitiveCharString,
+                    newElement_0_fabricSensitiveStruct, newElement_0_fabricSensitiveInt8uList, newElement_0_fabricIndex);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
         case Attributes::TimedWriteBoolean::Id: {
             using TypeInfo = Attributes::TimedWriteBoolean::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -12676,7 +13500,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string valueClassName     = "java/lang/Integer";
                 std::string valueCtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                              cppValue.Value(), value);
+                                                                              cppValue.Value().Raw(), value);
             }
             return value;
         }
@@ -12698,7 +13522,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string valueClassName     = "java/lang/Integer";
                 std::string valueCtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                               cppValue.Value(), value);
+                                                                               cppValue.Value().Raw(), value);
             }
             return value;
         }
@@ -12720,7 +13544,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string valueClassName     = "java/lang/Long";
                 std::string valueCtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                               cppValue.Value(), value);
+                                                                               cppValue.Value().Raw(), value);
             }
             return value;
         }
@@ -12742,7 +13566,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string valueClassName     = "java/lang/Long";
                 std::string valueCtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                               cppValue.Value(), value);
+                                                                               cppValue.Value().Raw(), value);
             }
             return value;
         }
@@ -13413,8 +14237,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -13437,8 +14261,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -13702,7 +14526,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+                                                                          static_cast<uint8_t>(cppValue), value);
             return value;
         }
         case Attributes::SystemMode::Id: {
@@ -13874,8 +14698,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                           cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -13898,8 +14722,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -15266,8 +16090,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -15290,8 +16114,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -15432,8 +16256,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -15456,8 +16280,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -15627,8 +16451,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -15651,8 +16475,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -15712,8 +16536,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             value = env->NewStringUTF(std::string(cppValue.data(), cppValue.size()).c_str());
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -15736,8 +16560,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -16039,8 +16863,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -16063,8 +16887,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -16163,7 +16987,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+                                                                          static_cast<uint8_t>(cppValue), value);
             return value;
         }
         case Attributes::CurrentPositionLift::Id: {
@@ -16222,7 +17046,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+                                                                          cppValue.Raw(), value);
             return value;
         }
         case Attributes::CurrentPositionLiftPercentage::Id: {
@@ -16340,7 +17164,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+                                                                          static_cast<uint8_t>(cppValue), value);
             return value;
         }
         case Attributes::CurrentPositionLiftPercent100ths::Id: {
@@ -16459,7 +17283,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+                                                                          cppValue.Raw(), value);
             return value;
         }
         case Attributes::SafetyStatus::Id: {
@@ -16477,8 +17301,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            cppValue, value);
             return value;
         }
-        case Attributes::ServerGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -16501,8 +17325,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ClientGeneratedCommandList::Id: {
-            using TypeInfo = Attributes::ClientGeneratedCommandList::TypeInfo;
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)

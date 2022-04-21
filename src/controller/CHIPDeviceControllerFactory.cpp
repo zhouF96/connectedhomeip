@@ -24,8 +24,10 @@
 
 #include <controller/CHIPDeviceControllerFactory.h>
 
+#include <app/OperationalDeviceProxy.h>
 #include <app/util/DataModelHandler.h>
 #include <lib/support/ErrorStr.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
@@ -34,6 +36,7 @@
 
 #include <app/server/Dnssd.h>
 #include <protocols/secure_channel/CASEServer.h>
+#include <protocols/secure_channel/SimpleSessionResumptionStorage.h>
 
 using namespace chip::Inet;
 using namespace chip::System;
@@ -53,9 +56,11 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
         return CHIP_NO_ERROR;
     }
 
+    // Save our initialization state that we can't recover later from a
+    // created-but-shut-down system state.
     mListenPort               = params.listenPort;
-    mFabricStorage            = params.fabricStorage;
     mFabricIndependentStorage = params.fabricIndependentStorage;
+    mEnableServerInteractions = params.enableServerInteractions;
 
     CHIP_ERROR err = InitSystemState(params);
 
@@ -73,9 +78,11 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState()
 #if CONFIG_NETWORK_LAYER_BLE
         params.bleLayer = mSystemState->BleLayer();
 #endif
+        params.listenPort               = mListenPort;
+        params.fabricIndependentStorage = mFabricIndependentStorage;
+        params.enableServerInteractions = mEnableServerInteractions;
+        params.groupDataProvider        = mSystemState->GetGroupDataProvider();
     }
-
-    params.fabricIndependentStorage = mFabricIndependentStorage;
 
     return InitSystemState(params);
 }
@@ -127,12 +134,12 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     //
     ReturnErrorOnFailure(stateParams.transportMgr->Init(Transport::UdpListenParameters(stateParams.udpEndPointManager)
                                                             .SetAddressType(Inet::IPAddressType::kIPv6)
-                                                            .SetListenPort(mListenPort)
+                                                            .SetListenPort(params.listenPort)
 #if INET_CONFIG_ENABLE_IPV4
                                                             ,
                                                         Transport::UdpListenParameters(stateParams.udpEndPointManager)
                                                             .SetAddressType(Inet::IPAddressType::kIPv4)
-                                                            .SetListenPort(mListenPort)
+                                                            .SetListenPort(params.listenPort)
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
                                                             ,
@@ -140,15 +147,25 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #endif
                                                             ));
 
-    stateParams.fabricTable           = chip::Platform::New<FabricTable>();
-    stateParams.sessionMgr            = chip::Platform::New<SessionManager>();
-    stateParams.exchangeMgr           = chip::Platform::New<Messaging::ExchangeManager>();
-    stateParams.messageCounterManager = chip::Platform::New<secure_channel::MessageCounterManager>();
+    stateParams.fabricTable                                   = chip::Platform::New<FabricTable>();
+    stateParams.sessionMgr                                    = chip::Platform::New<SessionManager>();
+    SimpleSessionResumptionStorage * sessionResumptionStorage = chip::Platform::New<SimpleSessionResumptionStorage>();
+    stateParams.sessionResumptionStorage                      = sessionResumptionStorage;
+    stateParams.exchangeMgr                                   = chip::Platform::New<Messaging::ExchangeManager>();
+    stateParams.messageCounterManager                         = chip::Platform::New<secure_channel::MessageCounterManager>();
+    stateParams.groupDataProvider                             = params.groupDataProvider;
 
-    ReturnErrorOnFailure(stateParams.fabricTable->Init(mFabricStorage));
+    ReturnErrorOnFailure(stateParams.fabricTable->Init(params.fabricIndependentStorage));
+    ReturnErrorOnFailure(sessionResumptionStorage->Init(params.fabricIndependentStorage));
+
+    auto delegate = chip::Platform::MakeUnique<ControllerFabricDelegate>();
+    ReturnErrorOnFailure(delegate->Init(stateParams.sessionMgr, stateParams.groupDataProvider));
+    ReturnErrorOnFailure(stateParams.fabricTable->AddFabricDelegate(delegate.get()));
+    delegate.release();
 
     ReturnErrorOnFailure(stateParams.sessionMgr->Init(stateParams.systemLayer, stateParams.transportMgr,
-                                                      stateParams.messageCounterManager, params.fabricIndependentStorage));
+                                                      stateParams.messageCounterManager, params.fabricIndependentStorage,
+                                                      stateParams.fabricTable));
     ReturnErrorOnFailure(stateParams.exchangeMgr->Init(stateParams.sessionMgr));
     ReturnErrorOnFailure(stateParams.messageCounterManager->Init(stateParams.exchangeMgr));
 
@@ -162,14 +179,10 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     {
         stateParams.caseServer = chip::Platform::New<CASEServer>();
 
-        //
         // Enable listening for session establishment messages.
-        //
-        // We pass in a nullptr for the BLELayer since we're not permitting usage of BLE in this server modality for the controller,
-        // especially since it will interrupt other potential usages of BLE by the controller acting in a commissioning capacity.
-        //
         ReturnErrorOnFailure(stateParams.caseServer->ListenForSessionEstablishment(
-            stateParams.exchangeMgr, stateParams.transportMgr, nullptr, stateParams.sessionMgr, stateParams.fabricTable));
+            stateParams.exchangeMgr, stateParams.sessionMgr, stateParams.fabricTable, stateParams.sessionResumptionStorage,
+            stateParams.groupDataProvider));
 
         //
         // We need to advertise the port that we're listening to for unsolicited messages over UDP. However, we have both a IPv4
@@ -190,10 +203,34 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         app::DnssdServer::Instance().SetFabricTable(stateParams.fabricTable);
 
         //
-        // Start up the DNS-SD server
+        // Start up the DNS-SD server.  We are not giving it a
+        // CommissioningModeProvider, so it will not claim we are in
+        // commissioning mode.
         //
-        chip::app::DnssdServer::Instance().StartServer(chip::Dnssd::CommissioningMode::kDisabled);
+        chip::app::DnssdServer::Instance().StartServer();
     }
+
+    stateParams.operationalDevicePool = Platform::New<DeviceControllerSystemStateParams::OperationalDevicePool>();
+    stateParams.caseClientPool        = Platform::New<DeviceControllerSystemStateParams::CASEClientPool>();
+
+    DeviceProxyInitParams deviceInitParams = {
+        .sessionManager           = stateParams.sessionMgr,
+        .sessionResumptionStorage = stateParams.sessionResumptionStorage,
+        .exchangeMgr              = stateParams.exchangeMgr,
+        .fabricTable              = stateParams.fabricTable,
+        .clientPool               = stateParams.caseClientPool,
+        .groupDataProvider        = stateParams.groupDataProvider,
+        .mrpLocalConfig           = Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()),
+    };
+
+    CASESessionManagerConfig sessionManagerConfig = {
+        .sessionInitParams = deviceInitParams,
+        .devicePool        = stateParams.operationalDevicePool,
+    };
+
+    // TODO: Need to be able to create a CASESessionManagerConfig here!
+    stateParams.caseSessionManager = Platform::New<CASESessionManager>();
+    ReturnErrorOnFailure(stateParams.caseSessionManager->Init(stateParams.systemLayer, sessionManagerConfig));
 
     // store the system state
     mSystemState = chip::Platform::New<DeviceControllerSystemState>(stateParams);
@@ -203,13 +240,11 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
 void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controllerParams, const SetupParams & params)
 {
-    controllerParams.deviceAddressUpdateDelegate    = params.deviceAddressUpdateDelegate;
     controllerParams.operationalCredentialsDelegate = params.operationalCredentialsDelegate;
     controllerParams.operationalKeypair             = params.operationalKeypair;
     controllerParams.controllerNOC                  = params.controllerNOC;
     controllerParams.controllerICAC                 = params.controllerICAC;
     controllerParams.controllerRCAC                 = params.controllerRCAC;
-    controllerParams.storageDelegate                = params.storageDelegate;
 
     controllerParams.systemState        = mSystemState;
     controllerParams.controllerVendorId = params.controllerVendorId;
@@ -235,7 +270,10 @@ CHIP_ERROR DeviceControllerFactory::SetupCommissioner(SetupParams params, Device
     ReturnErrorOnFailure(InitSystemState());
 
     CommissionerInitParams commissionerParams;
+    // PopulateInitParams works against ControllerInitParams base class of CommissionerInitParams only
     PopulateInitParams(commissionerParams, params);
+
+    // Set commissioner-specific fields not in ControllerInitParams
     commissionerParams.pairingDelegate     = params.pairingDelegate;
     commissionerParams.defaultCommissioner = params.defaultCommissioner;
 
@@ -267,7 +305,6 @@ void DeviceControllerFactory::Shutdown()
         chip::Platform::Delete(mSystemState);
         mSystemState = nullptr;
     }
-    mFabricStorage            = nullptr;
     mFabricIndependentStorage = nullptr;
 }
 
@@ -281,6 +318,28 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
     {
         chip::Platform::Delete(mCASEServer);
         mCASEServer = nullptr;
+    }
+
+    if (mCASESessionManager != nullptr)
+    {
+        mCASESessionManager->Shutdown();
+        Platform::Delete(mCASESessionManager);
+        mCASESessionManager = nullptr;
+    }
+
+    // mCASEClientPool and mDevicePool must be deallocated
+    // after mCASESessionManager, which uses them.
+
+    if (mOperationalDevicePool != nullptr)
+    {
+        Platform::Delete(mOperationalDevicePool);
+        mOperationalDevicePool = nullptr;
+    }
+
+    if (mCASEClientPool != nullptr)
+    {
+        Platform::Delete(mCASEClientPool);
+        mCASEClientPool = nullptr;
     }
 
     Dnssd::Resolver::Instance().Shutdown();
@@ -320,7 +379,11 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
     }
 
     mSystemLayer        = nullptr;
+    mTCPEndPointManager = nullptr;
     mUDPEndPointManager = nullptr;
+#if CONFIG_NETWORK_LAYER_BLE
+    mBleLayer = nullptr;
+#endif // CONFIG_NETWORK_LAYER_BLE
 
     if (mMessageCounterManager != nullptr)
     {

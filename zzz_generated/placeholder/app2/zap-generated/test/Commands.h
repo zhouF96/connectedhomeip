@@ -29,6 +29,7 @@ public:
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
     ~Test_TC_DM_1_3_SimulatedSuite() {}
@@ -158,13 +159,30 @@ private:
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
 
-    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & value) override
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
-        bool isExpectedDnssdResult = false;
+        bool shouldContinue = false;
 
-        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
-        NextTest();
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 1:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
     }
 
     //
@@ -405,6 +423,7 @@ public:
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
     ~Test_TC_DM_3_3_SimulatedSuite() {}
@@ -489,13 +508,26 @@ private:
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
 
-    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & value) override
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
-        bool isExpectedDnssdResult = false;
+        bool shouldContinue = false;
 
-        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
-        NextTest();
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
     }
 
     //
@@ -586,6 +618,7 @@ public:
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
     ~Test_TC_DM_2_3_SimulatedSuite() {}
@@ -671,13 +704,26 @@ private:
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
 
-    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & value) override
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
-        bool isExpectedDnssdResult = false;
+        bool shouldContinue = false;
 
-        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
-        NextTest();
+        switch (mTestIndex - 1)
+        {
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
     }
 
     //

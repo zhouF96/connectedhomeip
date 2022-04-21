@@ -32,6 +32,10 @@ function getManualTests()
     'Test_TC_DD_3_6',
     'Test_TC_DD_3_9',
     'Test_TC_DD_3_10',
+    'Test_TC_DD_3_11',
+    'Test_TC_DD_3_12',
+    'Test_TC_DD_3_13',
+    'Test_TC_DD_3_14',
     'Test_TC_DD_4_1',
   ];
 
@@ -66,8 +70,11 @@ function getManualTests()
 
   const DeviceManagement = [
     'Test_TC_DM_1_2',
+    'Test_TC_DM_1_4',
     'Test_TC_DM_2_3',
+    'Test_TC_DM_2_4',
     'Test_TC_DM_3_2',
+    'Test_TC_DM_3_4',
   ];
 
   const DiagnosticsLogs = [
@@ -85,7 +92,6 @@ function getManualTests()
   ];
 
   const GeneralCommissioning = [
-    'Test_TC_GC_1_1',
     'Test_TC_GC_1_2',
     'Test_TC_GC_1_3',
   ];
@@ -93,17 +99,15 @@ function getManualTests()
   const GeneralDiagnostics = [
     'Test_TC_GENDIAG_1_1',
     'Test_TC_GENDIAG_1_2',
+    'Test_TC_GENDIAG_2_1',
   ];
 
   const Identify = [
-    'Test_TC_I_1_1',
-    'Test_TC_I_2_1',
     'Test_TC_I_2_2',
-    'Test_TC_I_2_3',
   ];
 
   const IlluminanceMeasurement = [
-    'Test_TC_ILL_2_1',
+    'Test_TC_ILL_2_2',
   ];
 
   const InteractionDataModel = [
@@ -119,14 +123,16 @@ function getManualTests()
     'Test_TC_IDM_5_2',
     'Test_TC_IDM_6_1',
     'Test_TC_IDM_6_2',
+    'Test_TC_IDM_6_3',
+    'Test_TC_IDM_6_4',
   ];
 
   const MediaControl = [
     'Test_TC_MC_3_12',
+    'Test_TC_MC_3_13',
     'Test_TC_MC_4_1',
     'Test_TC_MC_8_2',
     'Test_TC_MC_9_2',
-    'Test_TC_MC_10_1',
     'Test_TC_MC_10_2',
     'Test_TC_MC_10_3',
     'Test_TC_MC_10_4',
@@ -138,9 +144,7 @@ function getManualTests()
     'Test_TC_MF_1_1',
     'Test_TC_MF_1_2',
     'Test_TC_MF_1_3',
-    'Test_TC_MF_1_4',
     'Test_TC_MF_1_5',
-    'Test_TC_MF_1_6',
     'Test_TC_MF_1_7',
     'Test_TC_MF_1_8',
     'Test_TC_MF_1_9',
@@ -159,12 +163,19 @@ function getManualTests()
     'Test_TC_MF_1_22',
     'Test_TC_MF_1_23',
     'Test_TC_MF_1_24',
+    'Test_TC_MF_1_25',
+    'Test_TC_MF_1_26',
+    'Test_TC_MF_1_27',
+    'Test_TC_MF_1_28',
   ];
 
   const ModeSelect = [
-    'Test_TC_MOD_1_1',
     'Test_TC_MOD_1_2',
     'Test_TC_MOD_2_1',
+    'Test_TC_MOD_2_2',
+    'Test_TC_MOD_3_1',
+    'Test_TC_MOD_3_2',
+    'Test_TC_MOD_3_3',
   ];
 
   const OTASoftwareUpdate = [
@@ -180,11 +191,13 @@ function getManualTests()
     'Test_TC_SU_3_2',
     'Test_TC_SU_3_3',
     'Test_TC_SU_3_4',
+    'Test_TC_SU_4_1',
+    'Test_TC_SU_4_2',
   ];
 
   const PowerSourceConfiguration = [
-    'Test_TC_PSCFG_1_1',
     'Test_TC_PSCFG_2_1',
+    'Test_TC_PSCFG_3_1',
   ];
 
   const SecureChannel = [
@@ -205,7 +218,26 @@ function getManualTests()
   ];
 
   const WindowCovering = [
-    'Test_TC_WNCV_2_3',
+    'Test_TC_WNCV_6_1',
+  ];
+
+  const FlowMeasurement = [
+    'Test_TC_FLW_3_1',
+  ];
+
+  const OccupancySensing = [
+    'Test_TC_OCC_2_3',
+    'Test_TC_OCC_2_4',
+    'Test_TC_OCC_3_1',
+  ];
+
+  const PressureMeasurement = [
+    'Test_TC_PRS_2_2',
+    'Test_TC_PRS_2_3',
+  ];
+
+  const PowerSource = [
+    'Test_TC_PS_2_2',
   ];
 
   const tests = [
@@ -232,6 +264,10 @@ function getManualTests()
     SoftwareDiagnostics, //
     WiFiNetworkDiagnostics, //
     WindowCovering, //
+    FlowMeasurement, //
+    OccupancySensing, //
+    PressureMeasurement, //
+    PowerSource, //
 
   ];
   return tests.flat(1);
@@ -305,8 +341,19 @@ function getTests()
     'Test_TC_FLW_2_2',
   ];
 
+  const GeneralCommissioning = [
+    'Test_TC_GC_1_1',
+  ];
+
+  const Identify = [
+    'Test_TC_I_1_1',
+    'Test_TC_I_2_1',
+    'Test_TC_I_2_3',
+  ];
+
   const IlluminanceMeasurement = [
     'Test_TC_ILL_1_1',
+    'Test_TC_ILL_2_1',
   ];
 
   const OccupancySensing = [
@@ -325,8 +372,23 @@ function getTests()
     'Test_TC_LVL_6_1',
   ];
 
+  const UserLabel = [
+    'Test_TC_LC_1_2',
+  ];
+
   const MediaControl = [
     'Test_TC_MC_1_1',
+    'Test_TC_MC_1_2',
+    'Test_TC_MC_1_3',
+    'Test_TC_MC_1_4',
+    'Test_TC_MC_1_5',
+    'Test_TC_MC_1_6',
+    'Test_TC_MC_1_7',
+    'Test_TC_MC_1_8',
+    'Test_TC_MC_1_9',
+    'Test_TC_MC_1_10',
+    'Test_TC_MC_1_11',
+    'Test_TC_MC_1_12',
     'Test_TC_MC_2_1',
     'Test_TC_MC_3_1',
     'Test_TC_MC_3_2',
@@ -350,6 +412,16 @@ function getTests()
     'Test_TC_MC_7_2',
     'Test_TC_MC_8_1',
     'Test_TC_MC_9_1',
+    'Test_TC_MC_10_1',
+  ];
+
+  const ModeSelect = [
+    'Test_TC_MOD_1_1',
+  ];
+
+  const MultipleFabrics = [
+    'Test_TC_MF_1_4',
+    'Test_TC_MF_1_6',
   ];
 
   const OnOff = [
@@ -357,10 +429,12 @@ function getTests()
     'Test_TC_OO_2_1',
     'Test_TC_OO_2_2',
     'Test_TC_OO_2_3',
+    'Test_TC_OO_2_4',
   ];
 
   const PowerSource = [
     'Test_TC_PS_1_1',
+    'Test_TC_PS_2_1',
   ];
 
   const PressureMeasurement = [
@@ -373,12 +447,21 @@ function getTests()
     'Test_TC_PCC_2_1',
     'Test_TC_PCC_2_2',
     'Test_TC_PCC_2_3',
+    'Test_TC_PCC_2_4',
+  ];
+
+  const PowerSourceConfiguration = [
+    'Test_TC_PSCFG_1_1',
   ];
 
   const RelativeHumidityMeasurement = [
     'Test_TC_RH_1_1',
     'Test_TC_RH_2_1',
     'Test_TC_RH_2_2',
+  ];
+
+  const SecureChannel = [
+    'Test_TC_SC_4_2',
   ];
 
   const Switch = [
@@ -406,6 +489,7 @@ function getTests()
 
   const ThreadNetworkDiagnostics = [
     'Test_TC_DIAG_TH_NW_1_1',
+    'Test_TC_DIAG_TH_NW_1_2',
   ];
 
   const WiFiNetworkDiagnostics = [
@@ -417,6 +501,7 @@ function getTests()
     'Test_TC_WNCV_1_1',
     'Test_TC_WNCV_2_1',
     'Test_TC_WNCV_2_2',
+    'Test_TC_WNCV_2_3',
     'Test_TC_WNCV_2_4',
     'Test_TC_WNCV_2_5',
     'Test_TC_WNCV_3_1',
@@ -428,6 +513,7 @@ function getTests()
     'Test_TC_WNCV_4_2',
     'Test_TC_WNCV_4_3',
     'Test_TC_WNCV_4_4',
+    'Test_TC_WNCV_4_5',
   ];
 
   const TV = [
@@ -456,11 +542,17 @@ function getTests()
     'TestConfigVariables',
     'TestDescriptorCluster',
     'TestBasicInformation',
+    'TestGeneralCommissioning',
     'TestIdentifyCluster',
     'TestOperationalCredentialsCluster',
     'TestModeSelectCluster',
     'TestSystemCommands',
     'TestBinding',
+    'TestUserLabelCluster',
+  ];
+
+  const MultiAdmin = [
+    'TestMultiAdmin',
   ];
 
   const SoftwareDiagnostics = [
@@ -477,6 +569,7 @@ function getTests()
     'DL_UsersAndCredentials',
     'DL_LockUnlock',
     'DL_Schedules',
+    'Test_TC_DL_1_3',
   ];
 
   const Groups = [
@@ -495,24 +588,32 @@ function getTests()
     ElectricalMeasurement, //
     EthernetNetworkDiagnostics, //
     FlowMeasurement, //
+    GeneralCommissioning, //
+    Identify, //
     IlluminanceMeasurement, //
     LevelControl, //
     MediaControl, //
+    ModeSelect, //
+    MultipleFabrics, //
     OccupancySensing, //
     OnOff, //
     PowerSource, //
     PressureMeasurement, //
     PumpConfigurationControl, //
+    PowerSourceConfiguration, //
     RelativeHumidityMeasurement, //
+    SecureChannel, //
     Switch, //
     TemperatureMeasurement, //
     Thermostat, //
     ThermostatUserConfiguration, //
     ThreadNetworkDiagnostics, //
+    UserLabel, //
     WiFiNetworkDiagnostics, //
     WindowCovering, //
     TV, //
     Others, //
+    MultiAdmin, //
     SoftwareDiagnostics, //
     Subscriptions, //
     DoorLock, //

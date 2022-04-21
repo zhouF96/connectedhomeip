@@ -18,53 +18,146 @@ name:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    nodeIdForDuplicateCommissioning:
+        type: NODE_ID
+        defaultValue: 0x11
+    nodeId2:
+        type: NODE_ID
+        defaultValue: 0xCAFE
+    nodeId3:
+        type: NODE_ID
+        defaultValue: 0xC00FEE
     endpoint: 0
+    discriminator:
+        type: INT16U
+        defaultValue: 3840
+    payload:
+        type: CHAR_STRING
+        defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
 
 tests:
+    - label: "Reboot target device"
+      cluster: "SystemCommands"
+      command: "Reboot"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: discriminator
+
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
-      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-    - label:
-          "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
-          timeout of PIXIT_COMM_WIN seconds using BCM"
-      disabled: true
+    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+      identity: "alpha"
+      cluster: "AdministratorCommissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
 
-    - label:
-          "TH_CR2 starts a commissioning process with DUT_CE after
-          PIXIT_COMM_WIN + 10 seconds"
-      disabled: true
+    - label: "Commission from beta"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithQRCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: payload
 
-    - label:
-          "TH_CR1 opens a new commissioning window on DUT_CE using a
-          commissioning timeout of PIXIT_COMM_WIN seconds using BCM"
-      disabled: true
+    - label: "TH_CR2 starts a commissioning process on DUT_CE"
+      identity: "beta"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
 
-    - label:
-          "TH_CR1 revokes the commissioning window on DUT_CE using
-          RevokeCommissioning command"
-      disabled: true
+    - label: "Open Commissioning Window from alpha"
+      cluster: "AdministratorCommissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
 
-    - label: "TH_CR2 starts a commissioning process with DUT_CE"
-      disabled: true
+    - label: "TH_CR1 revokes the commissioning window on DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "RevokeCommissioning"
+      timedInteractionTimeoutMs: 10000
 
-    - label:
-          "TH_CR1 revokes the commissioning window on DUT_CE using
-          RevokeCommissioning command"
-      disabled: true
+    - label: "TH_CR2 starts a commissioning process on DUT_CE"
+      identity: "beta"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
 
-    - label:
-          "TH_CR1 writes and reads the Basic Information Clusters NodeLabel
-          mandatory attribute of DUT_CE"
-      disabled: true
+    - label: "TH_CR1 writes the mandatory attribute NodeLabel of DUT_CE"
+      identity: "alpha"
+      cluster: "Basic"
+      command: "writeAttribute"
+      attribute: "NodeLabel"
+      arguments:
+          value: "chiptest"
 
-    - label:
-          "TH_CR1 opens a new commissioning window on DUT_CE using a
-          commissioning timeout of PIXIT_COMM_WIN seconds using BCM"
-      disabled: true
+    - label: "TH_CR1 read the mandatory attribute NodeLabel of DUT_CE"
+      identity: "alpha"
+      cluster: "Basic"
+      command: "readAttribute"
+      attribute: "NodeLabel"
+      response:
+          value: "chiptest"
 
-    - label: "TH_CR2 starts a commissioning process with DUT_CE"
-      disabled: true
+    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+      identity: "alpha"
+      cluster: "AdministratorCommissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "TH_CR2 starts a commissioning process on DUT_CE"
+      identity: "beta"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
 
     - label: "TH_CR3 starts a commissioning process with DUT_CE"
-      disabled: true
+      identity: "gamma"
+      cluster: "CommissionerCommands"
+      command: "PairWithQRCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId3
+              - name: "payload"
+                value: payload
+
+    - label: "Wait for the commissioned device to be retrieved for gamma"
+      identity: "gamma"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId3
+      response:
+          error: FAILURE

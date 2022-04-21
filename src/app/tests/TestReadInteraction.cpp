@@ -35,6 +35,7 @@
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/support/CHIPCounter.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
@@ -60,9 +61,6 @@ chip::EndpointId kInvalidTestEndpointId = 3;
 chip::DataVersion kTestDataVersion1     = 3;
 chip::DataVersion kTestDataVersion2     = 5;
 
-chip::Test::AppContext sContext;
-auto & sLoopback = sContext.GetLoopback();
-
 class TestContext : public chip::Test::AppContext
 {
 public:
@@ -75,6 +73,11 @@ public:
 
         auto * ctx = static_cast<TestContext *>(context);
 
+        if (ctx->mEventCounter.Init(0) != CHIP_NO_ERROR)
+        {
+            return FAILURE;
+        }
+
         chip::app::LogStorageResources logStorageResources[] = {
             { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
             { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
@@ -82,7 +85,7 @@ public:
         };
 
         chip::app::EventManagement::CreateEventManagement(&ctx->GetExchangeManager(), ArraySize(logStorageResources),
-                                                          gCircularEventBuffer, logStorageResources, nullptr, 0, nullptr);
+                                                          gCircularEventBuffer, logStorageResources, &ctx->mEventCounter);
 
         return SUCCESS;
     }
@@ -96,7 +99,13 @@ public:
 
         return SUCCESS;
     }
+
+private:
+    chip::MonotonicallyIncreasingCounter mEventCounter;
 };
+
+TestContext sContext;
+auto & sLoopback = sContext.GetLoopback();
 
 class TestEventGenerator : public chip::app::EventLoggingDelegate
 {
@@ -116,7 +125,7 @@ private:
     int32_t mStatus;
 };
 
-void GenerateEvents(nlTestSuite * apSuite, void * apContext, bool aIsUrgent = false)
+void GenerateEvents(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::EventNumber eid1, eid2;
@@ -128,11 +137,9 @@ void GenerateEvents(nlTestSuite * apSuite, void * apContext, bool aIsUrgent = fa
     options2.mPath     = { kTestEndpointId, kTestClusterId, kTestEventIdCritical };
     options2.mPriority = chip::app::PriorityLevel::Critical;
     TestEventGenerator testEventGenerator;
-    if (aIsUrgent)
-    {
-        options2.mUrgent = chip::app::EventOptions::Type::kUrgent;
-    }
     chip::app::EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
+
+    ChipLogDetail(DataManagement, "Generating Events");
     testEventGenerator.SetStatus(0);
     err = logMgmt.LogEvent(&testEventGenerator, options1, eid1);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -216,10 +223,11 @@ public:
 // The typical callback implementor is the engine, but that would proceed to return the object
 // back to the handler pool (which we obviously don't want in this case). This just no-ops those calls.
 //
-class NullReadHandlerCallback : public chip::app::ReadHandler::Callback
+class NullReadHandlerCallback : public chip::app::ReadHandler::ManagementCallback
 {
 public:
     void OnDone(chip::app::ReadHandler & apReadHandlerObj) override {}
+    chip::app::ReadHandler::ApplicationCallback * GetAppCallback() override { return nullptr; }
 };
 
 } // namespace
@@ -266,10 +274,13 @@ bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath,
     {
         return true;
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
+}
+
+bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
+{
+    return false;
 }
 
 class TestReadInteraction
@@ -294,6 +305,7 @@ public:
     static void TestReadChunking(nlTestSuite * apSuite, void * apContext);
     static void TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeRoundtrip(nlTestSuite * apSuite, void * apContext);
+    static void TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeWildcard(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeEarlyShutdown(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite * apSuite, void * apContext);
@@ -482,11 +494,14 @@ void TestReadInteraction::TestReadClientGenerateAttributePathList(nlTestSuite * 
                                chip::app::ReadClient::InteractionType::Read);
 
     AttributePathParams attributePathParams[2];
-    attributePathParams[0].mAttributeId                  = 0;
-    attributePathParams[1].mAttributeId                  = 0;
-    attributePathParams[1].mListIndex                    = 0;
+    attributePathParams[0].mAttributeId = 0;
+    attributePathParams[1].mAttributeId = 0;
+    attributePathParams[1].mListIndex   = 0;
+
+    Span<AttributePathParams> attributePaths(attributePathParams, 2 /*aAttributePathParamsListSize*/);
+
     AttributePathIBs::Builder & attributePathListBuilder = request.CreateAttributeRequests();
-    err = readClient.GenerateAttributePathList(attributePathListBuilder, attributePathParams, 2 /*aAttributePathParamsListSize*/);
+    err = readClient.GenerateAttributePaths(attributePathListBuilder, attributePaths);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
@@ -509,10 +524,13 @@ void TestReadInteraction::TestReadClientGenerateInvalidAttributePathList(nlTestS
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     AttributePathParams attributePathParams[2];
-    attributePathParams[0].mAttributeId                  = 0;
-    attributePathParams[1].mListIndex                    = 0;
+    attributePathParams[0].mAttributeId = 0;
+    attributePathParams[1].mListIndex   = 0;
+
+    Span<AttributePathParams> attributePaths(attributePathParams, 2 /*aAttributePathParamsListSize*/);
+
     AttributePathIBs::Builder & attributePathListBuilder = request.CreateAttributeRequests();
-    err = readClient.GenerateAttributePathList(attributePathListBuilder, attributePathParams, 2 /*aAttributePathParamsListSize*/);
+    err = readClient.GenerateAttributePaths(attributePathListBuilder, attributePaths);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 }
 
@@ -622,7 +640,8 @@ void TestReadInteraction::TestReadClientGenerateOneEventPaths(nlTestSuite * apSu
     eventPathParams[0].mEventId    = 4;
 
     EventPathIBs::Builder & eventPathListBuilder = request.CreateEventRequests();
-    err = readClient.GenerateEventPaths(eventPathListBuilder, eventPathParams, 1 /*aEventPathParamsListSize*/);
+    Span<EventPathParams> eventPaths(eventPathParams, 1 /*aEventPathParamsListSize*/);
+    err = readClient.GenerateEventPaths(eventPathListBuilder, eventPaths);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     request.IsFabricFiltered(false).EndOfReadRequestMessage();
@@ -673,7 +692,8 @@ void TestReadInteraction::TestReadClientGenerateTwoEventPaths(nlTestSuite * apSu
     eventPathParams[1].mEventId    = 5;
 
     EventPathIBs::Builder & eventPathListBuilder = request.CreateEventRequests();
-    err = readClient.GenerateEventPaths(eventPathListBuilder, eventPathParams, 2 /*aEventPathParamsListSize*/);
+    Span<EventPathParams> eventPaths(eventPathParams, 2 /*aEventPathParamsListSize*/);
+    err = readClient.GenerateEventPaths(eventPathListBuilder, eventPaths);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     request.IsFabricFiltered(false).EndOfReadRequestMessage();
@@ -733,7 +753,7 @@ void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apCont
     readPrepareParams.mEventPathParamsListSize     = 1;
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 2;
-    readPrepareParams.mEventNumber                 = 1;
+    readPrepareParams.mEventNumber.SetValue(1);
 
     {
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
@@ -1042,7 +1062,7 @@ void TestReadInteraction::TestReadRoundtripWithEventStatusIBInEventReport(nlTest
         ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
         readPrepareParams.mpEventPathParamsList    = eventPathParams;
         readPrepareParams.mEventPathParamsListSize = 1;
-        readPrepareParams.mEventNumber             = 1;
+        readPrepareParams.mEventNumber.SetValue(1);
 
         MockInteractionModelApp delegate;
         NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
@@ -1073,7 +1093,7 @@ void TestReadInteraction::TestReadRoundtripWithEventStatusIBInEventReport(nlTest
         ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
         readPrepareParams.mpEventPathParamsList    = eventPathParams;
         readPrepareParams.mEventPathParamsListSize = 1;
-        readPrepareParams.mEventNumber             = 1;
+        readPrepareParams.mEventNumber.SetValue(1);
 
         MockInteractionModelApp delegate;
         NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
@@ -1283,7 +1303,7 @@ void TestReadInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void 
                 {
                     mDidSetDirty = true;
 
-                    ClusterInfo dirtyPath;
+                    AttributePathParams dirtyPath;
                     dirtyPath.mEndpointId  = Test::kMockEndpoint3;
                     dirtyPath.mClusterId   = Test::MockClusterId(2);
                     dirtyPath.mAttributeId = Test::MockAttributeId(4);
@@ -1320,10 +1340,11 @@ void TestReadInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void 
 
         ctx.DrainAndServiceIO();
 
-        // We should receive another 2 * (6 + 1) = 14 attribute reports since the underlying path iterator should be reset.
+        // We should receive another (6 + 1) = 7 attribute reports since the underlying path iterator should be reset to the
+        // beginning of the cluster it is currently iterating.
         ChipLogError(DataManagement, "OLD: %d\n", currentAttributeResponsesWhenSetDirty);
         ChipLogError(DataManagement, "NEW: %d\n", delegate.mNumAttributeResponse);
-        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == currentAttributeResponsesWhenSetDirty + 14);
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == currentAttributeResponsesWhenSetDirty + 7);
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         // By now we should have closed all exchanges and sent all pending acks, so
@@ -1506,9 +1527,9 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     {
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Subscribe);
-
-        delegate.mGotReport = false;
-        err                 = readClient.SendRequest(readPrepareParams);
+        readPrepareParams.mpEventPathParamsList[0].mIsUrgentEvent = true;
+        delegate.mGotReport                                       = false;
+        err                                                       = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         ctx.DrainAndServiceIO();
@@ -1522,31 +1543,31 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
 
-        GenerateEvents(apSuite, apContext, true /*aIsUrgent*/);
+        GenerateEvents(apSuite, apContext);
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mHoldReport == false);
-        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mDirty == true);
-        chip::app::ClusterInfo dirtyPath1;
+        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty());
+        chip::app::AttributePathParams dirtyPath1;
         dirtyPath1.mClusterId   = kTestClusterId;
         dirtyPath1.mEndpointId  = kTestEndpointId;
         dirtyPath1.mAttributeId = 1;
 
-        chip::app::ClusterInfo dirtyPath2;
+        chip::app::AttributePathParams dirtyPath2;
         dirtyPath2.mClusterId   = kTestClusterId;
         dirtyPath2.mEndpointId  = kTestEndpointId;
         dirtyPath2.mAttributeId = 2;
 
-        chip::app::ClusterInfo dirtyPath3;
+        chip::app::AttributePathParams dirtyPath3;
         dirtyPath3.mClusterId   = kTestClusterId;
         dirtyPath3.mEndpointId  = kTestEndpointId;
         dirtyPath3.mAttributeId = 2;
         dirtyPath3.mListIndex   = 1;
 
-        chip::app::ClusterInfo dirtyPath4;
+        chip::app::AttributePathParams dirtyPath4;
         dirtyPath4.mClusterId   = kTestClusterId;
         dirtyPath4.mEndpointId  = kTestEndpointId;
         dirtyPath4.mAttributeId = 3;
 
-        chip::app::ClusterInfo dirtyPath5;
+        chip::app::AttributePathParams dirtyPath5;
         dirtyPath5.mClusterId   = kTestClusterId;
         dirtyPath5.mEndpointId  = kTestEndpointId;
         dirtyPath5.mAttributeId = 4;
@@ -1636,6 +1657,89 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
+void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    MockInteractionModelApp delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
+
+    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+    chip::app::EventPathParams eventPathParams[2];
+    readPrepareParams.mpEventPathParamsList                = eventPathParams;
+    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEndpointId;
+    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestClusterId;
+
+    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEndpointId;
+    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[1].mEventId    = kTestEventIdCritical;
+
+    readPrepareParams.mEventPathParamsListSize = 2;
+
+    chip::app::AttributePathParams attributePathParams[2];
+    readPrepareParams.mpAttributePathParamsList                 = attributePathParams;
+    readPrepareParams.mpAttributePathParamsList[0].mEndpointId  = kTestEndpointId;
+    readPrepareParams.mpAttributePathParamsList[0].mClusterId   = kTestClusterId;
+    readPrepareParams.mpAttributePathParamsList[0].mAttributeId = 1;
+
+    readPrepareParams.mpAttributePathParamsList[1].mEndpointId  = kTestEndpointId;
+    readPrepareParams.mpAttributePathParamsList[1].mClusterId   = kTestClusterId;
+    readPrepareParams.mpAttributePathParamsList[1].mAttributeId = 2;
+
+    readPrepareParams.mAttributePathParamsListSize = 2;
+
+    readPrepareParams.mMinIntervalFloorSeconds   = 2;
+    readPrepareParams.mMaxIntervalCeilingSeconds = 5;
+    printf("\nSend first subscribe request message with wildcard urgent event to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
+
+    delegate.mNumAttributeResponse       = 0;
+    readPrepareParams.mKeepSubscriptions = false;
+
+    {
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
+                                   chip::app::ReadClient::InteractionType::Subscribe);
+        readPrepareParams.mpEventPathParamsList[0].mIsUrgentEvent = true;
+        delegate.mGotReport                                       = false;
+        err                                                       = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+
+        NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
+        NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
+        delegate.mpReadHandler = engine->ActiveHandlerAt(0);
+
+        NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
+        NL_TEST_ASSERT(apSuite, delegate.mGotReport);
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
+        NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
+
+        GenerateEvents(apSuite, apContext);
+        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mHoldReport == false);
+        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty() == true);
+        delegate.mGotEventResponse = false;
+        delegate.mGotReport        = false;
+        ctx.DrainAndServiceIO();
+        NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
+    }
+
+    // By now we should have closed all exchanges and sent all pending acks, so
+    // there should be no queued-up things in the retransmit table.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
+    engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
 void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -1692,7 +1796,7 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
             delegate.mGotReport                 = false;
             delegate.mNumAttributeResponse      = 0;
 
-            ClusterInfo dirtyPath;
+            AttributePathParams dirtyPath;
             dirtyPath.mEndpointId  = Test::kMockEndpoint2;
             dirtyPath.mClusterId   = Test::MockClusterId(3);
             dirtyPath.mAttributeId = Test::MockAttributeId(1);
@@ -1713,7 +1817,7 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
             delegate.mGotReport                 = false;
             delegate.mNumAttributeResponse      = 0;
 
-            ClusterInfo dirtyPath;
+            AttributePathParams dirtyPath;
             dirtyPath.mEndpointId = Test::kMockEndpoint3;
 
             err = engine->GetReportingEngine().SetDirty(dirtyPath);
@@ -1982,6 +2086,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout(nlTestSu
     {
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Subscribe);
+        readPrepareParams.mpEventPathParamsList[0].mIsUrgentEvent = true;
         printf("\nSend first subscribe request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
         delegate.mGotReport = false;
         err                 = readClient.SendRequest(readPrepareParams);
@@ -1998,15 +2103,15 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout(nlTestSu
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
 
-        GenerateEvents(apSuite, apContext, true /*aIsUrgent*/);
+        GenerateEvents(apSuite, apContext);
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mHoldReport == false);
-        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mDirty == true);
-        chip::app::ClusterInfo dirtyPath1;
+        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty());
+        chip::app::AttributePathParams dirtyPath1;
         dirtyPath1.mClusterId   = kTestClusterId;
         dirtyPath1.mEndpointId  = kTestEndpointId;
         dirtyPath1.mAttributeId = 1;
 
-        chip::app::ClusterInfo dirtyPath2;
+        chip::app::AttributePathParams dirtyPath2;
         dirtyPath2.mClusterId   = kTestClusterId;
         dirtyPath2.mEndpointId  = kTestEndpointId;
         dirtyPath2.mAttributeId = 2;
@@ -2301,6 +2406,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout(nlT
     {
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Subscribe);
+        readPrepareParams.mpEventPathParamsList[0].mIsUrgentEvent = true;
         printf("\nSend first subscribe request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
         delegate.mGotReport = false;
         err                 = readClient.SendRequest(readPrepareParams);
@@ -2316,10 +2422,10 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout(nlT
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
 
-        GenerateEvents(apSuite, apContext, true /*aIsUrgent*/);
+        GenerateEvents(apSuite, apContext);
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mHoldReport == false);
-        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mDirty == true);
-        chip::app::ClusterInfo dirtyPath1;
+        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty());
+        chip::app::AttributePathParams dirtyPath1;
         dirtyPath1.mClusterId   = Test::MockClusterId(2);
         dirtyPath1.mEndpointId  = Test::kMockEndpoint3;
         dirtyPath1.mAttributeId = Test::MockAttributeId(4);
@@ -2397,6 +2503,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout(nlTestSui
     {
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Subscribe);
+        readPrepareParams.mpEventPathParamsList[0].mIsUrgentEvent = true;
         printf("\nSend first subscribe request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
         delegate.mGotReport = false;
         err                 = readClient.SendRequest(readPrepareParams);
@@ -2412,10 +2519,10 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout(nlTestSui
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
 
-        GenerateEvents(apSuite, apContext, true /*aIsUrgent*/);
+        GenerateEvents(apSuite, apContext);
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mHoldReport == false);
-        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mDirty == true);
-        chip::app::ClusterInfo dirtyPath1;
+        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty());
+        chip::app::AttributePathParams dirtyPath1;
         dirtyPath1.mClusterId   = Test::MockClusterId(2);
         dirtyPath1.mEndpointId  = Test::kMockEndpoint3;
         dirtyPath1.mAttributeId = Test::MockAttributeId(4);
@@ -2479,6 +2586,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadHandlerInvalidAttributePath", chip::app::TestReadInteraction::TestReadHandlerInvalidAttributePath),
     NL_TEST_DEF("TestProcessSubscribeRequest", chip::app::TestReadInteraction::TestProcessSubscribeRequest),
     NL_TEST_DEF("TestSubscribeRoundtrip", chip::app::TestReadInteraction::TestSubscribeRoundtrip),
+    NL_TEST_DEF("TestSubscribeUrgentWildcardEvent", chip::app::TestReadInteraction::TestSubscribeUrgentWildcardEvent),
     NL_TEST_DEF("TestSubscribeWildcard", chip::app::TestReadInteraction::TestSubscribeWildcard),
     NL_TEST_DEF("TestSubscribeEarlyShutdown", chip::app::TestReadInteraction::TestSubscribeEarlyShutdown),
     NL_TEST_DEF("TestSubscribeInvalidAttributePathRoundtrip", chip::app::TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip),

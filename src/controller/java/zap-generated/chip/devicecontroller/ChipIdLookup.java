@@ -88,6 +88,9 @@ public final class ChipIdLookup {
     if (clusterId == 55L) {
       return "EthernetNetworkDiagnostics";
     }
+    if (clusterId == 514L) {
+      return "FanControl";
+    }
     if (clusterId == 64L) {
       return "FixedLabel";
     }
@@ -229,11 +232,20 @@ public final class ChipIdLookup {
       if (attributeId == 1L) {
         return "Extension";
       }
+      if (attributeId == 2L) {
+        return "SubjectsPerAccessControlEntry";
+      }
+      if (attributeId == 3L) {
+        return "TargetsPerAccessControlEntry";
+      }
+      if (attributeId == 4L) {
+        return "AccessControlEntriesPerFabric";
+      }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -245,10 +257,10 @@ public final class ChipIdLookup {
     }
     if (clusterId == 1294L) {
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -269,10 +281,10 @@ public final class ChipIdLookup {
         return "AdminVendorId";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -308,10 +320,10 @@ public final class ChipIdLookup {
         return "AllowedVendorList";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -329,10 +341,10 @@ public final class ChipIdLookup {
         return "CurrentApp";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -350,10 +362,10 @@ public final class ChipIdLookup {
         return "CurrentOutput";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -377,10 +389,10 @@ public final class ChipIdLookup {
         return "BarrierPosition";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -448,11 +460,14 @@ public final class ChipIdLookup {
       if (attributeId == 18L) {
         return "UniqueID";
       }
+      if (attributeId == 19L) {
+        return "CapabilityMinima";
+      }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -473,10 +488,10 @@ public final class ChipIdLookup {
         return "StatusFlags";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -491,10 +506,10 @@ public final class ChipIdLookup {
         return "Binding";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -509,10 +524,10 @@ public final class ChipIdLookup {
         return "StateValue";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -533,10 +548,10 @@ public final class ChipIdLookup {
         return "SetupUrl";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -593,10 +608,10 @@ public final class ChipIdLookup {
         return "UniqueID";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -617,10 +632,10 @@ public final class ChipIdLookup {
         return "CurrentChannel";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -788,10 +803,10 @@ public final class ChipIdLookup {
         return "StartUpColorTemperatureMireds";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -809,10 +824,10 @@ public final class ChipIdLookup {
         return "SupportedStreamingProtocols";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -836,10 +851,10 @@ public final class ChipIdLookup {
         return "PartsList";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -851,10 +866,10 @@ public final class ChipIdLookup {
     }
     if (clusterId == 50L) {
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -888,6 +903,9 @@ public final class ChipIdLookup {
       }
       if (attributeId == 21L) {
         return "NumberOfYearDaySchedulesSupportedPerUser";
+      }
+      if (attributeId == 22L) {
+        return "NumberOfHolidaySchedulesSupported";
       }
       if (attributeId == 23L) {
         return "MaxPINCodeLength";
@@ -925,11 +943,17 @@ public final class ChipIdLookup {
       if (attributeId == 48L) {
         return "WrongCodeEntryLimit";
       }
+      if (attributeId == 49L) {
+        return "UserCodeTemporaryDisableTime";
+      }
+      if (attributeId == 51L) {
+        return "RequirePINforRemoteOperation";
+      }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -974,10 +998,10 @@ public final class ChipIdLookup {
         return "ActivePowerMax";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1016,10 +1040,61 @@ public final class ChipIdLookup {
         return "TimeSinceReset";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 514L) {
+      if (attributeId == 0L) {
+        return "FanMode";
+      }
+      if (attributeId == 1L) {
+        return "FanModeSequence";
+      }
+      if (attributeId == 2L) {
+        return "PercentSetting";
+      }
+      if (attributeId == 3L) {
+        return "PercentCurrent";
+      }
+      if (attributeId == 4L) {
+        return "SpeedMax";
+      }
+      if (attributeId == 5L) {
+        return "SpeedSetting";
+      }
+      if (attributeId == 6L) {
+        return "SpeedCurrent";
+      }
+      if (attributeId == 7L) {
+        return "RockSupport";
+      }
+      if (attributeId == 8L) {
+        return "RockSetting";
+      }
+      if (attributeId == 9L) {
+        return "WindSupport";
+      }
+      if (attributeId == 10L) {
+        return "WindSetting";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1037,10 +1112,10 @@ public final class ChipIdLookup {
         return "LabelList";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1064,10 +1139,10 @@ public final class ChipIdLookup {
         return "Tolerance";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1090,11 +1165,14 @@ public final class ChipIdLookup {
       if (attributeId == 3L) {
         return "LocationCapability";
       }
+      if (attributeId == 4L) {
+        return "SupportsConcurrentConnection";
+      }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1130,10 +1208,10 @@ public final class ChipIdLookup {
         return "ActiveNetworkFaults";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1157,10 +1235,10 @@ public final class ChipIdLookup {
         return "MaxGroupKeysPerFabric";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1175,10 +1253,10 @@ public final class ChipIdLookup {
         return "NameSupport";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1196,10 +1274,10 @@ public final class ChipIdLookup {
         return "IdentifyType";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1226,10 +1304,10 @@ public final class ChipIdLookup {
         return "LightSensorType";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1241,10 +1319,10 @@ public final class ChipIdLookup {
     }
     if (clusterId == 1289L) {
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1298,10 +1376,10 @@ public final class ChipIdLookup {
         return "StartUpCurrentLevel";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1322,10 +1400,10 @@ public final class ChipIdLookup {
         return "SupportedLocales";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65533L) {
         return "ClusterRevision";
@@ -1334,10 +1412,10 @@ public final class ChipIdLookup {
     }
     if (clusterId == 1288L) {
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1355,10 +1433,10 @@ public final class ChipIdLookup {
         return "CurrentInput";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1391,10 +1469,10 @@ public final class ChipIdLookup {
         return "SeekRangeStart";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1406,28 +1484,34 @@ public final class ChipIdLookup {
     }
     if (clusterId == 80L) {
       if (attributeId == 0L) {
-        return "CurrentMode";
-      }
-      if (attributeId == 1L) {
-        return "SupportedModes";
-      }
-      if (attributeId == 2L) {
-        return "OnMode";
-      }
-      if (attributeId == 3L) {
-        return "StartUpMode";
-      }
-      if (attributeId == 4L) {
         return "Description";
       }
+      if (attributeId == 1L) {
+        return "StandardNamespace";
+      }
+      if (attributeId == 2L) {
+        return "SupportedModes";
+      }
+      if (attributeId == 3L) {
+        return "CurrentMode";
+      }
+      if (attributeId == 4L) {
+        return "StartUpMode";
+      }
+      if (attributeId == 5L) {
+        return "OnMode";
+      }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
       }
       if (attributeId == 65533L) {
         return "ClusterRevision";
@@ -1460,10 +1544,10 @@ public final class ChipIdLookup {
         return "LastConnectErrorValue";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65532L) {
         return "FeatureMap";
@@ -1514,10 +1598,10 @@ public final class ChipIdLookup {
         return "OccupancySensorTypeBitmap";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1544,10 +1628,10 @@ public final class ChipIdLookup {
         return "StartUpOnOff";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1568,10 +1652,10 @@ public final class ChipIdLookup {
         return "SwitchActions";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1601,10 +1685,10 @@ public final class ChipIdLookup {
         return "CurrentFabricIndex";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1643,10 +1727,10 @@ public final class ChipIdLookup {
         return "BatteryChargeState";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1664,10 +1748,10 @@ public final class ChipIdLookup {
         return "Sources";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1769,10 +1853,10 @@ public final class ChipIdLookup {
         return "AlarmMask";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1799,10 +1883,10 @@ public final class ChipIdLookup {
         return "Tolerance";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1829,10 +1913,10 @@ public final class ChipIdLookup {
         return "NameSupport";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1856,10 +1940,10 @@ public final class ChipIdLookup {
         return "CurrentHeapHighWatermark";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1883,10 +1967,10 @@ public final class ChipIdLookup {
         return "MultiPressMax";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -1907,10 +1991,10 @@ public final class ChipIdLookup {
         return "CurrentTarget";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -2071,6 +2155,9 @@ public final class ChipIdLookup {
       if (attributeId == 42L) {
         return "ListLongOctetString";
       }
+      if (attributeId == 43L) {
+        return "ListFabricScoped";
+      }
       if (attributeId == 48L) {
         return "TimedWriteBoolean";
       }
@@ -2183,10 +2270,10 @@ public final class ChipIdLookup {
         return "NullableRangeRestrictedInt16s";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -2270,10 +2357,10 @@ public final class ChipIdLookup {
         return "ScheduleProgrammingVisibility";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -2474,10 +2561,10 @@ public final class ChipIdLookup {
         return "ActiveNetworkFaultsList";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -2501,10 +2588,10 @@ public final class ChipIdLookup {
         return "SupportedCalendarTypes";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65533L) {
         return "ClusterRevision";
@@ -2531,10 +2618,10 @@ public final class ChipIdLookup {
         return "LabelList";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65533L) {
         return "ClusterRevision";
@@ -2546,10 +2633,10 @@ public final class ChipIdLookup {
         return "MACAddress";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -2600,10 +2687,10 @@ public final class ChipIdLookup {
         return "OverrunCount";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -2672,10 +2759,10 @@ public final class ChipIdLookup {
         return "SafetyStatus";
       }
       if (attributeId == 65528L) {
-        return "ServerGeneratedCommandList";
+        return "GeneratedCommandList";
       }
       if (attributeId == 65529L) {
-        return "ClientGeneratedCommandList";
+        return "AcceptedCommandList";
       }
       if (attributeId == 65531L) {
         return "AttributeList";

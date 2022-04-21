@@ -22,9 +22,13 @@
 #include "AppEvent.h"
 #include "LEDWidget.h"
 #include "binding-handler.h"
+#include "sl_simple_led_instances.h"
+
+#ifdef DISPLAY_ENABLED
 #include "lcd.h"
 #include "qrcodegen.h"
-#include "sl_simple_led_instances.h"
+#endif // DISPLAY_ENABLED
+
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
@@ -347,7 +351,11 @@ void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
 {
     if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(SwitchToggleOnOff, 0);
+        BindingCommandData * data = Platform::New<BindingCommandData>();
+        data->commandId           = chip::app::Clusters::OnOff::Commands::Toggle::Id;
+        data->clusterId           = chip::app::Clusters::OnOff::Id;
+
+        DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     }
 }
 

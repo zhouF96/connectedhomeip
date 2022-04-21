@@ -251,11 +251,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Battery3AlarmState::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, battery3AlarmState));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -315,11 +315,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::HighTempDwellTripPoint::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, highTempDwellTripPoint));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -494,11 +494,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::IdentifyType::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, identifyType));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -898,11 +898,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::NameSupport::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, nameSupport));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -1822,11 +1822,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::LastConfiguredBy::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, lastConfiguredBy));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -2074,11 +2074,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::StartUpOnOff::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, startUpOnOff));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -2117,11 +2117,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::SwitchActions::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, switchActions));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -2524,11 +2524,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::StartUpCurrentLevel::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, startUpCurrentLevel));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -2776,11 +2776,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::AlarmCount::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, alarmCount));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -2843,11 +2843,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::ValidUntilTime::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, validUntilTime));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -2907,11 +2907,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::ApplicationType::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, applicationType));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -3948,11 +3948,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::ScheduleMode::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, scheduleMode));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -4280,11 +4280,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::RemainingTime::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, remainingTime));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -4317,11 +4317,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -4409,11 +4409,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::PartsList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, partsList));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -4453,14 +4453,14 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    if (accessingFabricIndex.HasValue())
-    {
-        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
-    }
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNode)), node));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroup)), group));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kEndpoint)), endpoint));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kCluster)), cluster));
+    if (accessingFabricIndex.HasValue())
+    {
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
+    }
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -4477,9 +4477,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kFabricIndex):
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
-            break;
         case to_underlying(Fields::kNode):
             ReturnErrorOnFailure(DataModel::Decode(reader, node));
             break;
@@ -4491,6 +4488,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         case to_underlying(Fields::kCluster):
             ReturnErrorOnFailure(DataModel::Decode(reader, cluster));
+            break;
+        case to_underlying(Fields::kFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
             break;
         default:
             break;
@@ -4517,11 +4517,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Binding::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, binding));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -4604,16 +4604,29 @@ CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricInde
 
 CHIP_ERROR Type::DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const
 {
+    bool includeSensitive = !accessingFabricIndex.HasValue() || (accessingFabricIndex.Value() == fabricIndex);
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    if (includeSensitive)
+    {
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kPrivilege)), privilege));
+    }
+    if (includeSensitive)
+    {
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAuthMode)), authMode));
+    }
+    if (includeSensitive)
+    {
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSubjects)), subjects));
+    }
+    if (includeSensitive)
+    {
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTargets)), targets));
+    }
     if (accessingFabricIndex.HasValue())
     {
         ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
     }
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kPrivilege)), privilege));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAuthMode)), authMode));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSubjects)), subjects));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTargets)), targets));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -4630,9 +4643,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kFabricIndex):
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
-            break;
         case to_underlying(Fields::kPrivilege):
             ReturnErrorOnFailure(DataModel::Decode(reader, privilege));
             break;
@@ -4644,6 +4654,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         case to_underlying(Fields::kTargets):
             ReturnErrorOnFailure(DataModel::Decode(reader, targets));
+            break;
+        case to_underlying(Fields::kFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
             break;
         default:
             break;
@@ -4670,13 +4683,17 @@ CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricInde
 
 CHIP_ERROR Type::DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const
 {
+    bool includeSensitive = !accessingFabricIndex.HasValue() || (accessingFabricIndex.Value() == fabricIndex);
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    if (includeSensitive)
+    {
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kData)), data));
+    }
     if (accessingFabricIndex.HasValue())
     {
         ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
     }
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kData)), data));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -4693,11 +4710,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kFabricIndex):
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
-            break;
         case to_underlying(Fields::kData):
             ReturnErrorOnFailure(DataModel::Decode(reader, data));
+            break;
+        case to_underlying(Fields::kFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
             break;
         default:
             break;
@@ -4727,11 +4744,20 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Extension::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, extension));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::SubjectsPerAccessControlEntry::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, subjectsPerAccessControlEntry));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::TargetsPerAccessControlEntry::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, targetsPerAccessControlEntry));
+        break;
+    case Attributes::AccessControlEntriesPerFabric::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, accessControlEntriesPerFabric));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -4756,12 +4782,12 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminFabricIndex)), adminFabricIndex));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminNodeID)), adminNodeID));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminPasscodeID)), adminPasscodeID));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kChangeType)), changeType));
     ReturnErrorOnFailure(
         DataModel::EncodeForRead(writer, TLV::ContextTag(to_underlying(Fields::kLatestValue)), GetFabricIndex(), latestValue));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminFabricIndex)), adminFabricIndex));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -4777,9 +4803,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kAdminFabricIndex):
-            ReturnErrorOnFailure(DataModel::Decode(reader, adminFabricIndex));
-            break;
         case to_underlying(Fields::kAdminNodeID):
             ReturnErrorOnFailure(DataModel::Decode(reader, adminNodeID));
             break;
@@ -4791,6 +4814,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         case to_underlying(Fields::kLatestValue):
             ReturnErrorOnFailure(DataModel::Decode(reader, latestValue));
+            break;
+        case to_underlying(Fields::kAdminFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, adminFabricIndex));
             break;
         default:
             break;
@@ -4807,12 +4833,12 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminFabricIndex)), adminFabricIndex));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminNodeID)), adminNodeID));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminPasscodeID)), adminPasscodeID));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kChangeType)), changeType));
     ReturnErrorOnFailure(
         DataModel::EncodeForRead(writer, TLV::ContextTag(to_underlying(Fields::kLatestValue)), GetFabricIndex(), latestValue));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminFabricIndex)), adminFabricIndex));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -4828,9 +4854,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kAdminFabricIndex):
-            ReturnErrorOnFailure(DataModel::Decode(reader, adminFabricIndex));
-            break;
         case to_underlying(Fields::kAdminNodeID):
             ReturnErrorOnFailure(DataModel::Decode(reader, adminNodeID));
             break;
@@ -4842,6 +4865,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         case to_underlying(Fields::kLatestValue):
             ReturnErrorOnFailure(DataModel::Decode(reader, latestValue));
+            break;
+        case to_underlying(Fields::kAdminFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, adminFabricIndex));
             break;
         default:
             break;
@@ -5055,11 +5081,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::FastPollTimeoutMax::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, fastPollTimeoutMax));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -5685,11 +5711,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::SetupUrl::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, setupUrl));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -5801,6 +5827,51 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace BridgedActions
 namespace Basic {
+namespace Structs {
+namespace CapabilityMinimaStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kCaseSessionsPerFabric)), caseSessionsPerFabric));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSubscriptionsPerFabric)), subscriptionsPerFabric));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    err = reader.EnterContainer(outer);
+    ReturnErrorOnFailure(err);
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kCaseSessionsPerFabric):
+            ReturnErrorOnFailure(DataModel::Decode(reader, caseSessionsPerFabric));
+            break;
+        case to_underlying(Fields::kSubscriptionsPerFabric):
+            ReturnErrorOnFailure(DataModel::Decode(reader, subscriptionsPerFabric));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+
+    return CHIP_NO_ERROR;
+}
+
+} // namespace CapabilityMinimaStruct
+} // namespace Structs
 
 namespace Commands {
 namespace MfgSpecificPing {
@@ -5897,11 +5968,14 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::UniqueID::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, uniqueID));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::CapabilityMinima::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, capabilityMinima));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -6305,11 +6379,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -6349,12 +6423,12 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kProviderNodeID)), providerNodeID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kEndpoint)), endpoint));
     if (accessingFabricIndex.HasValue())
     {
         ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
     }
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kProviderNodeID)), providerNodeID));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kEndpoint)), endpoint));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -6371,14 +6445,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kFabricIndex):
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
-            break;
         case to_underlying(Fields::kProviderNodeID):
             ReturnErrorOnFailure(DataModel::Decode(reader, providerNodeID));
             break;
         case to_underlying(Fields::kEndpoint):
             ReturnErrorOnFailure(DataModel::Decode(reader, endpoint));
+            break;
+        case to_underlying(Fields::kFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
             break;
         default:
             break;
@@ -6465,11 +6539,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::UpdateStateProgress::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, updateStateProgress));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -6639,11 +6713,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::SupportedLocales::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, supportedLocales));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -6685,11 +6759,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::SupportedCalendarTypes::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, supportedCalendarTypes));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -6725,11 +6799,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::TemperatureUnit::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, temperatureUnit));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -6765,11 +6839,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Sources::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, sources));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -7020,11 +7094,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::ActiveBatteryChargeFaults::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, activeBatteryChargeFaults));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -7098,7 +7172,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(
         DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kExpiryLengthSeconds)), expiryLengthSeconds));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kBreadcrumb)), breadcrumb));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTimeoutMs)), timeoutMs));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -7119,9 +7192,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         case to_underlying(Fields::kBreadcrumb):
             ReturnErrorOnFailure(DataModel::Decode(reader, breadcrumb));
-            break;
-        case to_underlying(Fields::kTimeoutMs):
-            ReturnErrorOnFailure(DataModel::Decode(reader, timeoutMs));
             break;
         default:
             break;
@@ -7176,10 +7246,10 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kLocation)), location));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNewRegulatoryConfig)), newRegulatoryConfig));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kCountryCode)), countryCode));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kBreadcrumb)), breadcrumb));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTimeoutMs)), timeoutMs));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -7195,17 +7265,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kLocation):
-            ReturnErrorOnFailure(DataModel::Decode(reader, location));
+        case to_underlying(Fields::kNewRegulatoryConfig):
+            ReturnErrorOnFailure(DataModel::Decode(reader, newRegulatoryConfig));
             break;
         case to_underlying(Fields::kCountryCode):
             ReturnErrorOnFailure(DataModel::Decode(reader, countryCode));
             break;
         case to_underlying(Fields::kBreadcrumb):
             ReturnErrorOnFailure(DataModel::Decode(reader, breadcrumb));
-            break;
-        case to_underlying(Fields::kTimeoutMs):
-            ReturnErrorOnFailure(DataModel::Decode(reader, timeoutMs));
             break;
         default:
             break;
@@ -7342,11 +7409,14 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::LocationCapability::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, locationCapability));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::SupportsConcurrentConnection::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, supportsConcurrentConnection));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -7747,6 +7817,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNetworkingStatus)), networkingStatus));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kDebugText)), debugText));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNetworkIndex)), networkIndex));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -7767,6 +7838,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         case to_underlying(Fields::kDebugText):
             ReturnErrorOnFailure(DataModel::Decode(reader, debugText));
+            break;
+        case to_underlying(Fields::kNetworkIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, networkIndex));
             break;
         default:
             break;
@@ -7931,11 +8005,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::LastConnectErrorValue::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, lastConnectErrorValue));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -8057,11 +8131,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -8187,11 +8261,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::ActiveNetworkFaults::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, activeNetworkFaults));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -8514,11 +8588,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::CurrentHeapHighWatermark::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, currentHeapHighWatermark));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -9097,11 +9171,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::ActiveNetworkFaultsList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, activeNetworkFaultsList));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -9237,11 +9311,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::OverrunCount::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, overrunCount));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -9438,11 +9512,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::TimeSinceReset::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, timeSinceReset));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -9475,11 +9549,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -9557,11 +9631,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::UniqueID::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, uniqueID));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -9731,11 +9805,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::MultiPressMax::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, multiPressMax));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -10020,7 +10094,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kDiscriminator)), discriminator));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kIterations)), iterations));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSalt)), salt));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kPasscodeID)), passcodeID));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -10050,9 +10123,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         case to_underlying(Fields::kSalt):
             ReturnErrorOnFailure(DataModel::Decode(reader, salt));
-            break;
-        case to_underlying(Fields::kPasscodeID):
-            ReturnErrorOnFailure(DataModel::Decode(reader, passcodeID));
             break;
         default:
             break;
@@ -10145,11 +10215,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::AdminVendorId::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, adminVendorId));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -10189,15 +10259,15 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    if (accessingFabricIndex.HasValue())
-    {
-        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
-    }
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kRootPublicKey)), rootPublicKey));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kVendorId)), vendorId));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricId)), fabricId));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNodeId)), nodeId));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kLabel)), label));
+    if (accessingFabricIndex.HasValue())
+    {
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
+    }
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -10214,9 +10284,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kFabricIndex):
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
-            break;
         case to_underlying(Fields::kRootPublicKey):
             ReturnErrorOnFailure(DataModel::Decode(reader, rootPublicKey));
             break;
@@ -10231,6 +10298,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         case to_underlying(Fields::kLabel):
             ReturnErrorOnFailure(DataModel::Decode(reader, label));
+            break;
+        case to_underlying(Fields::kFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
             break;
         default:
             break;
@@ -10257,14 +10327,21 @@ CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricInde
 
 CHIP_ERROR Type::DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const
 {
+    bool includeSensitive = !accessingFabricIndex.HasValue() || (accessingFabricIndex.Value() == fabricIndex);
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    if (includeSensitive)
+    {
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNoc)), noc));
+    }
+    if (includeSensitive)
+    {
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kIcac)), icac));
+    }
     if (accessingFabricIndex.HasValue())
     {
         ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
     }
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNoc)), noc));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kIcac)), icac));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -10281,14 +10358,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kFabricIndex):
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
-            break;
         case to_underlying(Fields::kNoc):
             ReturnErrorOnFailure(DataModel::Decode(reader, noc));
             break;
         case to_underlying(Fields::kIcac):
             ReturnErrorOnFailure(DataModel::Decode(reader, icac));
+            break;
+        case to_underlying(Fields::kFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
             break;
         default:
             break;
@@ -10811,11 +10888,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::CurrentFabricIndex::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, currentFabricIndex));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -10855,13 +10932,13 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupId)), groupId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kEndpoints)), endpoints));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupName)), groupName));
     if (accessingFabricIndex.HasValue())
     {
         ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
     }
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupId)), groupId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kEndpoints)), endpoints));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupName)), groupName));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -10878,9 +10955,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kFabricIndex):
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
-            break;
         case to_underlying(Fields::kGroupId):
             ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
             break;
@@ -10889,6 +10963,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         case to_underlying(Fields::kGroupName):
             ReturnErrorOnFailure(DataModel::Decode(reader, groupName));
+            break;
+        case to_underlying(Fields::kFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
             break;
         default:
             break;
@@ -10917,12 +10994,12 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupId)), groupId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupKeySetID)), groupKeySetID));
     if (accessingFabricIndex.HasValue())
     {
         ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
     }
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupId)), groupId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupKeySetID)), groupKeySetID));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -10939,14 +11016,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kFabricIndex):
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
-            break;
         case to_underlying(Fields::kGroupId):
             ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
             break;
         case to_underlying(Fields::kGroupKeySetID):
             ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySetID));
+            break;
+        case to_underlying(Fields::kFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
             break;
         default:
             break;
@@ -11252,11 +11329,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::MaxGroupKeysPerFabric::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, maxGroupKeysPerFabric));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -11294,11 +11371,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::LabelList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, labelList));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -11336,11 +11413,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::LabelList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, labelList));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -11373,11 +11450,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -11410,11 +11487,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -11447,11 +11524,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -11487,11 +11564,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::StateValue::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, stateValue));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -11680,26 +11757,29 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::CurrentMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, currentMode));
+    case Attributes::Description::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, description));
+        break;
+    case Attributes::StandardNamespace::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, standardNamespace));
         break;
     case Attributes::SupportedModes::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, supportedModes));
         break;
-    case Attributes::OnMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, onMode));
+    case Attributes::CurrentMode::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentMode));
         break;
     case Attributes::StartUpMode::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, startUpMode));
         break;
-    case Attributes::Description::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, description));
+    case Attributes::OnMode::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, onMode));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -11747,11 +11827,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Mode::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, mode));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -13818,11 +13898,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::RFIDProgrammingEventMask::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, RFIDProgrammingEventMask));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -14397,11 +14477,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::SafetyStatus::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, safetyStatus));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -14528,11 +14608,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::BarrierPosition::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, barrierPosition));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -14637,11 +14717,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::AlarmMask::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, alarmMask));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -15585,8 +15665,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::AcRefrigerantType::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, acRefrigerantType));
         break;
-    case Attributes::AcCompressor::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, acCompressor));
+    case Attributes::AcCompressorType::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acCompressorType));
         break;
     case Attributes::AcErrorCode::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, acErrorCode));
@@ -15600,11 +15680,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::AcCapacityFormat::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, acCapacityFormat));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -15643,11 +15723,38 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::FanModeSequence::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, fanModeSequence));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::PercentSetting::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, percentSetting));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::PercentCurrent::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, percentCurrent));
+        break;
+    case Attributes::SpeedMax::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, speedMax));
+        break;
+    case Attributes::SpeedSetting::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, speedSetting));
+        break;
+    case Attributes::SpeedCurrent::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, speedCurrent));
+        break;
+    case Attributes::RockSupport::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, rockSupport));
+        break;
+    case Attributes::RockSetting::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, rockSetting));
+        break;
+    case Attributes::WindSupport::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, windSupport));
+        break;
+    case Attributes::WindSetting::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, windSetting));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -15704,11 +15811,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::RelativeHumidityDisplay::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, relativeHumidityDisplay));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -15750,11 +15857,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::ScheduleProgrammingVisibility::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, scheduleProgrammingVisibility));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -16881,11 +16988,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::StartUpColorTemperatureMireds::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, startUpColorTemperatureMireds));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -16966,11 +17073,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::LampBurnHoursTripPoint::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, lampBurnHoursTripPoint));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -17018,11 +17125,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::LightSensorType::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, lightSensorType));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -17067,11 +17174,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -17131,11 +17238,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Scale::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, scale));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -17180,11 +17287,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -17229,11 +17336,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -17302,11 +17409,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, physicalContactUnoccupiedToOccupiedThreshold));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -17351,11 +17458,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -17400,11 +17507,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -17449,11 +17556,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -17498,11 +17605,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -17547,11 +17654,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -17596,11 +17703,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -17645,11 +17752,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -17694,11 +17801,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -17743,11 +17850,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -17792,11 +17899,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -17841,11 +17948,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -17890,11 +17997,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -17939,11 +18046,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -17988,11 +18095,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -18037,11 +18144,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -18086,11 +18193,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -18135,11 +18242,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -18184,11 +18291,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -18233,11 +18340,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -18282,11 +18389,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -18331,11 +18438,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -18380,11 +18487,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -18429,11 +18536,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -18478,11 +18585,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -18527,11 +18634,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -18576,11 +18683,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -18625,11 +18732,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -18674,11 +18781,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -18723,11 +18830,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -18772,11 +18879,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Tolerance::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, tolerance));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -19082,11 +19189,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::CurrentZoneSensitivityLevel::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, currentZoneSensitivityLevel));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -19942,11 +20049,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -20062,11 +20169,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::MaxDuration::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, maxDuration));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -20102,11 +20209,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::MACAddress::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, MACAddress));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -20396,11 +20503,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::CurrentChannel::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, currentChannel));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -20558,11 +20665,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::CurrentTarget::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, currentTarget));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -21041,11 +21148,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::SeekRangeStart::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, seekRangeStart));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -21267,11 +21374,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::CurrentInput::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, currentInput));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -21334,11 +21441,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -21439,11 +21546,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -21877,11 +21984,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::SupportedStreamingProtocols::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, supportedStreamingProtocols));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -22039,11 +22146,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::CurrentOutput::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, currentOutput));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -22310,11 +22417,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::CurrentApp::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, currentApp));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -22414,11 +22521,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::AllowedVendorList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, allowedVendorList));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -22589,11 +22696,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -22683,6 +22790,114 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 
 } // namespace SimpleStruct
+namespace TestFabricScoped {
+CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    return DoEncode(writer, tag, NullOptional);
+}
+
+CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex) const
+{
+    return DoEncode(writer, tag, MakeOptional(accessingFabricIndex));
+}
+
+CHIP_ERROR Type::DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const
+{
+    bool includeSensitive = !accessingFabricIndex.HasValue() || (accessingFabricIndex.Value() == fabricIndex);
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    if (includeSensitive)
+    {
+        ReturnErrorOnFailure(
+            DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricSensitiveInt8u)), fabricSensitiveInt8u));
+    }
+    if (includeSensitive)
+    {
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionalFabricSensitiveInt8u)),
+                                               optionalFabricSensitiveInt8u));
+    }
+    if (includeSensitive)
+    {
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNullableFabricSensitiveInt8u)),
+                                               nullableFabricSensitiveInt8u));
+    }
+    if (includeSensitive)
+    {
+        ReturnErrorOnFailure(DataModel::Encode(writer,
+                                               TLV::ContextTag(to_underlying(Fields::kNullableOptionalFabricSensitiveInt8u)),
+                                               nullableOptionalFabricSensitiveInt8u));
+    }
+    if (includeSensitive)
+    {
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricSensitiveCharString)),
+                                               fabricSensitiveCharString));
+    }
+    if (includeSensitive)
+    {
+        ReturnErrorOnFailure(
+            DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricSensitiveStruct)), fabricSensitiveStruct));
+    }
+    if (includeSensitive)
+    {
+        ReturnErrorOnFailure(
+            DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricSensitiveInt8uList)), fabricSensitiveInt8uList));
+    }
+    if (accessingFabricIndex.HasValue())
+    {
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
+    }
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    err = reader.EnterContainer(outer);
+    ReturnErrorOnFailure(err);
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kFabricSensitiveInt8u):
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricSensitiveInt8u));
+            break;
+        case to_underlying(Fields::kOptionalFabricSensitiveInt8u):
+            ReturnErrorOnFailure(DataModel::Decode(reader, optionalFabricSensitiveInt8u));
+            break;
+        case to_underlying(Fields::kNullableFabricSensitiveInt8u):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableFabricSensitiveInt8u));
+            break;
+        case to_underlying(Fields::kNullableOptionalFabricSensitiveInt8u):
+            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalFabricSensitiveInt8u));
+            break;
+        case to_underlying(Fields::kFabricSensitiveCharString):
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricSensitiveCharString));
+            break;
+        case to_underlying(Fields::kFabricSensitiveStruct):
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricSensitiveStruct));
+            break;
+        case to_underlying(Fields::kFabricSensitiveInt8uList):
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricSensitiveInt8uList));
+            break;
+        case to_underlying(Fields::kFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+
+    return CHIP_NO_ERROR;
+}
+
+} // namespace TestFabricScoped
 namespace NullablesAndOptionalsStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -22911,56 +23126,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 
 } // namespace DoubleNestedStructList
-namespace TestFabricScoped {
-CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    return DoEncode(writer, tag, NullOptional);
-}
-
-CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex) const
-{
-    return DoEncode(writer, tag, MakeOptional(accessingFabricIndex));
-}
-
-CHIP_ERROR Type::DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    if (accessingFabricIndex.HasValue())
-    {
-        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
-    }
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kFabricIndex):
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
-    return CHIP_NO_ERROR;
-}
-
-} // namespace TestFabricScoped
 namespace TestListStructOctet {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -24643,11 +24808,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::NullableRangeRestrictedInt16s::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, nullableRangeRestrictedInt16s));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -25063,11 +25228,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -25136,11 +25301,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::CecedSpecificationVersion::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, cecedSpecificationVersion));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -25209,11 +25374,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::PowerThreshold::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, powerThreshold));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -25390,11 +25555,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -25665,11 +25830,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::LogQueueMaxSize::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, logQueueMaxSize));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -26262,11 +26427,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::RmsVoltageSwellPeriodPhaseC::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, rmsVoltageSwellPeriodPhaseC));
         break;
-    case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
-    case Attributes::ClientGeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clientGeneratedCommandList));
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));

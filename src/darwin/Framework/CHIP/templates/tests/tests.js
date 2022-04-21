@@ -15,6 +15,11 @@
  *    limitations under the License.
  */
 
+function getManualTests()
+{
+  return [];
+}
+
 function getTests()
 {
   const AccessControl = [
@@ -75,6 +80,10 @@ function getTests()
     'Test_TC_DM_3_1',
   ];
 
+  const DoorLock = [
+    'Test_TC_DL_1_3',
+  ];
+
   const ElectricalMeasurement = [
     'Test_TC_EMR_1_1',
   ];
@@ -90,8 +99,19 @@ function getTests()
     'Test_TC_FLW_2_2',
   ];
 
+  const GeneralCommissioning = [
+    'Test_TC_GC_1_1',
+  ];
+
+  const Identify = [
+    'Test_TC_I_1_1',
+    'Test_TC_I_2_1',
+    'Test_TC_I_2_3',
+  ];
+
   const IlluminanceMeasurement = [
     'Test_TC_ILL_1_1',
+    'Test_TC_ILL_2_1',
   ];
 
   const OccupancySensing = [
@@ -112,6 +132,17 @@ function getTests()
 
   const MediaControl = [
     'Test_TC_MC_1_1',
+    'Test_TC_MC_1_2',
+    'Test_TC_MC_1_3',
+    'Test_TC_MC_1_4',
+    'Test_TC_MC_1_5',
+    'Test_TC_MC_1_6',
+    'Test_TC_MC_1_7',
+    'Test_TC_MC_1_8',
+    'Test_TC_MC_1_9',
+    'Test_TC_MC_1_10',
+    'Test_TC_MC_1_11',
+    'Test_TC_MC_1_12',
     'Test_TC_MC_2_1',
     'Test_TC_MC_3_1',
     'Test_TC_MC_3_2',
@@ -135,17 +166,21 @@ function getTests()
     'Test_TC_MC_7_2',
     'Test_TC_MC_8_1',
     'Test_TC_MC_9_1',
+    'Test_TC_MC_10_1',
+  ];
+
+  const ModeSelect = [
+    'Test_TC_MOD_1_1',
   ];
 
   const OnOff = [
-    'Test_TC_OO_1_1',
-    'Test_TC_OO_2_1',
-    'Test_TC_OO_2_2',
-    'Test_TC_OO_2_3',
+    'Test_TC_OO_1_1', 'Test_TC_OO_2_1', 'Test_TC_OO_2_2', 'Test_TC_OO_2_3',
+    // 'Test_TC_OO_2_4', Disable this Test for now as Darwin does not support reboot commands currently
   ];
 
   const PowerSource = [
     'Test_TC_PS_1_1',
+    'Test_TC_PS_2_1',
   ];
 
   const PressureMeasurement = [
@@ -158,6 +193,11 @@ function getTests()
     'Test_TC_PCC_2_1',
     'Test_TC_PCC_2_2',
     'Test_TC_PCC_2_3',
+    'Test_TC_PCC_2_4',
+  ];
+
+  const PowerSourceConfiguration = [
+    'Test_TC_PSCFG_1_1',
   ];
 
   const RelativeHumidityMeasurement = [
@@ -191,6 +231,11 @@ function getTests()
 
   const ThreadNetworkDiagnostics = [
     'Test_TC_DIAG_TH_NW_1_1',
+    'Test_TC_DIAG_TH_NW_1_2',
+  ];
+
+  const UserLabel = [
+    'Test_TC_LC_1_2',
   ];
 
   const WiFiNetworkDiagnostics = [
@@ -206,6 +251,7 @@ function getTests()
     'Test_TC_WNCV_1_1',
     'Test_TC_WNCV_2_1',
     'Test_TC_WNCV_2_2',
+    'Test_TC_WNCV_2_3',
     'Test_TC_WNCV_2_4',
     'Test_TC_WNCV_2_5',
     //'Test_TC_WNCV_3_1',
@@ -226,13 +272,14 @@ function getTests()
     'TestDelayCommands',
     'TestDescriptorCluster',
     'TestBasicInformation',
+    'TestGeneralCommissioning',
     'TestGroupsCluster',
     'TestGroupKeyManagementCluster',
     'TestIdentifyCluster',
     'TestLogCommands',
     'TestOperationalCredentialsCluster',
-    'TestModeSelectCluster',
     'TestBinding',
+    'TestUserLabelCluster',
   ];
 
   const SoftwareDiagnostics = [
@@ -253,23 +300,29 @@ function getTests()
     ColorControl, //
     DeviceDiscovery, //
     DeviceManagement, //
+    DoorLock, //
     ElectricalMeasurement, //
     EthernetNetworkDiagnostics, //
     FlowMeasurement, //
+    GeneralCommissioning, //
+    Identify, //
     IlluminanceMeasurement, //
     LevelControl, //
     MediaControl, //
+    ModeSelect, //
     OccupancySensing, //
     OnOff, //
     PowerSource, //
     PressureMeasurement, //
     PumpConfigurationControl, //
+    PowerSourceConfiguration, //
     RelativeHumidityMeasurement, //
     Switch, //
     TemperatureMeasurement, //
     Thermostat, //
     ThermostatUserConfiguration, //
     ThreadNetworkDiagnostics, //
+    UserLabel, //
     WiFiNetworkDiagnostics, //
     WindowCovering, //
     Others, //
@@ -282,4 +335,5 @@ function getTests()
 //
 // Module exports
 //
-exports.getTests = getTests;
+exports.getTests       = getTests;
+exports.getManualTests = getManualTests;

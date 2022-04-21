@@ -87,6 +87,14 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
 #if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
 void ExchangeContext::UpdateSEDPollingMode()
 {
+    if (!HasSessionHandle())
+    {
+        // After the session has been deleted, no further communication can occur on the exchange,
+        // so withdraw a SED fast-polling mode request.
+        UpdateSEDPollingMode(false);
+        return;
+    }
+
     Transport::PeerAddress address;
 
     switch (GetSessionHandle()->GetSessionType())
@@ -340,6 +348,7 @@ void ExchangeContext::OnSessionReleased()
     {
         // Exchange is already being closed. It may occur when closing an exchange after sending
         // RemoveFabric response which triggers removal of all sessions for the given fabric.
+        mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(this);
         return;
     }
 
@@ -482,12 +491,10 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
     {
         return mDelegate->OnMessageReceived(this, payloadHeader, std::move(msgBuf));
     }
-    else
-    {
-        DefaultOnMessageReceived(this, payloadHeader.GetProtocolID(), payloadHeader.GetMessageType(), messageCounter,
-                                 std::move(msgBuf));
-        return CHIP_NO_ERROR;
-    }
+
+    DefaultOnMessageReceived(this, payloadHeader.GetProtocolID(), payloadHeader.GetMessageType(), messageCounter,
+                             std::move(msgBuf));
+    return CHIP_NO_ERROR;
 }
 
 void ExchangeContext::MessageHandled()

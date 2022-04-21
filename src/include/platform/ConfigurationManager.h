@@ -29,6 +29,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/FailSafeContext.h>
 #include <platform/PersistedStorage.h>
 #include <setup_payload/CHIPAdditionalDataPayloadBuildConfig.h>
 
@@ -98,11 +99,6 @@ public:
     virtual CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth) = 0;
     virtual CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize)                         = 0;
     virtual CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer)                                   = 0;
-    virtual CHIP_ERROR GetSetupPinCode(uint32_t & setupPinCode)                                     = 0;
-    virtual CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator)                         = 0;
-    virtual CHIP_ERROR GetSpake2pIterationCount(uint32_t & iterationCount)                          = 0;
-    virtual CHIP_ERROR GetSpake2pSalt(uint8_t * buf, size_t bufSize, size_t & saltLen)              = 0;
-    virtual CHIP_ERROR GetSpake2pVerifier(uint8_t * buf, size_t bufSize, size_t & verifierLen)      = 0;
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     // Lifetime counter is monotonic counter that is incremented upon each commencement of advertising
     virtual CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) = 0;
@@ -120,8 +116,6 @@ public:
     virtual CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) = 0;
     virtual CHIP_ERROR StoreSoftwareVersion(uint32_t softwareVer)                      = 0;
     virtual CHIP_ERROR StoreHardwareVersion(uint16_t hardwareVer)                      = 0;
-    virtual CHIP_ERROR StoreSetupPinCode(uint32_t setupPinCode)                        = 0;
-    virtual CHIP_ERROR StoreSetupDiscriminator(uint16_t setupDiscriminator)            = 0;
     virtual CHIP_ERROR StoreRegulatoryLocation(uint8_t location)                       = 0;
     virtual CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen)             = 0;
     virtual CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb)                            = 0;
@@ -141,6 +135,8 @@ public:
     virtual CHIP_ERROR GetUniqueId(char * buf, size_t bufSize)                         = 0;
     virtual CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen)        = 0;
     virtual CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize)                    = 0;
+    virtual CHIP_ERROR GetFailSafeArmed(bool & val)                                    = 0;
+    virtual CHIP_ERROR SetFailSafeArmed(bool val)                                      = 0;
 
     virtual CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) = 0;
 
@@ -159,7 +155,7 @@ public:
     virtual void LogDeviceConfig() = 0;
 
     virtual bool IsCommissionableDeviceTypeEnabled()                              = 0;
-    virtual CHIP_ERROR GetDeviceTypeId(uint16_t & deviceType)                     = 0;
+    virtual CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType)                     = 0;
     virtual bool IsCommissionableDeviceNameEnabled()                              = 0;
     virtual CHIP_ERROR GetCommissionableDeviceName(char * buf, size_t bufSize)    = 0;
     virtual CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint)              = 0;
@@ -183,8 +179,6 @@ protected:
 
     virtual CHIP_ERROR Init()                                                                                   = 0;
     virtual bool CanFactoryReset()                                                                              = 0;
-    virtual CHIP_ERROR GetFailSafeArmed(bool & val)                                                             = 0;
-    virtual CHIP_ERROR SetFailSafeArmed(bool val)                                                               = 0;
     virtual CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) = 0;
     virtual CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)  = 0;
 

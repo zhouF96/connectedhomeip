@@ -28,13 +28,13 @@ namespace Clusters {
 namespace Globals {
 namespace Attributes {
 
-namespace ServerGeneratedCommandList {
+namespace GeneratedCommandList {
 static constexpr AttributeId Id = 0x0000FFF8;
-} // namespace ServerGeneratedCommandList
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
+namespace AcceptedCommandList {
 static constexpr AttributeId Id = 0x0000FFF9;
-} // namespace ClientGeneratedCommandList
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = 0x0000FFFB;
@@ -282,13 +282,13 @@ namespace Battery3AlarmState {
 static constexpr AttributeId Id = 0x0000007E;
 } // namespace Battery3AlarmState
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -344,13 +344,13 @@ namespace HighTempDwellTripPoint {
 static constexpr AttributeId Id = 0x00000014;
 } // namespace HighTempDwellTripPoint
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -378,13 +378,13 @@ namespace IdentifyType {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace IdentifyType
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -408,13 +408,13 @@ namespace NameSupport {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace NameSupport
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -458,13 +458,13 @@ namespace LastConfiguredBy {
 static constexpr AttributeId Id = 0x00000005;
 } // namespace LastConfiguredBy
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -504,13 +504,13 @@ namespace StartUpOnOff {
 static constexpr AttributeId Id = 0x00004003;
 } // namespace StartUpOnOff
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -538,13 +538,13 @@ namespace SwitchActions {
 static constexpr AttributeId Id = 0x00000010;
 } // namespace SwitchActions
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -620,13 +620,13 @@ namespace StartUpCurrentLevel {
 static constexpr AttributeId Id = 0x00004000;
 } // namespace StartUpCurrentLevel
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -650,13 +650,13 @@ namespace AlarmCount {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace AlarmCount
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -716,13 +716,13 @@ namespace ValidUntilTime {
 static constexpr AttributeId Id = 0x00000009;
 } // namespace ValidUntilTime
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -778,13 +778,13 @@ namespace ApplicationType {
 static constexpr AttributeId Id = 0x00000100;
 } // namespace ApplicationType
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -824,13 +824,13 @@ namespace ScheduleMode {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace ScheduleMode
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -862,13 +862,13 @@ namespace RemainingTime {
 static constexpr AttributeId Id = 0x00000002;
 } // namespace RemainingTime
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -888,13 +888,13 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace PulseWidthModulation {
 namespace Attributes {
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -930,13 +930,13 @@ namespace PartsList {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace PartsList
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -960,13 +960,13 @@ namespace Binding {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace Binding
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -994,13 +994,25 @@ namespace Extension {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace Extension
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace SubjectsPerAccessControlEntry {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace SubjectsPerAccessControlEntry
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace TargetsPerAccessControlEntry {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace TargetsPerAccessControlEntry
+
+namespace AccessControlEntriesPerFabric {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace AccessControlEntriesPerFabric
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -1048,13 +1060,13 @@ namespace FastPollTimeoutMax {
 static constexpr AttributeId Id = 0x00000006;
 } // namespace FastPollTimeoutMax
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -1086,13 +1098,13 @@ namespace SetupUrl {
 static constexpr AttributeId Id = 0x00000002;
 } // namespace SetupUrl
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -1188,13 +1200,17 @@ namespace UniqueID {
 static constexpr AttributeId Id = 0x00000012;
 } // namespace UniqueID
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace CapabilityMinima {
+static constexpr AttributeId Id = 0x00000013;
+} // namespace CapabilityMinima
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -1214,13 +1230,13 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace OtaSoftwareUpdateProvider {
 namespace Attributes {
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -1256,13 +1272,13 @@ namespace UpdateStateProgress {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace UpdateStateProgress
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -1290,13 +1306,13 @@ namespace SupportedLocales {
 static constexpr AttributeId Id = 0x00000002;
 } // namespace SupportedLocales
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -1328,13 +1344,13 @@ namespace SupportedCalendarTypes {
 static constexpr AttributeId Id = 0x00000002;
 } // namespace SupportedCalendarTypes
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -1358,13 +1374,13 @@ namespace TemperatureUnit {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace TemperatureUnit
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -1388,13 +1404,13 @@ namespace Sources {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace Sources
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -1538,13 +1554,13 @@ namespace ActiveBatteryChargeFaults {
 static constexpr AttributeId Id = 0x0000001E;
 } // namespace ActiveBatteryChargeFaults
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -1580,13 +1596,17 @@ namespace LocationCapability {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace LocationCapability
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace SupportsConcurrentConnection {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace SupportsConcurrentConnection
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -1638,13 +1658,13 @@ namespace LastConnectErrorValue {
 static constexpr AttributeId Id = 0x00000007;
 } // namespace LastConnectErrorValue
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -1664,13 +1684,13 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace DiagnosticLogs {
 namespace Attributes {
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -1722,13 +1742,13 @@ namespace ActiveNetworkFaults {
 static constexpr AttributeId Id = 0x00000007;
 } // namespace ActiveNetworkFaults
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -1764,13 +1784,13 @@ namespace CurrentHeapHighWatermark {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace CurrentHeapHighWatermark
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -2042,13 +2062,13 @@ namespace ActiveNetworkFaultsList {
 static constexpr AttributeId Id = 0x0000003E;
 } // namespace ActiveNetworkFaultsList
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -2120,13 +2140,13 @@ namespace OverrunCount {
 static constexpr AttributeId Id = 0x0000000C;
 } // namespace OverrunCount
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -2182,13 +2202,13 @@ namespace TimeSinceReset {
 static constexpr AttributeId Id = 0x00000008;
 } // namespace TimeSinceReset
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -2208,13 +2228,13 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace TimeSynchronization {
 namespace Attributes {
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -2294,13 +2314,13 @@ namespace UniqueID {
 static constexpr AttributeId Id = 0x00000012;
 } // namespace UniqueID
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -2332,13 +2352,13 @@ namespace MultiPressMax {
 static constexpr AttributeId Id = 0x00000002;
 } // namespace MultiPressMax
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -2370,13 +2390,13 @@ namespace AdminVendorId {
 static constexpr AttributeId Id = 0x00000002;
 } // namespace AdminVendorId
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -2420,13 +2440,13 @@ namespace CurrentFabricIndex {
 static constexpr AttributeId Id = 0x00000005;
 } // namespace CurrentFabricIndex
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -2462,13 +2482,13 @@ namespace MaxGroupKeysPerFabric {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace MaxGroupKeysPerFabric
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -2492,13 +2512,13 @@ namespace LabelList {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace LabelList
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -2522,13 +2542,13 @@ namespace LabelList {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace LabelList
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -2548,13 +2568,13 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace ProxyConfiguration {
 namespace Attributes {
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -2574,13 +2594,13 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace ProxyDiscovery {
 namespace Attributes {
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -2600,13 +2620,13 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace ProxyValid {
 namespace Attributes {
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -2630,13 +2650,13 @@ namespace StateValue {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace StateValue
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -2656,33 +2676,37 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace ModeSelect {
 namespace Attributes {
 
-namespace CurrentMode {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace CurrentMode
-
-namespace SupportedModes {
-static constexpr AttributeId Id = 0x00000001;
-} // namespace SupportedModes
-
-namespace OnMode {
-static constexpr AttributeId Id = 0x00000002;
-} // namespace OnMode
-
-namespace StartUpMode {
-static constexpr AttributeId Id = 0x00000003;
-} // namespace StartUpMode
-
 namespace Description {
-static constexpr AttributeId Id = 0x00000004;
+static constexpr AttributeId Id = 0x00000000;
 } // namespace Description
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace StandardNamespace {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace StandardNamespace
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace SupportedModes {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace SupportedModes
+
+namespace CurrentMode {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace CurrentMode
+
+namespace StartUpMode {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace StartUpMode
+
+namespace OnMode {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace OnMode
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -2722,13 +2746,13 @@ namespace Mode {
 static constexpr AttributeId Id = 0x00000011;
 } // namespace Mode
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -2928,13 +2952,13 @@ namespace RFIDProgrammingEventMask {
 static constexpr AttributeId Id = 0x00000047;
 } // namespace RFIDProgrammingEventMask
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -3042,13 +3066,13 @@ namespace SafetyStatus {
 static constexpr AttributeId Id = 0x0000001A;
 } // namespace SafetyStatus
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -3108,13 +3132,13 @@ namespace BarrierPosition {
 static constexpr AttributeId Id = 0x0000000A;
 } // namespace BarrierPosition
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -3230,13 +3254,13 @@ namespace AlarmMask {
 static constexpr AttributeId Id = 0x00000022;
 } // namespace AlarmMask
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -3408,9 +3432,9 @@ namespace AcRefrigerantType {
 static constexpr AttributeId Id = 0x00000042;
 } // namespace AcRefrigerantType
 
-namespace AcCompressor {
+namespace AcCompressorType {
 static constexpr AttributeId Id = 0x00000043;
-} // namespace AcCompressor
+} // namespace AcCompressorType
 
 namespace AcErrorCode {
 static constexpr AttributeId Id = 0x00000044;
@@ -3428,13 +3452,13 @@ namespace AcCapacityFormat {
 static constexpr AttributeId Id = 0x00000047;
 } // namespace AcCapacityFormat
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -3462,13 +3486,49 @@ namespace FanModeSequence {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace FanModeSequence
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace PercentSetting {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace PercentSetting
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace PercentCurrent {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PercentCurrent
+
+namespace SpeedMax {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace SpeedMax
+
+namespace SpeedSetting {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace SpeedSetting
+
+namespace SpeedCurrent {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace SpeedCurrent
+
+namespace RockSupport {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace RockSupport
+
+namespace RockSetting {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace RockSetting
+
+namespace WindSupport {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace WindSupport
+
+namespace WindSetting {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace WindSetting
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -3520,13 +3580,13 @@ namespace RelativeHumidityDisplay {
 static constexpr AttributeId Id = 0x00000015;
 } // namespace RelativeHumidityDisplay
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -3558,13 +3618,13 @@ namespace ScheduleProgrammingVisibility {
 static constexpr AttributeId Id = 0x00000002;
 } // namespace ScheduleProgrammingVisibility
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -3792,13 +3852,13 @@ namespace StartUpColorTemperatureMireds {
 static constexpr AttributeId Id = 0x00004010;
 } // namespace StartUpColorTemperatureMireds
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -3882,13 +3942,13 @@ namespace LampBurnHoursTripPoint {
 static constexpr AttributeId Id = 0x00000035;
 } // namespace LampBurnHoursTripPoint
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -3928,13 +3988,13 @@ namespace LightSensorType {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace LightSensorType
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -3970,13 +4030,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -4032,13 +4092,13 @@ namespace Scale {
 static constexpr AttributeId Id = 0x00000014;
 } // namespace Scale
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -4074,13 +4134,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -4116,13 +4176,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -4190,13 +4250,13 @@ namespace PhysicalContactUnoccupiedToOccupiedThreshold {
 static constexpr AttributeId Id = 0x00000032;
 } // namespace PhysicalContactUnoccupiedToOccupiedThreshold
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -4232,13 +4292,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -4274,13 +4334,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -4316,13 +4376,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -4358,13 +4418,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -4400,13 +4460,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -4442,13 +4502,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -4484,13 +4544,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -4526,13 +4586,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -4568,13 +4628,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -4610,13 +4670,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -4652,13 +4712,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -4694,13 +4754,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -4736,13 +4796,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -4778,13 +4838,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -4820,13 +4880,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -4862,13 +4922,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -4904,13 +4964,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -4946,13 +5006,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -4988,13 +5048,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5030,13 +5090,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5072,13 +5132,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5114,13 +5174,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5156,13 +5216,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5198,13 +5258,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5240,13 +5300,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5282,13 +5342,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5324,13 +5384,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5366,13 +5426,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5408,13 +5468,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5450,13 +5510,13 @@ namespace Tolerance {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Tolerance
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5504,13 +5564,13 @@ namespace CurrentZoneSensitivityLevel {
 static constexpr AttributeId Id = 0x00000013;
 } // namespace CurrentZoneSensitivityLevel
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5530,13 +5590,13 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace IasAce {
 namespace Attributes {
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5560,13 +5620,13 @@ namespace MaxDuration {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace MaxDuration
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5590,13 +5650,13 @@ namespace MACAddress {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace MACAddress
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5628,13 +5688,13 @@ namespace CurrentChannel {
 static constexpr AttributeId Id = 0x00000002;
 } // namespace CurrentChannel
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5662,13 +5722,13 @@ namespace CurrentTarget {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace CurrentTarget
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5716,13 +5776,13 @@ namespace SeekRangeStart {
 static constexpr AttributeId Id = 0x00000006;
 } // namespace SeekRangeStart
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5750,13 +5810,13 @@ namespace CurrentInput {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace CurrentInput
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5776,13 +5836,13 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace LowPower {
 namespace Attributes {
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5802,13 +5862,13 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace KeypadInput {
 namespace Attributes {
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5836,13 +5896,13 @@ namespace SupportedStreamingProtocols {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace SupportedStreamingProtocols
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5870,13 +5930,13 @@ namespace CurrentOutput {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace CurrentOutput
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5904,13 +5964,13 @@ namespace CurrentApp {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace CurrentApp
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5962,13 +6022,13 @@ namespace AllowedVendorList {
 static constexpr AttributeId Id = 0x00000007;
 } // namespace AllowedVendorList
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5988,13 +6048,13 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace AccountLogin {
 namespace Attributes {
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -6338,13 +6398,13 @@ namespace NullableRangeRestrictedInt16s {
 static constexpr AttributeId Id = 0x00008029;
 } // namespace NullableRangeRestrictedInt16s
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -6364,13 +6424,13 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace Messaging {
 namespace Attributes {
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -6438,13 +6498,13 @@ namespace CecedSpecificationVersion {
 static constexpr AttributeId Id = 0x0000001A;
 } // namespace CecedSpecificationVersion
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -6512,13 +6572,13 @@ namespace PowerThreshold {
 static constexpr AttributeId Id = 0x0000000E;
 } // namespace PowerThreshold
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -6538,13 +6598,13 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace ApplianceEventsAndAlert {
 namespace Attributes {
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -6572,13 +6632,13 @@ namespace LogQueueMaxSize {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace LogQueueMaxSize
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -7110,13 +7170,13 @@ namespace RmsVoltageSwellPeriodPhaseC {
 static constexpr AttributeId Id = 0x00000A17;
 } // namespace RmsVoltageSwellPeriodPhaseC
 
-namespace ServerGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;
-} // namespace ServerGeneratedCommandList
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
 
-namespace ClientGeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::ClientGeneratedCommandList::Id;
-} // namespace ClientGeneratedCommandList
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;

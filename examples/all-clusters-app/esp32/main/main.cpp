@@ -38,7 +38,9 @@
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/BDXDownloader.h>
-#include <app/clusters/ota-requestor/OTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/util/af.h>
 #include <binding-handler.h>
@@ -46,7 +48,6 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 #include <platform/ESP32/OTAImageProcessorImpl.h>
-#include <platform/GenericOTARequestorDriver.h>
 
 #if CONFIG_HAVE_DISPLAY
 #include "DeviceWithDisplay.h"
@@ -76,28 +77,27 @@ static DeviceCallbacks EchoCallbacks;
 namespace {
 
 #if CONFIG_ENABLE_OTA_REQUESTOR
-OTARequestor gRequestorCore;
-GenericOTARequestorDriver gRequestorUser;
+DefaultOTARequestor gRequestorCore;
+DefaultOTARequestorStorage gRequestorStorage;
+DefaultOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 #endif
 
-namespace {
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
-} // namespace
 
 class AppCallbacks : public AppDelegate
 {
 public:
-    void OnRendezvousStarted() override { bluetoothLED.Set(true); }
-    void OnRendezvousStopped() override
+    void OnCommissioningSessionStarted() override { bluetoothLED.Set(true); }
+    void OnCommissioningSessionStopped() override
     {
         bluetoothLED.Set(false);
         pairingWindowLED.Set(false);
     }
-    void OnPairingWindowOpened() override { pairingWindowLED.Set(true); }
-    void OnPairingWindowClosed() override { pairingWindowLED.Set(false); }
+    void OnCommissioningWindowOpened() override { pairingWindowLED.Set(true); }
+    void OnCommissioningWindowClosed() override { pairingWindowLED.Set(false); }
 };
 
 AppCallbacks sCallbacks;
@@ -109,7 +109,10 @@ constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 static void InitServer(intptr_t context)
 {
     // Init ZCL Data Model and CHIP App Server
-    chip::Server::GetInstance().Init(&sCallbacks);
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.appDelegate = &sCallbacks;
+    chip::Server::GetInstance().Init(initParams);
 
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
@@ -127,7 +130,8 @@ static void InitOTARequestor(void)
 {
 #if CONFIG_ENABLE_OTA_REQUESTOR
     SetRequestorInstance(&gRequestorCore);
-    gRequestorCore.Init(&Server::GetInstance(), &gRequestorUser, &gDownloader);
+    gRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
+    gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);

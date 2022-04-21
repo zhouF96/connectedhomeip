@@ -216,9 +216,15 @@ enum PublicEventTypes
     kInterfaceIpAddressChanged,
 
     /**
-     * Commissioning has completed either through timer expiry or by a call to the general commissioning cluster command.
+     * Commissioning has completed by a call to the general commissioning cluster command.
      */
     kCommissioningComplete,
+
+    /**
+     * Signals that the fail-safe timer expired before the CommissioningComplete command was
+     * successfully invoked.
+     */
+    kFailSafeTimerExpired,
 
     /**
      *
@@ -229,6 +235,16 @@ enum PublicEventTypes
      * Signals that DNS-SD platform layer was initialized and is ready to operate.
      */
     kDnssdPlatformInitialized,
+
+    /**
+     * Signals that bindings were updated.
+     */
+    kBindingsChangedViaCluster,
+
+    /**
+     * Signals that the state of the OTA engine changed.
+     */
+    kOtaStateChanged,
 };
 
 /**
@@ -286,6 +302,11 @@ enum ActivityChange
     kActivity_NoChange = 0,
     kActivity_Started  = 1,
     kActivity_Stopped  = -1,
+};
+
+enum OtaState
+{
+    kOtaSpaceAvailable = 0,
 };
 
 inline ConnectivityChange GetConnectivityChange(bool prevState, bool newState)
@@ -441,16 +462,27 @@ struct ChipDeviceEvent final
 
         struct
         {
-            CHIP_ERROR Status;
             uint64_t PeerNodeId;
             FabricIndex PeerFabricIndex;
         } CommissioningComplete;
 
         struct
         {
+            FabricIndex PeerFabricIndex;
+            bool AddNocCommandHasBeenInvoked;
+            bool UpdateNocCommandHasBeenInvoked;
+        } FailSafeTimerExpired;
+
+        struct
+        {
             // TODO(cecille): This should just specify wifi or thread since we assume at most 1.
             int network;
         } OperationalNetwork;
+
+        struct
+        {
+            OtaState newState;
+        } OtaStateChanged;
     };
 
     void Clear() { memset(this, 0, sizeof(*this)); }

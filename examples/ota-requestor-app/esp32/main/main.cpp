@@ -30,7 +30,9 @@
 #include "nvs_flash.h"
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/BDXDownloader.h>
-#include <app/clusters/ota-requestor/OTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/server/Server.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 
@@ -40,8 +42,6 @@
 #include <lib/support/ErrorStr.h>
 
 #include "OTAImageProcessorImpl.h"
-#include "platform/GenericOTARequestorDriver.h"
-#include "platform/OTARequestorInterface.h"
 
 using namespace ::chip;
 using namespace ::chip::System;
@@ -53,8 +53,9 @@ namespace {
 const char * TAG = "ota-requester-app";
 static DeviceCallbacks EchoCallbacks;
 
-OTARequestor gRequestorCore;
-GenericOTARequestorDriver gRequestorUser;
+DefaultOTARequestor gRequestorCore;
+DefaultOTARequestorStorage gRequestorStorage;
+DefaultOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 
@@ -63,7 +64,9 @@ app::Clusters::NetworkCommissioning::Instance
 
 static void InitServer(intptr_t context)
 {
-    chip::Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -71,7 +74,8 @@ static void InitServer(intptr_t context)
     sWiFiNetworkCommissioningInstance.Init();
 
     SetRequestorInstance(&gRequestorCore);
-    gRequestorCore.Init(&(Server::GetInstance()), &gRequestorUser, &gDownloader);
+    gRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
+    gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);

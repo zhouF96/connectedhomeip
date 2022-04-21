@@ -23,15 +23,15 @@
 #include "AppEvent.h"
 #include "ButtonHandler.h"
 #include "LEDWidget.h"
-#include "app/clusters/ota-requestor/BDXDownloader.h"
-#include "app/clusters/ota-requestor/OTARequestor.h"
-#include "platform/GenericOTARequestorDriver.h"
-#include "platform/P6/OTAImageProcessorImpl.h"
 #include "qrcodegen.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -41,6 +41,7 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <cy_wcm.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/P6/OTAImageProcessorImpl.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -59,13 +60,12 @@ extern "C" {
 
 using chip::BDXDownloader;
 using chip::CharSpan;
+using chip::DefaultOTARequestor;
 using chip::FabricIndex;
 using chip::GetRequestorInstance;
 using chip::NodeId;
 using chip::OTADownloader;
 using chip::OTAImageProcessorImpl;
-using chip::OTAImageProcessorParams;
-using chip::OTARequestor;
 using chip::System::Layer;
 
 using namespace ::chip;
@@ -93,8 +93,9 @@ StaticQueue_t sAppEventQueueStruct;
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
 
-OTARequestor gRequestorCore;
-GenericOTARequestorDriver gRequestorUser;
+DefaultOTARequestor gRequestorCore;
+DefaultOTARequestorStorage gRequestorStorage;
+DefaultOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 
@@ -109,6 +110,17 @@ AppTask AppTask::sAppTask;
 void NetWorkCommissioningInstInit()
 {
     sWiFiNetworkCommissioningInstance.Init();
+}
+
+static void InitServer(intptr_t context)
+{
+    // Init ZCL Data Model
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 }
 
 CHIP_ERROR AppTask::StartAppTask()
@@ -150,11 +162,8 @@ CHIP_ERROR AppTask::Init()
             }
         },
         0);
-    // Init ZCL Data Model
-    chip::Server::GetInstance().Init();
 
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 
     // Initialise WSTK buttons PB0 and PB1 (including debounce).
     ButtonHandler::Init();
@@ -180,7 +189,8 @@ CHIP_ERROR AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
 
     SetRequestorInstance(&gRequestorCore);
-    gRequestorCore.Init(&(Server::GetInstance()), &gRequestorUser, &gDownloader);
+    gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
+    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
@@ -201,7 +211,7 @@ CHIP_ERROR AppTask::Init()
         chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
         if (requestor != nullptr)
         {
-            requestor->NotifyUpdateApplied(savedSoftwareVersion);
+            requestor->NotifyUpdateApplied();
         }
     }
 
@@ -460,6 +470,6 @@ void OnTriggerUpdateTimerHandler(Layer * systemLayer, void * appState)
 {
     P6_LOG("Triggering immediate OTA update query");
 
-    OTARequestor * req = static_cast<OTARequestor *>(GetRequestorInstance());
+    DefaultOTARequestor * req = static_cast<DefaultOTARequestor *>(GetRequestorInstance());
     req->TriggerImmediateQuery();
 }

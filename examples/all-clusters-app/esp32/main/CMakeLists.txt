@@ -90,17 +90,17 @@ set(SRC_DIRS_LIST
 if (CONFIG_ENABLE_PW_RPC)
 # Append additional directories for RPC build
 set(PRIV_INCLUDE_DIRS_LIST  "${PRIV_INCLUDE_DIRS_LIST}"
-                     "${CMAKE_SOURCE_DIR}/../../platform/esp32/pw_sys_io/public"
-                     "${CMAKE_SOURCE_DIR}/../../common"
-                     "${CMAKE_SOURCE_DIR}/../../common/pigweed"
-                     "${CMAKE_SOURCE_DIR}/../../common/pigweed/esp32"
-                     "${CMAKE_SOURCE_DIR}/../../../src/lib/support"
+                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/pw_sys_io/public"
+                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common"
+                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed"
+                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed/esp32"
+                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/lib/support"
                      "${IDF_PATH}/components/freertos/include/freertos"
 )
 set(SRC_DIRS_LIST  "${SRC_DIRS_LIST}"
-                     "${CMAKE_SOURCE_DIR}/../../platform/esp32"
-                     "${CMAKE_SOURCE_DIR}/../../common/pigweed"
-                     "${CMAKE_SOURCE_DIR}/../../common/pigweed/esp32"
+                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32"
+                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed"
+                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed/esp32"
 )
 endif (CONFIG_ENABLE_PW_RPC)
 
@@ -126,10 +126,13 @@ idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
 
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DLWIP_IPV6_SCOPES=0" "-DCHIP_HAVE_CONFIG_H")
+target_compile_options(${COMPONENT_LIB} PUBLIC
+           "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
+)
 
 if (CONFIG_ENABLE_PW_RPC)
 
-get_filename_component(CHIP_ROOT ../third_party/connectedhomeip REALPATH)
+get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 
 set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
 include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
@@ -250,6 +253,7 @@ target_compile_options(${COMPONENT_LIB} PRIVATE
                        "-DPW_RPC_LIGHTING_SERVICE=1"
                        "-DPW_RPC_LOCKING_SERVICE=1"
                        "-DPW_RPC_TRACING_SERVICE=1"
-                       "-DPW_RPC_WIFI_SERVICE=1")
+                       "-DPW_RPC_WIFI_SERVICE=1"
+                       "-DPW_TRACE_BACKEND_SET=1")
 
 endif (CONFIG_ENABLE_PW_RPC)

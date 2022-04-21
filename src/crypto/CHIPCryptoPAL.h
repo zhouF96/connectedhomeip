@@ -30,6 +30,7 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/Optional.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
@@ -96,6 +97,11 @@ constexpr size_t kMAX_Hash_SHA256_Context_Size = CHIP_CONFIG_SHA256_CONTEXT_SIZE
 
 constexpr size_t kSpake2p_WS_Length                 = kP256_FE_Length + 8;
 constexpr size_t kSpake2p_VerifierSerialized_Length = kP256_FE_Length + kP256_Point_Length;
+
+constexpr char kVIDPrefixForCNEncoding[]    = "Mvid:";
+constexpr char kPIDPrefixForCNEncoding[]    = "Mpid:";
+constexpr size_t kVIDandPIDHexLength        = sizeof(uint16_t) * 2;
+constexpr size_t kMax_CommonNameAttr_Length = 64;
 
 /*
  * Overhead to encode a raw ECDSA signature in X9.62 format in ASN.1 DER
@@ -172,6 +178,15 @@ enum class SupportedECPKeyTypes : uint8_t
  **/
 void ClearSecretData(uint8_t * buf, size_t len);
 
+/**
+ * Helper for clearing a C array which auto-deduces the size.
+ */
+template <size_t N>
+void ClearSecretData(uint8_t (&buf)[N])
+{
+    ClearSecretData(buf, N);
+}
+
 template <typename Sig>
 class ECPKey
 {
@@ -198,6 +213,18 @@ public:
     {
         // Sanitize after use
         ClearSecretData(&bytes[0], Cap);
+    }
+
+    CapacityBoundBuffer & operator=(const CapacityBoundBuffer & other)
+    {
+        // Guard self assignment
+        if (this == &other)
+            return *this;
+
+        ClearSecretData(&bytes[0], Cap);
+        SetLength(other.Length());
+        ::memcpy(Bytes(), other.Bytes(), other.Length());
+        return *this;
     }
 
     /** @brief Set current length of the buffer that's being used
@@ -362,7 +389,7 @@ class P256Keypair : public P256KeypairBase
 {
 public:
     P256Keypair() {}
-    virtual ~P256Keypair();
+    ~P256Keypair() override;
 
     /**
      * @brief Initialize the keypair.
@@ -552,15 +579,15 @@ CHIP_ERROR ConvertIntegerRawToDerWithoutTag(const ByteSpan & raw_integer, Mutabl
  * @param aad_length Length of additional authentication data
  * @param key Encryption key
  * @param key_length Length of encryption key (in bytes)
- * @param iv Initial vector
- * @param iv_length Length of initial vector
+ * @param nonce Encryption nonce
+ * @param nonce_length Length of encryption nonce
  * @param ciphertext Buffer to write ciphertext into. Caller must ensure this is large enough to hold the ciphertext
  * @param tag Buffer to write tag into. Caller must ensure this is large enough to hold the tag
  * @param tag_length Expected length of tag
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  * */
 CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
-                           const uint8_t * key, size_t key_length, const uint8_t * iv, size_t iv_length, uint8_t * ciphertext,
+                           const uint8_t * key, size_t key_length, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
                            uint8_t * tag, size_t tag_length);
 
 /**
@@ -579,15 +606,15 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
  * @param tag_length Length of tag
  * @param key Decryption key
  * @param key_length Length of Decryption key (in bytes)
- * @param iv Initial vector
- * @param iv_length Length of initial vector
+ * @param nonce Encryption nonce
+ * @param nonce_length Length of encryption nonce
  * @param plaintext Buffer to write plaintext into
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 
 CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length, const uint8_t * aad, size_t aad_length,
-                           const uint8_t * tag, size_t tag_length, const uint8_t * key, size_t key_length, const uint8_t * iv,
-                           size_t iv_length, uint8_t * plaintext);
+                           const uint8_t * tag, size_t tag_length, const uint8_t * key, size_t key_length, const uint8_t * nonce,
+                           size_t nonce_length, uint8_t * plaintext);
 
 /**
  * @brief Verify the Certificate Signing Request (CSR). If successfully verified, it outputs the public key from the CSR.
@@ -1397,19 +1424,50 @@ CHIP_ERROR ExtractSKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
  **/
 CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & akid);
 
-enum class MatterOid
+/**
+ * Defines DN attribute types that can include endocing of VID/PID parameters.
+ */
+enum class DNAttrType
 {
-    kVendorId,
-    kProductId,
+    kUnspecified = 0,
+    kCommonName  = 1,
+    kMatterVID   = 2,
+    kMatterPID   = 3,
 };
 
 /**
- * @brief Extracts one of the IDs listed in MatterOid enum from an X509 Certificate.
- **/
-CHIP_ERROR ExtractDNAttributeFromX509Cert(MatterOid matterOid, const ByteSpan & certificate, uint16_t & id);
+ *  @struct AttestationCertVidPid
+ *
+ *  @brief
+ *    A data structure representing Attestation Certificate VID and PID attributes.
+ */
+struct AttestationCertVidPid
+{
+    Optional<VendorId> mVendorId;
+    Optional<uint16_t> mProductId;
+
+    bool Initialized() const { return (mVendorId.HasValue() || mProductId.HasValue()); }
+};
 
 /**
- * @brief Opaque context used to protect the symmetric key. The key operations must
+ * @brief Extracts VID and PID attributes from the DN Attribute string.
+ *        If attribute is not present the corresponding output value stays uninitialized.
+ *
+ * @return CHIP_ERROR_INVALID_ARGUMENT if wrong input is provided.
+ *         CHIP_ERROR_WRONG_CERT_DN if encoding of kMatterVID and kMatterPID attributes is wrong.
+ *         CHIP_NO_ERROR otherwise.
+ **/
+CHIP_ERROR ExtractVIDPIDFromAttributeString(DNAttrType attrType, const ByteSpan & attr,
+                                            AttestationCertVidPid & vidpidFromMatterAttr, AttestationCertVidPid & vidpidFromCNAttr);
+
+/**
+ * @brief Extracts VID and PID attributes from the Subject DN of an X509 Certificate.
+ *        If attribute is not present the corresponding output value stays uninitialized.
+ **/
+CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & x509Cert, AttestationCertVidPid & vidpid);
+
+/**
+ * @brief Opaque context used to protect a symmetric key. The key operations must
  *        be performed without exposing the protected key value.
  */
 class SymmetricKeyContext
@@ -1417,6 +1475,9 @@ class SymmetricKeyContext
 public:
     /**
      * @brief Returns the symmetric key hash
+     *
+     * TODO: Replace GetKeyHash() with DeriveGroupSessionId(SymmetricKeyContext &, uint16_t & session_id)
+     *
      * @return Group Key Hash
      */
     virtual uint16_t GetKeyHash() = 0;
@@ -1470,7 +1531,7 @@ public:
                                       const ByteSpan & mic) const = 0;
 
     /**
-     * @brief Release the dynamic memory used to allocate this instance of the SymmetricKeyContext
+     * @brief Release resources such as dynamic memory used to allocate this instance of the SymmetricKeyContext
      */
     virtual void Release() = 0;
 };
@@ -1482,7 +1543,7 @@ public:
  The buffer size must be at least CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes length.
  * @return Returns a CHIP_NO_ERROR on succcess, or CHIP_ERROR_INTERNAL if the provided key is invalid.
  **/
-CHIP_ERROR DeriveGroupOperationalKey(const ByteSpan & epoch_key, MutableByteSpan & out_key);
+CHIP_ERROR DeriveGroupOperationalKey(const ByteSpan & epoch_key, const ByteSpan & compressed_fabric_id, MutableByteSpan & out_key);
 
 /**
  *  @brief Derives the Group Session ID from a given operational group key using

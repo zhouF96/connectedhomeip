@@ -288,14 +288,14 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             if (hasDataResponse)
             {
                 ChipLogProgress(DataManagement,
-                                "Received Command Response Data, Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
+                                "Received Command Response Data, Endpoint=%u Cluster=" ChipLogFormatMEI
                                 " Command=" ChipLogFormatMEI,
                                 endpointId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
             }
             else
             {
                 ChipLogProgress(DataManagement,
-                                "Received Command Response Status for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
+                                "Received Command Response Status for Endpoint=%u Cluster=" ChipLogFormatMEI
                                 " Command=" ChipLogFormatMEI " Status=0x%x",
                                 endpointId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId),
                                 to_underlying(statusIB.mStatus));
@@ -372,10 +372,8 @@ TLV::TLVWriter * CommandSender::GetCommandDataIBTLVWriter()
     {
         return nullptr;
     }
-    else
-    {
-        return mInvokeRequestBuilder.GetInvokeRequests().GetCommandData().GetWriter();
-    }
+
+    return mInvokeRequestBuilder.GetInvokeRequests().GetCommandData().GetWriter();
 }
 
 CHIP_ERROR CommandSender::HandleTimedStatus(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)

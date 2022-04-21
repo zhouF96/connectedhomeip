@@ -21,7 +21,6 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/dnssd/Advertiser.h>
-#include <lib/dnssd/DnssdCache.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/dnssd/ResolverProxy.h>
 #include <lib/dnssd/platform/Dnssd.h>
@@ -57,7 +56,6 @@ public:
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
-    bool ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type) override;
 
     static DiscoveryImplPlatform & GetInstance();
 

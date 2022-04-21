@@ -22,6 +22,7 @@
 #include "ListParser.h"
 
 #include <app/AppBuildConfig.h>
+#include <app/ConcreteEventPath.h>
 #include <app/EventPathParams.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
@@ -119,7 +120,7 @@ public:
     /**
      *  @brief Fill the fields in apPath from the parser, the path in the parser should be a concrete path.
      *
-     *  @param [in] apEvent    A pointer to apEvent
+     *  @param [in] apPath    A pointer to the path to fill in.
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_IM_MALFORMED_EVENT_PATH if the path from the reader is not a valid concrere event path.

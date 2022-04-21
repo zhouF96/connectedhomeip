@@ -41,45 +41,81 @@ public:
      */
     CHIP_ERROR ArmFailSafe(FabricIndex accessingFabricIndex, System::Clock::Timeout expiryLength);
     CHIP_ERROR DisarmFailSafe();
+    CHIP_ERROR SetAddNocCommandInvoked(FabricIndex nocFabricIndex);
+    CHIP_ERROR SetUpdateNocCommandInvoked();
 
-    inline bool IsFailSafeArmed(FabricIndex accessingFabricIndex)
+    /**
+     * @brief
+     *   Schedules a work to cleanup the FailSafe Context asynchronously after various cleanup work
+     *   has completed.
+     */
+    void ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addNocCommandInvoked, bool updateNocCommandInvoked);
+
+    inline bool IsFailSafeArmed(FabricIndex accessingFabricIndex) const
     {
         return mFailSafeArmed && MatchesFabricIndex(accessingFabricIndex);
     }
 
-    inline bool IsFailSafeArmed() { return mFailSafeArmed; }
+    // Returns true if the fail-safe is in a state where commands that require an armed
+    // fail-safe can no longer execute, but a new fail-safe can't be armed yet.
+    inline bool IsFailSafeBusy() const { return mFailSafeBusy; }
 
-    inline bool MatchesFabricIndex(FabricIndex accessingFabricIndex)
+    inline bool IsFailSafeArmed() const { return mFailSafeArmed; }
+
+    inline bool MatchesFabricIndex(FabricIndex accessingFabricIndex) const
     {
         VerifyOrDie(mFailSafeArmed);
         return (accessingFabricIndex == mFabricIndex);
     }
 
-    inline bool NocCommandHasBeenInvoked() { return mNocCommandHasBeenInvoked; }
+    inline bool NocCommandHasBeenInvoked() const { return mAddNocCommandHasBeenInvoked || mUpdateNocCommandHasBeenInvoked; }
+    inline bool AddNocCommandHasBeenInvoked() { return mAddNocCommandHasBeenInvoked; }
+    inline bool UpdateNocCommandHasBeenInvoked() { return mUpdateNocCommandHasBeenInvoked; }
 
-    inline void SetNocCommandInvoked(FabricIndex nocFabricIndex)
-    {
-        mNocCommandHasBeenInvoked = true;
-        mFabricIndex              = nocFabricIndex;
-    }
-
-    inline FabricIndex GetFabricIndex()
+    inline FabricIndex GetFabricIndex() const
     {
         VerifyOrDie(mFailSafeArmed);
         return mFabricIndex;
     }
 
+    // Immediately disarms the timer and schedules a failsafe timer expiry.
+    // If the failsafe is not armed, this is a no-op.
+    void ForceFailSafeTimerExpiry();
+
+    static CHIP_ERROR LoadFromStorage(FabricIndex & fabricIndex, bool & addNocCommandInvoked, bool & updateNocCommandInvoked);
+    static CHIP_ERROR DeleteFromStorage();
+
 private:
     // ===== Private members reserved for use by this class only.
 
-    bool mFailSafeArmed            = false;
-    bool mNocCommandHasBeenInvoked = false;
-    FabricIndex mFabricIndex       = kUndefinedFabricIndex;
+    bool mFailSafeArmed                  = false;
+    bool mFailSafeBusy                   = false;
+    bool mAddNocCommandHasBeenInvoked    = false;
+    bool mUpdateNocCommandHasBeenInvoked = false;
+    FabricIndex mFabricIndex             = kUndefinedFabricIndex;
 
     // TODO:: Track the state of what was mutated during fail-safe.
 
-    static void HandleArmFailSafe(System::Layer * layer, void * aAppState);
-    void CommissioningFailedTimerComplete();
+    static constexpr size_t FailSafeContextTLVMaxSize()
+    {
+        return TLV::EstimateStructOverhead(sizeof(FabricIndex), sizeof(bool), sizeof(bool));
+    }
+
+    /**
+     * @brief
+     *  The callback function to be called when "fail-safe timer" expires.
+     */
+    static void HandleArmFailSafeTimer(System::Layer * layer, void * aAppState);
+
+    /**
+     * @brief
+     *  The callback function to be called asynchronously after various cleanup work has completed
+     *  to actually disarm the fail-safe.
+     */
+    static void HandleDisarmFailSafe(intptr_t arg);
+
+    void FailSafeTimerExpired();
+    CHIP_ERROR CommitToStorage();
 };
 
 } // namespace DeviceLayer

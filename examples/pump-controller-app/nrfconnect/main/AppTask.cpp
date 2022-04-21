@@ -37,10 +37,7 @@
 #include <system/SystemClock.h>
 
 #if CONFIG_CHIP_OTA_REQUESTOR
-#include <app/clusters/ota-requestor/BDXDownloader.h>
-#include <app/clusters/ota-requestor/OTARequestor.h>
-#include <platform/GenericOTARequestorDriver.h>
-#include <platform/nrfconnect/OTAImageProcessorImpl.h>
+#include "OTAUtil.h"
 #endif
 
 #include <dk_buttons_and_leds.h>
@@ -60,7 +57,7 @@ using namespace ::chip::DeviceLayer;
 
 namespace {
 
-LOG_MODULE_DECLARE(app);
+LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(AppEvent));
 k_timer sFunctionTimer;
 
@@ -72,13 +69,6 @@ LEDWidget sUnusedLED_1;
 bool sIsThreadProvisioned = false;
 bool sIsThreadEnabled     = false;
 bool sHaveBLEConnections  = false;
-
-#if CONFIG_CHIP_OTA_REQUESTOR
-GenericOTARequestorDriver sOTARequestorDriver;
-OTAImageProcessorImpl sOTAImageProcessor;
-chip::BDXDownloader sBDXDownloader;
-chip::OTARequestor sOTARequestor;
-#endif
 
 } // namespace
 
@@ -153,8 +143,13 @@ CHIP_ERROR AppTask::Init()
 
     // Initialize CHIP server
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-    InitOTARequestor();
-    ReturnErrorOnFailure(chip::Server::GetInstance().Init());
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+
+    ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
+#if CONFIG_CHIP_OTA_REQUESTOR
+    InitBasicOTARequestor();
+#endif
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
@@ -170,17 +165,6 @@ CHIP_ERROR AppTask::Init()
     }
 
     return err;
-}
-
-void AppTask::InitOTARequestor()
-{
-#if CONFIG_CHIP_OTA_REQUESTOR
-    sOTAImageProcessor.SetOTADownloader(&sBDXDownloader);
-    sBDXDownloader.SetImageProcessorDelegate(&sOTAImageProcessor);
-    sOTARequestorDriver.Init(&sOTARequestor, &sOTAImageProcessor);
-    sOTARequestor.Init(&chip::Server::GetInstance(), &sOTARequestorDriver, &sBDXDownloader);
-    chip::SetRequestorInstance(&sOTARequestor);
-#endif
 }
 
 CHIP_ERROR AppTask::StartApp()
@@ -366,11 +350,6 @@ void AppTask::StartThreadHandler(AppEvent * aEvent)
     if (aEvent->ButtonEvent.PinNo != THREAD_START_BUTTON)
         return;
 
-    if (chip::Server::GetInstance().AddTestCommissioning() != CHIP_NO_ERROR)
-    {
-        LOG_ERR("Failed to add test pairing");
-    }
-
     if (!ConnectivityMgr().IsThreadProvisioned())
     {
         StartDefaultThreadNetwork();
@@ -382,15 +361,11 @@ void AppTask::StartThreadHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
+void AppTask::StartBLEAdvertisementHandler(AppEvent *)
 {
-    if (aEvent->ButtonEvent.PinNo != BLE_ADVERTISEMENT_START_BUTTON)
-        return;
-
-    // Don't allow on starting Matter service BLE advertising after Thread provisioning.
-    if (ConnectivityMgr().IsThreadProvisioned())
+    if (Server::GetInstance().GetFabricTable().FabricCount() != 0)
     {
-        LOG_INF("NFC Tag emulation and Matter service BLE advertising not started - device is commissioned to a Thread network.");
+        LOG_INF("Matter service BLE advertising not started - device is already commissioned");
         return;
     }
 
@@ -400,7 +375,7 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
         return;
     }
 
-    if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
+    if (Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
     {
         LOG_ERR("OpenBasicCommissioningWindow() failed");
     }

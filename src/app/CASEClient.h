@@ -17,10 +17,10 @@
 
 #pragma once
 
+#include <credentials/GroupDataProvider.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <protocols/secure_channel/CASESession.h>
-#include <protocols/secure_channel/SessionIDAllocator.h>
 
 namespace chip {
 
@@ -31,15 +31,16 @@ typedef void (*OnCASEConnectionFailure)(void * context, CASEClient * client, CHI
 
 struct CASEClientInitParams
 {
-    SessionManager * sessionManager          = nullptr;
-    Messaging::ExchangeManager * exchangeMgr = nullptr;
-    SessionIDAllocator * idAllocator         = nullptr;
-    FabricInfo * fabricInfo                  = nullptr;
+    SessionManager * sessionManager                     = nullptr;
+    SessionResumptionStorage * sessionResumptionStorage = nullptr;
+    Messaging::ExchangeManager * exchangeMgr            = nullptr;
+    FabricInfo * fabricInfo                             = nullptr;
+    Credentials::GroupDataProvider * groupDataProvider  = nullptr;
 
     Optional<ReliableMessageProtocolConfig> mrpLocalConfig = Optional<ReliableMessageProtocolConfig>::Missing();
 };
 
-class DLL_EXPORT CASEClient : public SessionEstablishmentDelegate
+class DLL_EXPORT CASEClient
 {
 public:
     CASEClient(const CASEClientInitParams & params);
@@ -47,26 +48,12 @@ public:
     void SetMRPIntervals(const ReliableMessageProtocolConfig & mrpConfig);
 
     CHIP_ERROR EstablishSession(PeerId peer, const Transport::PeerAddress & peerAddress,
-                                const ReliableMessageProtocolConfig & mrpConfig, OnCASEConnected onConnection,
-                                OnCASEConnectionFailure onFailure, void * context);
-
-    // Implementation of SessionEstablishmentDelegate
-    void OnSessionEstablishmentError(CHIP_ERROR error) override;
-
-    void OnSessionEstablished() override;
-
-    CHIP_ERROR DeriveSecureSessionHandle(SessionHolder & handle);
+                                const ReliableMessageProtocolConfig & mrpConfig, SessionEstablishmentDelegate * delegate);
 
 private:
     CASEClientInitParams mInitParams;
 
     CASESession mCASESession;
-    PeerId mPeerId;
-    Transport::PeerAddress mPeerAddress;
-
-    OnCASEConnected mConnectionSuccessCallback         = nullptr;
-    OnCASEConnectionFailure mConnectionFailureCallback = nullptr;
-    void * mConectionContext                           = nullptr;
 };
 
 } // namespace chip
