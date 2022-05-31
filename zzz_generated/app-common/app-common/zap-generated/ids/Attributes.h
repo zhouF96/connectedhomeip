@@ -1299,11 +1299,11 @@ namespace LocalizationConfiguration {
 namespace Attributes {
 
 namespace ActiveLocale {
-static constexpr AttributeId Id = 0x00000001;
+static constexpr AttributeId Id = 0x00000000;
 } // namespace ActiveLocale
 
 namespace SupportedLocales {
-static constexpr AttributeId Id = 0x00000002;
+static constexpr AttributeId Id = 0x00000001;
 } // namespace SupportedLocales
 
 namespace GeneratedCommandList {
@@ -1741,6 +1741,10 @@ static constexpr AttributeId Id = 0x00000006;
 namespace ActiveNetworkFaults {
 static constexpr AttributeId Id = 0x00000007;
 } // namespace ActiveNetworkFaults
+
+namespace TestEventTriggersEnabled {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace TestEventTriggersEnabled
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -2848,6 +2852,10 @@ namespace CredentialRulesSupport {
 static constexpr AttributeId Id = 0x0000001B;
 } // namespace CredentialRulesSupport
 
+namespace NumberOfCredentialsSupportedPerUser {
+static constexpr AttributeId Id = 0x0000001C;
+} // namespace NumberOfCredentialsSupportedPerUser
+
 namespace EnableLogging {
 static constexpr AttributeId Id = 0x00000020;
 } // namespace EnableLogging
@@ -3250,10 +3258,6 @@ namespace ControlMode {
 static constexpr AttributeId Id = 0x00000021;
 } // namespace ControlMode
 
-namespace AlarmMask {
-static constexpr AttributeId Id = 0x00000022;
-} // namespace AlarmMask
-
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -3308,17 +3312,17 @@ namespace AbsMaxCoolSetpointLimit {
 static constexpr AttributeId Id = 0x00000006;
 } // namespace AbsMaxCoolSetpointLimit
 
-namespace PiCoolingDemand {
+namespace PICoolingDemand {
 static constexpr AttributeId Id = 0x00000007;
-} // namespace PiCoolingDemand
+} // namespace PICoolingDemand
 
-namespace PiHeatingDemand {
+namespace PIHeatingDemand {
 static constexpr AttributeId Id = 0x00000008;
-} // namespace PiHeatingDemand
+} // namespace PIHeatingDemand
 
-namespace HvacSystemTypeConfiguration {
+namespace HVACSystemTypeConfiguration {
 static constexpr AttributeId Id = 0x00000009;
-} // namespace HvacSystemTypeConfiguration
+} // namespace HVACSystemTypeConfiguration
 
 namespace LocalTemperatureCalibration {
 static constexpr AttributeId Id = 0x00000010;
@@ -3372,10 +3376,6 @@ namespace SystemMode {
 static constexpr AttributeId Id = 0x0000001C;
 } // namespace SystemMode
 
-namespace AlarmMask {
-static constexpr AttributeId Id = 0x0000001D;
-} // namespace AlarmMask
-
 namespace ThermostatRunningMode {
 static constexpr AttributeId Id = 0x0000001E;
 } // namespace ThermostatRunningMode
@@ -3420,37 +3420,65 @@ namespace SetpointChangeSourceTimestamp {
 static constexpr AttributeId Id = 0x00000032;
 } // namespace SetpointChangeSourceTimestamp
 
-namespace AcType {
+namespace OccupiedSetback {
+static constexpr AttributeId Id = 0x00000034;
+} // namespace OccupiedSetback
+
+namespace OccupiedSetbackMin {
+static constexpr AttributeId Id = 0x00000035;
+} // namespace OccupiedSetbackMin
+
+namespace OccupiedSetbackMax {
+static constexpr AttributeId Id = 0x00000036;
+} // namespace OccupiedSetbackMax
+
+namespace UnoccupiedSetback {
+static constexpr AttributeId Id = 0x00000037;
+} // namespace UnoccupiedSetback
+
+namespace UnoccupiedSetbackMin {
+static constexpr AttributeId Id = 0x00000038;
+} // namespace UnoccupiedSetbackMin
+
+namespace UnoccupiedSetbackMax {
+static constexpr AttributeId Id = 0x00000039;
+} // namespace UnoccupiedSetbackMax
+
+namespace EmergencyHeatDelta {
+static constexpr AttributeId Id = 0x0000003A;
+} // namespace EmergencyHeatDelta
+
+namespace ACType {
 static constexpr AttributeId Id = 0x00000040;
-} // namespace AcType
+} // namespace ACType
 
-namespace AcCapacity {
+namespace ACCapacity {
 static constexpr AttributeId Id = 0x00000041;
-} // namespace AcCapacity
+} // namespace ACCapacity
 
-namespace AcRefrigerantType {
+namespace ACRefrigerantType {
 static constexpr AttributeId Id = 0x00000042;
-} // namespace AcRefrigerantType
+} // namespace ACRefrigerantType
 
-namespace AcCompressorType {
+namespace ACCompressorType {
 static constexpr AttributeId Id = 0x00000043;
-} // namespace AcCompressorType
+} // namespace ACCompressorType
 
-namespace AcErrorCode {
+namespace ACErrorCode {
 static constexpr AttributeId Id = 0x00000044;
-} // namespace AcErrorCode
+} // namespace ACErrorCode
 
-namespace AcLouverPosition {
+namespace ACLouverPosition {
 static constexpr AttributeId Id = 0x00000045;
-} // namespace AcLouverPosition
+} // namespace ACLouverPosition
 
-namespace AcCoilTemperature {
+namespace ACCoilTemperature {
 static constexpr AttributeId Id = 0x00000046;
-} // namespace AcCoilTemperature
+} // namespace ACCoilTemperature
 
-namespace AcCapacityFormat {
+namespace ACCapacityformat {
 static constexpr AttributeId Id = 0x00000047;
-} // namespace AcCapacityFormat
+} // namespace ACCapacityformat
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -3680,9 +3708,9 @@ namespace ColorMode {
 static constexpr AttributeId Id = 0x00000008;
 } // namespace ColorMode
 
-namespace ColorControlOptions {
+namespace Options {
 static constexpr AttributeId Id = 0x0000000F;
-} // namespace ColorControlOptions
+} // namespace Options
 
 namespace NumberOfPrimaries {
 static constexpr AttributeId Id = 0x00000010;
@@ -3836,13 +3864,13 @@ namespace ColorCapabilities {
 static constexpr AttributeId Id = 0x0000400A;
 } // namespace ColorCapabilities
 
-namespace ColorTempPhysicalMin {
+namespace ColorTempPhysicalMinMireds {
 static constexpr AttributeId Id = 0x0000400B;
-} // namespace ColorTempPhysicalMin
+} // namespace ColorTempPhysicalMinMireds
 
-namespace ColorTempPhysicalMax {
+namespace ColorTempPhysicalMaxMireds {
 static constexpr AttributeId Id = 0x0000400C;
-} // namespace ColorTempPhysicalMax
+} // namespace ColorTempPhysicalMaxMireds
 
 namespace CoupleColorTempToLevelMinMireds {
 static constexpr AttributeId Id = 0x0000400D;
@@ -6267,135 +6295,135 @@ static constexpr AttributeId Id = 0x000000FF;
 } // namespace Unsupported
 
 namespace NullableBoolean {
-static constexpr AttributeId Id = 0x00008000;
+static constexpr AttributeId Id = 0x00004000;
 } // namespace NullableBoolean
 
 namespace NullableBitmap8 {
-static constexpr AttributeId Id = 0x00008001;
+static constexpr AttributeId Id = 0x00004001;
 } // namespace NullableBitmap8
 
 namespace NullableBitmap16 {
-static constexpr AttributeId Id = 0x00008002;
+static constexpr AttributeId Id = 0x00004002;
 } // namespace NullableBitmap16
 
 namespace NullableBitmap32 {
-static constexpr AttributeId Id = 0x00008003;
+static constexpr AttributeId Id = 0x00004003;
 } // namespace NullableBitmap32
 
 namespace NullableBitmap64 {
-static constexpr AttributeId Id = 0x00008004;
+static constexpr AttributeId Id = 0x00004004;
 } // namespace NullableBitmap64
 
 namespace NullableInt8u {
-static constexpr AttributeId Id = 0x00008005;
+static constexpr AttributeId Id = 0x00004005;
 } // namespace NullableInt8u
 
 namespace NullableInt16u {
-static constexpr AttributeId Id = 0x00008006;
+static constexpr AttributeId Id = 0x00004006;
 } // namespace NullableInt16u
 
 namespace NullableInt24u {
-static constexpr AttributeId Id = 0x00008007;
+static constexpr AttributeId Id = 0x00004007;
 } // namespace NullableInt24u
 
 namespace NullableInt32u {
-static constexpr AttributeId Id = 0x00008008;
+static constexpr AttributeId Id = 0x00004008;
 } // namespace NullableInt32u
 
 namespace NullableInt40u {
-static constexpr AttributeId Id = 0x00008009;
+static constexpr AttributeId Id = 0x00004009;
 } // namespace NullableInt40u
 
 namespace NullableInt48u {
-static constexpr AttributeId Id = 0x0000800A;
+static constexpr AttributeId Id = 0x0000400A;
 } // namespace NullableInt48u
 
 namespace NullableInt56u {
-static constexpr AttributeId Id = 0x0000800B;
+static constexpr AttributeId Id = 0x0000400B;
 } // namespace NullableInt56u
 
 namespace NullableInt64u {
-static constexpr AttributeId Id = 0x0000800C;
+static constexpr AttributeId Id = 0x0000400C;
 } // namespace NullableInt64u
 
 namespace NullableInt8s {
-static constexpr AttributeId Id = 0x0000800D;
+static constexpr AttributeId Id = 0x0000400D;
 } // namespace NullableInt8s
 
 namespace NullableInt16s {
-static constexpr AttributeId Id = 0x0000800E;
+static constexpr AttributeId Id = 0x0000400E;
 } // namespace NullableInt16s
 
 namespace NullableInt24s {
-static constexpr AttributeId Id = 0x0000800F;
+static constexpr AttributeId Id = 0x0000400F;
 } // namespace NullableInt24s
 
 namespace NullableInt32s {
-static constexpr AttributeId Id = 0x00008010;
+static constexpr AttributeId Id = 0x00004010;
 } // namespace NullableInt32s
 
 namespace NullableInt40s {
-static constexpr AttributeId Id = 0x00008011;
+static constexpr AttributeId Id = 0x00004011;
 } // namespace NullableInt40s
 
 namespace NullableInt48s {
-static constexpr AttributeId Id = 0x00008012;
+static constexpr AttributeId Id = 0x00004012;
 } // namespace NullableInt48s
 
 namespace NullableInt56s {
-static constexpr AttributeId Id = 0x00008013;
+static constexpr AttributeId Id = 0x00004013;
 } // namespace NullableInt56s
 
 namespace NullableInt64s {
-static constexpr AttributeId Id = 0x00008014;
+static constexpr AttributeId Id = 0x00004014;
 } // namespace NullableInt64s
 
 namespace NullableEnum8 {
-static constexpr AttributeId Id = 0x00008015;
+static constexpr AttributeId Id = 0x00004015;
 } // namespace NullableEnum8
 
 namespace NullableEnum16 {
-static constexpr AttributeId Id = 0x00008016;
+static constexpr AttributeId Id = 0x00004016;
 } // namespace NullableEnum16
 
 namespace NullableFloatSingle {
-static constexpr AttributeId Id = 0x00008017;
+static constexpr AttributeId Id = 0x00004017;
 } // namespace NullableFloatSingle
 
 namespace NullableFloatDouble {
-static constexpr AttributeId Id = 0x00008018;
+static constexpr AttributeId Id = 0x00004018;
 } // namespace NullableFloatDouble
 
 namespace NullableOctetString {
-static constexpr AttributeId Id = 0x00008019;
+static constexpr AttributeId Id = 0x00004019;
 } // namespace NullableOctetString
 
 namespace NullableCharString {
-static constexpr AttributeId Id = 0x0000801E;
+static constexpr AttributeId Id = 0x0000401E;
 } // namespace NullableCharString
 
 namespace NullableEnumAttr {
-static constexpr AttributeId Id = 0x00008024;
+static constexpr AttributeId Id = 0x00004024;
 } // namespace NullableEnumAttr
 
 namespace NullableStruct {
-static constexpr AttributeId Id = 0x00008025;
+static constexpr AttributeId Id = 0x00004025;
 } // namespace NullableStruct
 
 namespace NullableRangeRestrictedInt8u {
-static constexpr AttributeId Id = 0x00008026;
+static constexpr AttributeId Id = 0x00004026;
 } // namespace NullableRangeRestrictedInt8u
 
 namespace NullableRangeRestrictedInt8s {
-static constexpr AttributeId Id = 0x00008027;
+static constexpr AttributeId Id = 0x00004027;
 } // namespace NullableRangeRestrictedInt8s
 
 namespace NullableRangeRestrictedInt16u {
-static constexpr AttributeId Id = 0x00008028;
+static constexpr AttributeId Id = 0x00004028;
 } // namespace NullableRangeRestrictedInt16u
 
 namespace NullableRangeRestrictedInt16s {
-static constexpr AttributeId Id = 0x00008029;
+static constexpr AttributeId Id = 0x00004029;
 } // namespace NullableRangeRestrictedInt16s
 
 namespace GeneratedCommandList {

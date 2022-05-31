@@ -21,6 +21,7 @@ from .gn import GnBuilder
 
 class HostApp(Enum):
     ALL_CLUSTERS = auto()
+    ALL_CLUSTERS_MINIMAL = auto()
     CHIP_TOOL = auto()
     CHIP_TOOL_DARWIN = auto()
     THERMOSTAT = auto()
@@ -28,6 +29,8 @@ class HostApp(Enum):
     MIN_MDNS = auto()
     ADDRESS_RESOLVE = auto()
     TV_APP = auto()
+    TV_CASTING_APP = auto()
+    LIGHT = auto()
     LOCK = auto()
     TESTS = auto()
     SHELL = auto()
@@ -36,14 +39,18 @@ class HostApp(Enum):
     OTA_REQUESTOR = auto()
     PYTHON_BINDINGS = auto()
     NL_TEST_RUNNER = auto()
+    TV_CASTING = auto()
+    BRIDGE = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
             return 'all-clusters-app/linux'
+        elif self == HostApp.ALL_CLUSTERS_MINIMAL:
+            return 'all-clusters-minimal-app/linux'
         elif self == HostApp.CHIP_TOOL:
             return 'chip-tool'
         elif self == HostApp.CHIP_TOOL_DARWIN:
-            return 'chip-tool-darwin'
+            return 'darwin-framework-tool'
         elif self == HostApp.THERMOSTAT:
             return 'thermostat/linux'
         elif self == HostApp.RPC_CONSOLE:
@@ -52,6 +59,10 @@ class HostApp(Enum):
             return 'minimal-mdns'
         elif self == HostApp.TV_APP:
             return 'tv-app/linux'
+        elif self == HostApp.TV_CASTING_APP:
+            return 'tv-casting-app/linux'
+        elif self == HostApp.LIGHT:
+            return 'lighting-app/linux'
         elif self == HostApp.LOCK:
             return 'lock-app/linux'
         elif self == HostApp.SHELL:
@@ -64,6 +75,10 @@ class HostApp(Enum):
             return '../'
         elif self == HostApp.NL_TEST_RUNNER:
             return '../src/test_driver/efr32'
+        elif self == HostApp.TV_CASTING:
+            return 'tv-casting-app/linux'
+        elif self == HostApp.BRIDGE:
+            return 'bridge-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -71,12 +86,15 @@ class HostApp(Enum):
         if self == HostApp.ALL_CLUSTERS:
             yield 'chip-all-clusters-app'
             yield 'chip-all-clusters-app.map'
+        elif self == HostApp.ALL_CLUSTERS_MINIMAL:
+            yield 'chip-all-clusters-minimal-app'
+            yield 'chip-all-clusters-minimal-app.map'
         elif self == HostApp.CHIP_TOOL:
             yield 'chip-tool'
             yield 'chip-tool.map'
         elif self == HostApp.CHIP_TOOL_DARWIN:
-            yield 'chip-tool-darwin'
-            yield 'chip-tool-darwin.map'
+            yield 'darwin-framework-tool'
+            yield 'darwin-framework-tool.map'
         elif self == HostApp.THERMOSTAT:
             yield 'thermostat-app'
             yield 'thermostat-app.map'
@@ -95,6 +113,12 @@ class HostApp(Enum):
         elif self == HostApp.TV_APP:
             yield 'chip-tv-app'
             yield 'chip-tv-app.map'
+        elif self == HostApp.TV_CASTING_APP:
+            yield 'chip-tv-casting-app'
+            yield 'chip-tv-casting-app.map'
+        elif self == HostApp.LIGHT:
+            yield 'chip-lighting-app'
+            yield 'chip-lighting-app.map'
         elif self == HostApp.LOCK:
             yield 'chip-lock-app'
             yield 'chip-lock-app.map'
@@ -116,6 +140,15 @@ class HostApp(Enum):
             yield 'controller/python'  # Directory containing WHL files
         elif self == HostApp.NL_TEST_RUNNER:
             yield 'chip_nl_test_runner_wheels'
+        elif self == HostApp.LIGHTING:
+            yield 'chip-lighting-app'
+            yield 'chip-lighting-app.map'
+        elif self == HostApp.TV_CASTING_APP:
+            yield 'chip-tv-casting-app'
+            yield 'chip-tv-casting-app.map'
+        elif self == HostApp.BRIDGE_APP:
+            yield 'chip-bridge-app'
+            yield 'chip-bridge-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -164,7 +197,7 @@ class HostBuilder(GnBuilder):
 
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE, enable_ipv4=True,
                  enable_ble=True, enable_wifi=True, use_tsan=False,  use_asan=False, separate_event_loop=True,
-                 test_group=False, use_libfuzzer=False, use_clang=False, interactive_mode=True,
+                 use_libfuzzer=False, use_clang=False, interactive_mode=True, extra_tests=False,
                  use_platform_mdns=False):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -195,10 +228,6 @@ class HostBuilder(GnBuilder):
         if not interactive_mode:
             self.extra_gn_options.append('config_use_interactive_mode=false')
 
-        if test_group:
-            self.extra_gn_options.append(
-                'chip_enable_group_messaging_tests=true')
-
         if use_libfuzzer:
             self.extra_gn_options.append('is_libfuzzer=true')
 
@@ -207,6 +236,11 @@ class HostBuilder(GnBuilder):
 
         if use_platform_mdns:
             self.extra_gn_options.append('chip_mdns="platform"')
+
+        if extra_tests:
+            # Flag for testing purpose
+            self.extra_gn_options.append(
+                'chip_im_force_fabric_quota_check=true')
 
         if app == HostApp.TESTS:
             self.extra_gn_options.append('chip_build_tests=true')

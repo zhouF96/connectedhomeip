@@ -41,38 +41,48 @@ tests:
       response:
           value: 1
 
-    - label:
-          "Check EnhancedCurrentHue attribute value matched the value sent by
-          the last command"
-      disabled: true
+    - label: "Reads EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
-          value: 1025
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Enhanced move to hue and saturation command"
       command: "EnhancedMoveToHueAndSaturation"
       arguments:
           values:
-              - name: "enhancedHue"
+              - name: "EnhancedHue"
                 value: 1200
-              - name: "saturation"
+              - name: "Saturation"
                 value: 90
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 10
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
+
+    - label: "Wait 10ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10
 
     - label:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
-      disabled: true
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
-          value: 1200
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"

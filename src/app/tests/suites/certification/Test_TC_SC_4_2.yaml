@@ -34,9 +34,15 @@ config:
         defaultValue: 5
 
 tests:
-    - label: "Reboot target device"
+    - label: "Stop target device"
       cluster: "SystemCommands"
-      command: "Reboot"
+      command: "Stop"
+
+    - label:
+          "Start target device with the provided discriminator for basic
+          commissioning advertisement"
+      cluster: "SystemCommands"
+      command: "Start"
       arguments:
           values:
               - name: "discriminator"
@@ -78,8 +84,6 @@ tests:
     #validate the service type and the service domain not implemented in CI
 
     - label: "Check Hostname"
-      # On macOS the hostname is the device name and because of it this test is disabled for now.
-      disabled: true
       PICS: "(WIFI || ETH) && !THREAD"
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -93,9 +97,7 @@ tests:
                     isHexString: true
 
     - label: "Check Hostname"
-      # On macOS the hostname is the device name and because of it this test is disabled for now.
-      disabled: true
-      PICS: "(!WIFI && !ETH) && THREAD"
+      PICS: "PICS_SKIP_SAMPLE_APP && (!WIFI && !ETH) && THREAD"
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -134,8 +136,7 @@ tests:
                 value: vendorId
 
     - label: "Check Device Type ID (_T)"
-      disabled: true
-      PICS: DEVTYPE_SUBTYPE
+      PICS: PICS_SKIP_SAMPLE_APP && DEVTYPE_SUBTYPE
       cluster: "DiscoveryCommands"
       command: "FindCommissionableByDeviceType"
       arguments:
@@ -195,8 +196,7 @@ tests:
                 value: 1
 
     - label: "Optional TXT key for device type (DT)"
-      disabled: true
-      PICS: DT_KEY
+      PICS: PICS_SKIP_SAMPLE_APP && DT_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -233,7 +233,8 @@ tests:
       response:
           values:
               - name: "pairingHint"
-                notValue: 0
+                constraints:
+                    notValue: 0
 
     - label: "Optional TXT key for pairing instructions (PI)"
       PICS: PI_KEY
@@ -254,17 +255,29 @@ tests:
                 constraints:
                     minValue: 1
 
-    # The testplan needs TH needs to be Rebooted so below steps disabled for now
-    - label: "Reboot target device"
+    - label: "Stop target device"
       cluster: "SystemCommands"
-      command: "Reboot"
+      command: "Stop"
+
+    - label:
+          "Start target device with the provided discriminator for basic
+          commissioning advertisement"
+      cluster: "SystemCommands"
+      command: "Start"
       arguments:
           values:
               - name: "discriminator"
                 value: discriminator
 
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
     - label: "Open Commissioning Window"
-      disabled: true
       cluster: "AdministratorCommissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
@@ -274,7 +287,6 @@ tests:
                 value: 180
 
     - label: "Check Instance Name"
-      disabled: true
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -290,8 +302,6 @@ tests:
     #validate the service type and the service domain not implemented in CI
 
     - label: "Check Hostname"
-      # On macOS the hostname is the device name and because of it this test is disabled for now.
-      disabled: true
       PICS: "(WIFI || ETH) && !THREAD"
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -305,9 +315,7 @@ tests:
                     isHexString: true
 
     - label: "Check Hostname"
-      # On macOS the hostname is the device name and because of it this test is disabled for now.
-      disabled: true
-      PICS: "(!WIFI && !ETH) && THREAD"
+      PICS: "PICS_SKIP_SAMPLE_APP && (!WIFI && !ETH) && THREAD"
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -320,7 +328,6 @@ tests:
                     isHexString: true
 
     - label: "Check Long Discriminator _L"
-      disabled: true
       cluster: "DiscoveryCommands"
       command: "FindCommissionableByLongDiscriminator"
       arguments:
@@ -329,7 +336,6 @@ tests:
                 value: discriminator
 
     - label: "Check Short Discriminator (_S)"
-      disabled: true
       cluster: "DiscoveryCommands"
       command: "FindCommissionableByShortDiscriminator"
       arguments:
@@ -338,7 +344,6 @@ tests:
                 value: discriminator
 
     - label: "Check Vendor ID (_V)"
-      disabled: true
       PICS: VENDOR_SUBTYPE
       cluster: "DiscoveryCommands"
       command: "FindCommissionableByVendorId"
@@ -348,9 +353,7 @@ tests:
                 value: vendorId
 
     - label: "Check Device Type ID (_T)"
-      # The device type is not broadcasted by the accessory under CI.
-      disabled: true
-      PICS: DEVTYPE_SUBTYPE
+      PICS: PICS_SKIP_SAMPLE_APP && DEVTYPE_SUBTYPE
       cluster: "DiscoveryCommands"
       command: "FindCommissionableByDeviceType"
       arguments:
@@ -359,13 +362,11 @@ tests:
                 value: deviceType
 
     - label: "Check Commissioning Mode (_CM)"
-      disabled: true
       cluster: "DiscoveryCommands"
       command: "FindCommissionableByCommissioningMode"
 
     - label: "TXT key for Vendor ID and Product ID (VP)"
       PICS: VP_KEY
-      disabled: true
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -375,7 +376,6 @@ tests:
 
     - label: "TXT key for Vendor ID and Product ID (VP)"
       PICS: VP_KEY
-      disabled: true
       optional: true
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -385,7 +385,6 @@ tests:
                 value: productId
 
     - label: "Optional TXT key for MRP Retry Interval Idle (CRI)"
-      disabled: true
       PICS: CRI_COMM_DISCOVERY_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -396,7 +395,6 @@ tests:
                     maxValue: 3600000
 
     - label: "Optional TXT key for MRP Retry Interval Active (CRA)"
-      disabled: true
       PICS: CRA_COMM_DISCOVERY_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -407,7 +405,6 @@ tests:
                     maxValue: 3600000
 
     - label: "TXT key for commissioning mode (CM)"
-      disabled: true
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -416,8 +413,7 @@ tests:
                 value: 1
 
     - label: "Optional TXT key for device type (DT)"
-      disabled: true
-      PICS: DT_KEY
+      PICS: PICS_SKIP_SAMPLE_APP && DT_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -425,10 +421,9 @@ tests:
               - name: "deviceType"
                 value: deviceType
                 constraints:
-                    maxValue: 49151
+                    maxValue: 999
 
     - label: "Optional TXT key for device name (DN)"
-      disabled: true
       PICS: DN_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -439,7 +434,6 @@ tests:
                     maxLength: 32
 
     - label: "Optional TXT key for rotating device identifier (RI)"
-      disabled: true
       PICS: RI_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -450,17 +444,16 @@ tests:
                     maxValue: 100
 
     - label: "Optional TXT key for pairing hint (PH)"
-      disabled: true
       PICS: PH_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
           values:
               - name: "pairingHint"
-                notValue: 0
+                constraints:
+                    notValue: 0
 
     - label: "Optional TXT key for pairing instructions (PI)"
-      disabled: true
       PICS: PI_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -471,7 +464,6 @@ tests:
                     maxLength: 128
 
     - label: "Check IPs"
-      disabled: true
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:

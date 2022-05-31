@@ -81,7 +81,7 @@ uint8_t singletonAttributeData[ACTUAL_SINGLETONS_SIZE];
 
 uint16_t emberEndpointCount = 0;
 
-// If we have attributes that are more than 2 bytes, then
+// If we have attributes that are more than 4 bytes, then
 // we need this data block for the defaults
 #if (defined(GENERATED_DEFAULTS) && GENERATED_DEFAULTS_COUNT)
 constexpr const uint8_t generatedDefaults[] = GENERATED_DEFAULTS;
@@ -349,9 +349,9 @@ void emberAfClusterMessageSentCallback(const MessageSendDestination & destinatio
 }
 
 // This function is used to call the per-cluster attribute changed callback
-void emAfClusterAttributeChangedCallback(const app::ConcreteAttributePath & attributePath, uint8_t clientServerMask)
+void emAfClusterAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
-    const EmberAfCluster * cluster = emberAfFindCluster(attributePath.mEndpointId, attributePath.mClusterId, clientServerMask);
+    const EmberAfCluster * cluster = emberAfFindCluster(attributePath.mEndpointId, attributePath.mClusterId, CLUSTER_MASK_SERVER);
     if (cluster != nullptr)
     {
         EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION);
@@ -363,10 +363,10 @@ void emAfClusterAttributeChangedCallback(const app::ConcreteAttributePath & attr
 }
 
 // This function is used to call the per-cluster pre-attribute changed callback
-EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath, uint8_t clientServerMask,
+EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
-    const EmberAfCluster * cluster = emberAfFindCluster(attributePath.mEndpointId, attributePath.mClusterId, clientServerMask);
+    const EmberAfCluster * cluster = emberAfFindCluster(attributePath.mEndpointId, attributePath.mClusterId, CLUSTER_MASK_SERVER);
     if (cluster == nullptr)
     {
         return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
@@ -404,7 +404,7 @@ static void initializeEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
 // Calls the init functions.
 void emAfCallInits(void)
 {
-    uint8_t index;
+    uint16_t index;
     for (index = 0; index < emberAfEndpointCount(); index++)
     {
         if (emberAfEndpointIndexIsEnabled(index))
@@ -415,14 +415,12 @@ void emAfCallInits(void)
 }
 
 // Returns the pointer to metadata, or null if it is not found
-const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                                                                uint8_t mask)
+const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
 {
     const EmberAfAttributeMetadata * metadata = nullptr;
     EmberAfAttributeSearchRecord record;
     record.endpoint    = endpoint;
     record.clusterId   = clusterId;
-    record.clusterMask = mask;
     record.attributeId = attributeId;
     emAfReadOrWriteAttribute(&record, &metadata,
                              nullptr, // buffer
@@ -512,12 +510,11 @@ static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, u
  *
  * Clusters match if:
  *   1. Cluster ids match AND
- *   2. Cluster directions match as defined by cluster->mask
- *        and attRecord->clusterMask
+ *   2. Cluster is a server cluster (because there are no client attributes).
  */
 bool emAfMatchCluster(const EmberAfCluster * cluster, EmberAfAttributeSearchRecord * attRecord)
 {
-    return (cluster->clusterId == attRecord->clusterId && cluster->mask & attRecord->clusterMask);
+    return (cluster->clusterId == attRecord->clusterId && (cluster->mask & CLUSTER_MASK_SERVER));
 }
 
 /**
@@ -553,7 +550,7 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
 
     uint16_t attributeOffsetIndex = 0;
 
-    for (uint8_t ep = 0; ep < emberAfEndpointCount(); ep++)
+    for (uint16_t ep = 0; ep < emberAfEndpointCount(); ep++)
     {
         // Is this a dynamic endpoint?
         bool isDynamicEndpoint = (ep >= emberAfFixedEndpointCount());
@@ -702,7 +699,7 @@ const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endp
 
 uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask)
 {
-    for (uint8_t ep = 0; ep < emberAfEndpointCount(); ep++)
+    for (uint16_t ep = 0; ep < emberAfEndpointCount(); ep++)
     {
         // Check the endpoint id first, because that way we avoid examining the
         // endpoint type for endpoints that are not actually defined.
@@ -956,8 +953,19 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
             }
         }
 
-        // TODO: Once endpoints are in parts lists other than that of endpoint
-        // 0, something more complicated might need to happen here.
+        EndpointId parentEndpointId = emberAfParentEndpointFromIndex(index);
+        while (parentEndpointId != kInvalidEndpointId)
+        {
+            MatterReportingAttributeChangeCallback(parentEndpointId, app::Clusters::Descriptor::Id,
+                                                   app::Clusters::Descriptor::Attributes::PartsList::Id);
+            uint16_t parentIndex = emberAfIndexFromEndpoint(parentEndpointId);
+            if (parentIndex == kEmberInvalidEndpointIndex)
+            {
+                // Something has gone wrong.
+                break;
+            }
+            parentEndpointId = emberAfParentEndpointFromIndex(parentIndex);
+        }
 
         MatterReportingAttributeChangeCallback(/* endpoint = */ 0, app::Clusters::Descriptor::Id,
                                                app::Clusters::Descriptor::Attributes::PartsList::Id);
@@ -1244,16 +1252,24 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                     EmberAfAttributeSearchRecord record;
                     record.endpoint    = de->endpoint;
                     record.clusterId   = cluster->clusterId;
-                    record.clusterMask = (emberAfAttributeIsClient(am) ? CLUSTER_MASK_CLIENT : CLUSTER_MASK_SERVER);
                     record.attributeId = am->attributeId;
 
                     if (ptr == nullptr)
                     {
+                        size_t defaultValueSizeForBigEndianNudger = 0;
+                        // Bypasses compiler warning about unused variable for little endian platforms.
+                        (void) defaultValueSizeForBigEndianNudger;
                         if ((am->mask & ATTRIBUTE_MASK_MIN_MAX) != 0U)
                         {
+                            // This is intentionally 2 and not 4 bytes since defaultValue in min/max
+                            // attributes is still uint16_t.
                             if (emberAfAttributeSize(am) <= 2)
                             {
+                                static_assert(sizeof(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue) == 2,
+                                              "if statement relies on size of max/min defaultValue being 2");
                                 ptr = (uint8_t *) &(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue);
+                                defaultValueSizeForBigEndianNudger =
+                                    sizeof(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue);
                             }
                             else
                             {
@@ -1262,9 +1278,10 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                         }
                         else
                         {
-                            if (emberAfAttributeSize(am) <= 2)
+                            if ((emberAfAttributeSize(am) <= 4) && !emberAfIsStringAttributeType(am->attributeType))
                             {
-                                ptr = (uint8_t *) &(am->defaultValue.defaultValue);
+                                ptr                                = (uint8_t *) &(am->defaultValue.defaultValue);
+                                defaultValueSizeForBigEndianNudger = sizeof(am->defaultValue.defaultValue);
                             }
                             else
                             {
@@ -1275,13 +1292,15 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                         // it should be treated as if it is pointing to an array of all zeroes.
 
 #if (BIGENDIAN_CPU)
-                        // The default value for one- and two-byte attributes is stored in an
-                        // uint16_t.  On big-endian platforms, a pointer to the default value of
-                        // a one-byte attribute will point to the wrong byte.  So, for those
-                        // cases, nudge the pointer forward so it points to the correct byte.
-                        if (emberAfAttributeSize(am) == 1 && ptr != NULL)
+                        // The default values for attributes that are less than or equal to
+                        // defaultValueSizeForBigEndianNudger in bytes are stored in an
+                        // uint32_t.  On big-endian platforms, a pointer to the default value
+                        // of size less than defaultValueSizeForBigEndianNudger will point to the wrong
+                        // byte.  So, for those cases, nudge the pointer forward so it points
+                        // to the correct byte.
+                        if (emberAfAttributeSize(am) < defaultValueSizeForBigEndianNudger && ptr != NULL)
                         {
-                            *ptr++;
+                            ptr += (defaultValueSizeForBigEndianNudger - emberAfAttributeSize(am));
                         }
 #endif // BIGENDIAN
                     }

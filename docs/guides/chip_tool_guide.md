@@ -286,22 +286,23 @@ In this command:
 -   _<pin_code\>_ and _<discriminator\>_ are device specific keys determined in
     the step 4.
 
-##### Commissioning with QR code payload
+##### Commissioning with QR code payload or manual pairing code
 
-Matter devices log the QR code and its payload when they boot.
+Matter devices log the QR code payload and manual pairing code when they boot.
 
 Use the following command pattern to discover devices based on the given QR code
-payload and try to pair with the first discovered one:
+payload or manual pairing code and try to pair with the first discovered one:
 
 ```
-$ ./chip-tool qrcode <node_id> <qrcode_payload>
+$ ./chip-tool pairing code <node_id> <qrcode_payload-or-manual_code>
 ```
 
 In this command:
 
 -   _<node_id\>_ is the user-defined ID of the node being commissioned.
--   _<qrcode_payload\>_ is the QR code payload ID, for example
-    `MT:Y.K9042C00KA0648G00`.
+-   _<qrcode_payload-or-manual_code\>_ is the QR code payload ID, for example
+    `MT:Y.K9042C00KA0648G00`, or a manual pairing code like
+    `749701123365521327694`.
 
 #### Forgetting the already-commissioned device
 
@@ -390,6 +391,40 @@ $ ./chip-tool basic
 
 This section contains a general list of various CHIP Tool commands and options,
 not limited to commissioning procedure and cluster interaction.
+
+### Interactive mode versus single command mode
+
+By default, chip-tool runs in single command mode where if any single command
+does not complete within a certain timeout period, chip-tool will exit with a
+timeout error.
+
+Example of error:
+
+```
+[1650992689511] [32397:1415601] CHIP: [TOO] Run command failure: ../../../examples/chip-tool/commands/common/CHIPCommand.cpp:392: CHIP Error 0x00000032: Timeout
+```
+
+This timeout can be modified for any command execution by supplying the optional
+`--timeout` parameter, which takes a value in seconds, with the maximum being
+65535 seconds.
+
+Example of command:
+
+```
+$ ./chip-tool otasoftwareupdaterequestor subscribe-event state-transition 5 10 0x1234567890 0 --timeout 65535
+```
+
+For commands such as event subscriptions that need to run for an extended period
+of time, chip-tool can be started in interactive mode first before running the
+command. In interactive mode, there will be no timeout and multiple commands can
+be issued.
+
+Example of command:
+
+```
+$ ./chip-tool interactive start
+otasoftwareupdaterequestor subscribe-event state-transition 5 10 ${NODE_ID} 0
+```
 
 ### Printing all supported clusters
 
@@ -622,6 +657,27 @@ $ ./chip-tool tests <test_name>
 In this command:
 
 -   _<test_name\>_ is the name of the particular test.
+
+#### Example: running `TestClusters` test
+
+As an example of running one test suite test:
+
+```
+# Clean initialization of state.
+rm -fr /tmp/chip_*
+
+# In a shell window, start the DUT device.
+./out/debug/standalone/chip-all-clusters-app
+
+# In a second shell window, pair the DUT with chip-tool.
+./out/debug/standalone/chip-tool pairing onnetwork 333221 20202021
+
+# Now run the test
+./out/debug/standalone/chip-tool tests TestCluster --nodeId 333221
+```
+
+Developer details on how the test suite is structured can be found
+[here](../../src/app/tests/suites/README.md).
 
 ### Parsing the setup payload
 

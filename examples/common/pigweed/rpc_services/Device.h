@@ -28,6 +28,8 @@
 #include "platform/ConfigurationManager.h"
 #include "platform/DiagnosticDataProvider.h"
 #include "platform/PlatformManager.h"
+#include <platform/DeviceInstanceInfoProvider.h>
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
 namespace chip {
 namespace rpc {
@@ -82,7 +84,7 @@ public:
         size_t count                    = 0;
         for (const FabricInfo & fabricInfo : Server::GetInstance().GetFabricTable())
         {
-            if (count < ArraySize(response.fabric_info) && fabricInfo.IsInitialized())
+            if (count < ArraySize(response.fabric_info))
             {
                 response.fabric_info[count].fabric_id = fabricInfo.GetFabricId();
                 response.fabric_info[count].node_id   = fabricInfo.GetPeerId().GetNodeId();
@@ -140,16 +142,18 @@ public:
             response.has_pairing_info           = true;
         }
 
-        if (DeviceLayer::ConfigurationMgr().GetSerialNumber(response.serial_number, sizeof(response.serial_number)) ==
+        if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetSerialNumber(response.serial_number, sizeof(response.serial_number)) ==
             CHIP_NO_ERROR)
         {
             snprintf(response.serial_number, sizeof(response.serial_number), CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER);
         }
 
-        std::string qrCodeText;
+        // Create buffer for QR code that can fit max size and null terminator.
+        char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
+        chip::MutableCharSpan qrCodeText(qrCodeBuffer);
         if (GetQRCode(qrCodeText, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)) == CHIP_NO_ERROR)
         {
-            snprintf(response.pairing_info.qr_code, sizeof(response.pairing_info.qr_code), "%s", qrCodeText.c_str());
+            snprintf(response.pairing_info.qr_code, sizeof(response.pairing_info.qr_code), "%s", qrCodeText.data());
             GetQRCodeUrl(response.pairing_info.qr_code_url, sizeof(response.pairing_info.qr_code_url), qrCodeText);
             response.has_pairing_info = true;
         }

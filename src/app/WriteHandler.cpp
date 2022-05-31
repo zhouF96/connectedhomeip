@@ -306,9 +306,6 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         err = element.GetPath(&attributePath);
         SuccessOrExit(err);
 
-        // We are using the feature that the parser won't touch the value if the field does not exist, since all fields in the
-        // cluster info will be invalid / wildcard, it is safe ignore CHIP_END_OF_TLV directly.
-
         err = attributePath.GetEndpoint(&(dataAttributePath.mEndpointId));
         SuccessOrExit(err);
 
@@ -423,9 +420,6 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
 
         err = element.GetPath(&attributePath);
         SuccessOrExit(err);
-
-        // We are using the feature that the parser won't touch the value if the field does not exist, since all fields in the
-        // cluster info will be invalid / wildcard, it is safe to ignore CHIP_END_OF_TLV.
 
         err = attributePath.GetCluster(&(dataAttributePath.mClusterId));
         SuccessOrExit(err);
@@ -643,6 +637,18 @@ exit:
 CHIP_ERROR WriteHandler::AddStatus(const ConcreteDataAttributePath & aPath, const Protocols::InteractionModel::Status aStatus)
 {
     return AddStatus(aPath, StatusIB(aStatus));
+}
+
+CHIP_ERROR WriteHandler::AddClusterSpecificSuccess(const ConcreteDataAttributePath & aPath, ClusterStatus aClusterStatus)
+{
+    using Protocols::InteractionModel::Status;
+    return AddStatus(aPath, StatusIB(Status::Success, aClusterStatus));
+}
+
+CHIP_ERROR WriteHandler::AddClusterSpecificFailure(const ConcreteDataAttributePath & aPath, ClusterStatus aClusterStatus)
+{
+    using Protocols::InteractionModel::Status;
+    return AddStatus(aPath, StatusIB(Status::Failure, aClusterStatus));
 }
 
 CHIP_ERROR WriteHandler::AddStatus(const ConcreteDataAttributePath & aPath, const StatusIB & aStatus)

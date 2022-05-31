@@ -124,7 +124,7 @@ public:
          *
          * @param[in] aSubscriptionId The identifier of the subscription that was established.
          */
-        virtual void OnSubscriptionEstablished(uint64_t aSubscriptionId) {}
+        virtual void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) {}
 
         /**
          * OnError will be called when an error occurs *after* a successful call to SendRequest(). The following
@@ -145,8 +145,9 @@ public:
         virtual void OnError(CHIP_ERROR aError) {}
 
         /**
-         * OnDone will be called when ReadClient has finished all work and is safe to destroy and free the
-         * allocated CommandSender object.
+         * OnDone will be called when ReadClient has finished all work and it is
+         * safe to destroy and free the allocated ReadClient object and any
+         * other objects associated with the Read or Subscribe interaction.
          *
          * This function will:
          *      - Always be called exactly *once* for a given ReadClient instance.
@@ -154,8 +155,9 @@ public:
          *      - Only be called after a successful call to SendRequest has been
          *        made, when the read completes or the subscription is shut down.
          *
+         * @param[in] apReadClient the ReadClient for the completed interaction.
          */
-        virtual void OnDone() = 0;
+        virtual void OnDone(ReadClient * apReadClient) = 0;
 
         /**
          * This function is invoked when using SendAutoResubscribeRequest, where the ReadClient was configured to auto re-subscribe
@@ -186,8 +188,8 @@ public:
 
         /*
          * Get highest received event number.
-         * If application don't have this one, it clear outparam and return CHIP_NO_ERROR.
-         * if any returning error, it will fail the entire read client.
+         * If the application does not want to filter events by event number, it should call ClearValue() on aEventNumber
+         * and return CHIP_NO_ERROR.  An error return from this function will fail the entire read client interaction.
          */
         virtual CHIP_ERROR GetHighestReceivedEventNumber(Optional<EventNumber> & aEventNumber)
         {
@@ -300,6 +302,16 @@ public:
     // that's the only case when the consumer moved a ReadParams into the client.
     CHIP_ERROR SendAutoResubscribeRequest(ReadPrepareParams && aReadPrepareParams);
 
+    // Like SendSubscribeRequest, but allows sending certain forms of invalid
+    // subscribe requests that servers are expected to reject, for testing
+    // purposes.  Should only be called from tests.
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    CHIP_ERROR SendSubscribeRequestWithoutValidation(const ReadPrepareParams & aReadPrepareParams)
+    {
+        return SendSubscribeRequestImpl(aReadPrepareParams);
+    }
+#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
+
 private:
     friend class TestReadInteraction;
     friend class InteractionModelEngine;
@@ -312,7 +324,7 @@ private:
         SubscriptionActive,        ///< The client is maintaining subscription
     };
 
-    bool IsMatchingClient(uint64_t aSubscriptionId)
+    bool IsMatchingClient(SubscriptionId aSubscriptionId)
     {
         return aSubscriptionId == mSubscriptionId && mInteractionType == InteractionType::Subscribe;
     }
@@ -356,7 +368,10 @@ private:
     bool ResubscribeIfNeeded();
     // Specialized request-sending functions.
     CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams);
-    CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aSubscribePrepareParams);
+    // SendSubscribeRequest performs som validation on aSubscribePrepareParams
+    // and then calls SendSubscribeRequestImpl.
+    CHIP_ERROR SendSubscribeRequest(const ReadPrepareParams & aSubscribePrepareParams);
+    CHIP_ERROR SendSubscribeRequestImpl(const ReadPrepareParams & aSubscribePrepareParams);
     void UpdateDataVersionFilters(const ConcreteDataAttributePath & aPath);
     static void OnResubscribeTimerCallback(System::Layer * apSystemLayer, void * apAppState);
 
@@ -383,7 +398,7 @@ private:
     bool mPendingMoreChunks             = false;
     uint16_t mMinIntervalFloorSeconds   = 0;
     uint16_t mMaxIntervalCeilingSeconds = 0;
-    uint64_t mSubscriptionId            = 0;
+    SubscriptionId mSubscriptionId      = 0;
     NodeId mPeerNodeId                  = kUndefinedNodeId;
     FabricIndex mFabricIndex            = kUndefinedFabricIndex;
     InteractionType mInteractionType    = InteractionType::Read;

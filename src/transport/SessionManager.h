@@ -53,8 +53,6 @@
 
 namespace chip {
 
-class PairingSession;
-
 /**
  * @brief
  *  Tracks ownership of a encrypted packet buffer.
@@ -152,14 +150,10 @@ public:
     /// ExchangeManager)
     void SetMessageDelegate(SessionMessageDelegate * cb) { mCB = cb; }
 
-    void RegisterRecoveryDelegate(SessionRecoveryDelegate & cb);
-    void UnregisterRecoveryDelegate(SessionRecoveryDelegate & cb);
-    void RefreshSessionOperationalData(const SessionHandle & sessionHandle);
-
     // Test-only: create a session on the fly.
     CHIP_ERROR InjectPaseSessionWithTestKey(SessionHolder & sessionHolder, uint16_t localSessionId, NodeId peerNodeId,
-                                            uint16_t peerSessionId, FabricIndex fabric, const Transport::PeerAddress & peerAddress,
-                                            CryptoContext::SessionRole role);
+                                            uint16_t peerSessionId, FabricIndex fabricIndex,
+                                            const Transport::PeerAddress & peerAddress, CryptoContext::SessionRole role);
 
     /**
      * @brief
@@ -169,10 +163,11 @@ public:
      * @return SessionHandle with a reference to a SecureSession, else NullOptional on failure
      */
     CHECK_RETURN_VALUE
-    Optional<SessionHandle> AllocateSession();
+    Optional<SessionHandle> AllocateSession(Transport::SecureSession::Type secureSessionType);
 
     void ExpirePairing(const SessionHandle & session);
     void ExpireAllPairings(const ScopedNodeId & node);
+    void ExpireAllPairingsForPeerExceptPending(const ScopedNodeId & node);
     void ExpireAllPairingsForFabric(FabricIndex fabric);
     void ExpireAllPASEPairings();
 
@@ -262,32 +257,16 @@ private:
     System::Layer * mSystemLayer = nullptr;
     FabricTable * mFabricTable   = nullptr;
     Transport::UnauthenticatedSessionTable<CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE> mUnauthenticatedSessions;
-    Transport::SecureSessionTable<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mSecureSessions;
+    Transport::SecureSessionTable mSecureSessions;
     State mState; // < Initialization state of the object
     chip::Transport::GroupOutgoingCounters mGroupClientCounter;
 
     SessionMessageDelegate * mCB = nullptr;
 
-    ObjectPool<std::reference_wrapper<SessionRecoveryDelegate>, CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES>
-        mSessionRecoveryDelegates;
-
     TransportMgrBase * mTransportMgr                                   = nullptr;
     Transport::MessageCounterManagerInterface * mMessageCounterManager = nullptr;
 
     GlobalUnencryptedMessageCounter mGlobalUnencryptedMessageCounter;
-
-    friend class SessionHandle;
-
-    /** Schedules a new oneshot timer for checking connection expiry. */
-    void ScheduleExpiryTimer();
-
-    /** Cancels any active timers for connection expiry checks. */
-    void CancelExpiryTimer();
-
-    /**
-     * Callback for timer expiry check
-     */
-    static void ExpiryTimerCallback(System::Layer * layer, void * param);
 
     void SecureUnicastMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                       System::PacketBufferHandle && msg);

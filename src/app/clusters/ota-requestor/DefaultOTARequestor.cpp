@@ -20,9 +20,11 @@
  * OTA Requestor logic is contained in this class.
  */
 
+#include <app/clusters/basic/basic.h>
 #include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <lib/core/CHIPEncoding.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/OTAImageProcessor.h>
 #include <protocols/bdx/BdxUri.h>
 #include <zap-generated/CHIPClusters.h>
@@ -375,15 +377,9 @@ void DefaultOTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
 
     ChipLogDetail(SoftwareUpdate, "Establishing session to provider node ID 0x" ChipLogFormatX64 " on fabric index %d",
                   ChipLogValueX64(mProviderLocation.Value().providerNodeID), mProviderLocation.Value().fabricIndex);
-    CHIP_ERROR err =
-        mCASESessionManager->FindOrEstablishSession(fabricInfo->GetPeerIdForNode(mProviderLocation.Value().providerNodeID),
-                                                    &mOnConnectedCallback, &mOnConnectionFailureCallback);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(SoftwareUpdate, "Cannot establish connection to provider: %" CHIP_ERROR_FORMAT, err.Format());
-        RecordErrorUpdateState(CHIP_ERROR_INCORRECT_STATE);
-        return;
-    }
+
+    mCASESessionManager->FindOrEstablishSession(fabricInfo->GetPeerIdForNode(mProviderLocation.Value().providerNodeID),
+                                                &mOnConnectedCallback, &mOnConnectionFailureCallback);
 }
 
 void DefaultOTARequestor::DisconnectFromProvider()
@@ -405,7 +401,9 @@ void DefaultOTARequestor::DisconnectFromProvider()
         return;
     }
 
-    mCASESessionManager->ReleaseSession(fabricInfo->GetPeerIdForNode(mProviderLocation.Value().providerNodeID));
+    PeerId peerID = fabricInfo->GetPeerIdForNode(mProviderLocation.Value().providerNodeID);
+    mCASESessionManager->FindExistingSession(peerID)->Disconnect();
+    mCASESessionManager->ReleaseSession(peerID);
 }
 
 // Requestor is directed to cancel image update in progress. All the Requestor state is
@@ -671,19 +669,19 @@ void DefaultOTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAC
     }
     OtaRequestorServerOnStateTransition(mCurrentUpdateState, newState, reason, targetSoftwareVersion);
 
-    if ((newState == OTAUpdateStateEnum::kIdle) && (mCurrentUpdateState != OTAUpdateStateEnum::kIdle))
+    OTAUpdateStateEnum prevState = mCurrentUpdateState;
+    // Update the new state before handling the state transition
+    mCurrentUpdateState = newState;
+
+    if ((newState == OTAUpdateStateEnum::kIdle) && (prevState != OTAUpdateStateEnum::kIdle))
     {
         IdleStateReason idleStateReason = MapErrorToIdleStateReason(error);
-
-        // Inform the driver that the core logic has entered the Idle state
         mOtaRequestorDriver->HandleIdleStateEnter(idleStateReason);
     }
-    else if ((mCurrentUpdateState == OTAUpdateStateEnum::kIdle) && (newState != OTAUpdateStateEnum::kIdle))
+    else if ((prevState == OTAUpdateStateEnum::kIdle) && (newState != OTAUpdateStateEnum::kIdle))
     {
         mOtaRequestorDriver->HandleIdleStateExit();
     }
-
-    mCurrentUpdateState = newState;
 }
 
 void DefaultOTARequestor::RecordErrorUpdateState(CHIP_ERROR error, OTAChangeReasonEnum reason)
@@ -733,10 +731,10 @@ CHIP_ERROR DefaultOTARequestor::SendQueryImageRequest(OperationalDeviceProxy & d
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(args.softwareVersion));
 
     args.protocolsSupported = kProtocolsSupported;
-    args.requestorCanConsent.SetValue(mOtaRequestorDriver->CanConsent());
+    args.requestorCanConsent.SetValue(!Basic::IsLocalConfigDisabled() && mOtaRequestorDriver->CanConsent());
 
     uint16_t hardwareVersion;
-    if (DeviceLayer::ConfigurationMgr().GetHardwareVersion(hardwareVersion) == CHIP_NO_ERROR)
+    if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetHardwareVersion(hardwareVersion) == CHIP_NO_ERROR)
     {
         args.hardwareVersion.SetValue(hardwareVersion);
     }

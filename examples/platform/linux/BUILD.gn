@@ -27,6 +27,8 @@ source_set("app-main") {
   sources = [
     "AppMain.cpp",
     "AppMain.h",
+    "CommissionableInit.cpp",
+    "CommissionableInit.h",
     "CommissioneeShellCommands.cpp",
     "CommissioneeShellCommands.h",
     "CommissionerMain.cpp",
@@ -49,6 +51,7 @@ source_set("app-main") {
   }
 
   public_deps = [
+    "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/app/server",
     "${chip_root}/src/credentials:default_attestation_verifier",
     "${chip_root}/src/lib",

@@ -68,7 +68,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
     {
         app::DnssdServer::Instance().AdvertiseOperational();
-        ChipLogError(AppServer, "Operational advertising enabled");
+        ChipLogProgress(AppServer, "Operational advertising enabled");
     }
 }
 
@@ -182,11 +182,12 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
 
 CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow(Seconds16 commissioningTimeout)
 {
-    VerifyOrReturnError(commissioningTimeout <= MaxCommissioningTimeout() &&
-                            commissioningTimeout >= mMinCommissioningTimeoutOverride.ValueOr(MinCommissioningTimeout()),
+    VerifyOrReturnError(commissioningTimeout <= MaxCommissioningTimeout() && commissioningTimeout >= MinCommissioningTimeout(),
                         CHIP_ERROR_INVALID_ARGUMENT);
     DeviceLayer::FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
     VerifyOrReturnError(!failSafeContext.IsFailSafeArmed(), CHIP_ERROR_INCORRECT_STATE);
+
+    ReturnErrorOnFailure(Dnssd::ServiceAdvertiser::Instance().UpdateCommissionableInstanceName());
 
     ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(commissioningTimeout, HandleCommissioningWindowTimeout, this));
 
@@ -301,6 +302,15 @@ void CommissioningWindowManager::CloseCommissioningWindow()
 {
     if (mWindowStatus != AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen)
     {
+#if CONFIG_NETWORK_LAYER_BLE
+        if (mListeningForPASE)
+        {
+            // We never established PASE, so never armed a fail-safe and hence
+            // can't rely on it expiring to close our BLE connection.  Do that
+            // manually here.
+            mServer->GetBleLayerObject()->CloseAllBleConnections();
+        }
+#endif
         ChipLogProgress(AppServer, "Closing pairing window");
         Cleanup();
     }
@@ -337,7 +347,7 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     if (!mIsBLE && mWindowStatus == AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen)
     {
-        DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(true);
+        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(true);
     }
 #endif
 
@@ -379,7 +389,7 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     if (!mIsBLE && mWindowStatus != AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen)
     {
-        DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(false);
+        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(false);
     }
 #endif
 

@@ -629,10 +629,12 @@ public:
     /**
      * Get a pointer to the initial encoded byte of a TLV byte or UTF8 string element.
      *
-     * This method returns a direct pointer the encoded string value within the underlying input buffer.
-     * To succeed, the method requires that the entirety of the string value be present in a single buffer.
-     * Otherwise the method returns #CHIP_ERROR_TLV_UNDERRUN.  This makes the method of limited use when
-     * reading data from multiple discontiguous buffers.
+     * This method returns a direct pointer to the encoded string value within the underlying input buffer
+     * if a non-zero length string payload is present. To succeed, the method requires that the entirety of the
+     * string value be present in a single buffer. Otherwise the method returns #CHIP_ERROR_TLV_UNDERRUN.
+     * This makes the method of limited use when reading data from multiple discontiguous buffers.
+     *
+     * If no string data is present (i.e the length is zero), data shall be updated to point to null.
      *
      * @param[out] data                     A reference to a const pointer that will receive a pointer to
      *                                      the underlying string data.
@@ -836,6 +838,19 @@ public:
      * @return Total number of bytes that can be read until the max read length is reached.
      */
     uint32_t GetRemainingLength() const { return mMaxLen - mLenRead; }
+
+    /**
+     * Return the total number of bytes for the TLV data
+     * @return the total number of bytes for the TLV data
+     */
+    uint32_t GetTotalLength() const { return mMaxLen; }
+
+    /**
+     * Returns the stored backing store.
+     *
+     * @return the stored backing store.
+     */
+    TLVBackingStore * GetBackingStore() { return mBackingStore; }
 
     /**
      * Gets the point in the underlying input buffer that corresponds to the reader's current position.

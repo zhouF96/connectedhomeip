@@ -28,11 +28,9 @@ CHIP_ERROR CASESessionManager::Init(chip::System::Layer * systemLayer, const CAS
     return AddressResolve::Resolver::Instance().Init(systemLayer);
 }
 
-CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+void CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
+                                                Callback::Callback<OnDeviceConnectionFailure> * onFailure)
 {
-    Dnssd::ResolvedNodeData resolutionData;
-
     ChipLogDetail(CASESessionManager, "FindOrEstablishSession: PeerId = " ChipLogFormatX64 ":" ChipLogFormatX64,
                   ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()));
 
@@ -45,19 +43,25 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::C
 
         if (session == nullptr)
         {
-            onFailure->mCall(onFailure->mContext, peerId, CHIP_ERROR_NO_MEMORY);
-            return CHIP_ERROR_NO_MEMORY;
+            if (onFailure != nullptr)
+            {
+                onFailure->mCall(onFailure->mContext, peerId, CHIP_ERROR_NO_MEMORY);
+            }
+            return;
         }
     }
 
-    CHIP_ERROR err = session->Connect(onConnection, onFailure);
-    if (err != CHIP_NO_ERROR)
+    session->Connect(onConnection, onFailure);
+    if (!session->IsConnected() && !session->IsConnecting() && !session->IsResolvingAddress())
     {
-        // Release the peer rather than the pointer in case the failure handler has already released the session.
+        // This session is not making progress toward anything.  It will have
+        // notified the consumer about the failure already via the provided
+        // callbacks, if any.
+        //
+        // Release the peer rather than the pointer in case the failure handler
+        // has already released the session.
         ReleaseSession(peerId);
     }
-
-    return err;
 }
 
 void CASESessionManager::ReleaseSession(PeerId peerId)
@@ -65,9 +69,9 @@ void CASESessionManager::ReleaseSession(PeerId peerId)
     ReleaseSession(FindExistingSession(peerId));
 }
 
-void CASESessionManager::ReleaseSessionsForFabric(CompressedFabricId compressedFabricId)
+void CASESessionManager::ReleaseSessionsForFabric(FabricIndex fabricIndex)
 {
-    mConfig.devicePool->ReleaseDevicesForFabric(compressedFabricId);
+    mConfig.devicePool->ReleaseDevicesForFabric(fabricIndex);
 }
 
 void CASESessionManager::ReleaseAllSessions()
@@ -81,11 +85,6 @@ CHIP_ERROR CASESessionManager::GetPeerAddress(PeerId peerId, Transport::PeerAddr
     VerifyOrReturnError(session != nullptr, CHIP_ERROR_NOT_CONNECTED);
     addr = session->GetPeerAddress();
     return CHIP_NO_ERROR;
-}
-
-OperationalDeviceProxy * CASESessionManager::FindSession(const SessionHandle & session) const
-{
-    return mConfig.devicePool->FindDevice(session);
 }
 
 OperationalDeviceProxy * CASESessionManager::FindExistingSession(PeerId peerId) const

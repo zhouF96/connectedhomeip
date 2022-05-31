@@ -24,26 +24,18 @@
  *
  */
 
-const PairWithQRCode = {
-  name : 'PairWithQRCode',
+const PairWithCode = {
+  name : 'PairWithCode',
   arguments : [ { type : 'NODE_ID', name : 'nodeId' }, { type : 'CHAR_STRING', name : 'payload' } ],
-  response : { arguments : [] }
-};
-
-const PairWithManualCode = {
-  name : 'PairWithManualCode',
-  arguments : [ { type : 'NODE_ID', name : 'nodeId' }, { type : 'CHAR_STRING', name : 'payload' } ],
-  response : { arguments : [] }
 };
 
 const Unpair = {
   name : 'Unpair',
   arguments : [ { type : 'NODE_ID', name : 'nodeId' } ],
-  response : { arguments : [] }
 };
 
 const name     = 'CommissionerCommands';
-const commands = [ PairWithQRCode, PairWithManualCode, Unpair ];
+const commands = [ PairWithCode, Unpair ];
 
 const CommissionerCommands = {
   name,

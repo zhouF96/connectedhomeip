@@ -20,31 +20,25 @@
 
 constexpr uint16_t kPayloadMaxSize = 64;
 
-CHIP_ERROR CommissionerCommands::PairWithQRCode(chip::NodeId nodeId, const chip::CharSpan payload)
+CHIP_ERROR
+CommissionerCommands::PairWithCode(const char * identity,
+                                   const chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type & value)
 {
-    VerifyOrReturnError(payload.size() > 0 && payload.size() < kPayloadMaxSize, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(value.payload.size() > 0 && value.payload.size() < kPayloadMaxSize, CHIP_ERROR_INVALID_ARGUMENT);
 
-    GetCurrentCommissioner().RegisterPairingDelegate(this);
+    GetCommissioner(identity).RegisterPairingDelegate(this);
 
-    char qrCode[kPayloadMaxSize];
-    memcpy(qrCode, payload.data(), payload.size());
-    return GetCurrentCommissioner().PairDevice(nodeId, qrCode);
+    char code[kPayloadMaxSize];
+    memset(code, '\0', sizeof(code));
+    memcpy(code, value.payload.data(), value.payload.size());
+    ChipLogError(chipTool, "Pairing Code is %s", code);
+    return GetCommissioner(identity).PairDevice(value.nodeId, code);
 }
 
-CHIP_ERROR CommissionerCommands::PairWithManualCode(chip::NodeId nodeId, const chip::CharSpan payload)
+CHIP_ERROR CommissionerCommands::Unpair(const char * identity,
+                                        const chip::app::Clusters::CommissionerCommands::Commands::Unpair::Type & value)
 {
-    VerifyOrReturnError(payload.size() > 0 && payload.size() < kPayloadMaxSize, CHIP_ERROR_INVALID_ARGUMENT);
-
-    GetCurrentCommissioner().RegisterPairingDelegate(this);
-
-    char manualCode[kPayloadMaxSize];
-    memcpy(manualCode, payload.data(), payload.size());
-    return GetCurrentCommissioner().PairDevice(nodeId, manualCode);
-}
-
-CHIP_ERROR CommissionerCommands::Unpair(chip::NodeId nodeId)
-{
-    return GetCurrentCommissioner().UnpairDevice(nodeId);
+    return GetCommissioner(identity).UnpairDevice(value.nodeId);
 }
 
 chip::app::StatusIB ConvertToStatusIB(CHIP_ERROR err)
@@ -70,7 +64,7 @@ chip::app::StatusIB ConvertToStatusIB(CHIP_ERROR err)
     {
         return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kFabricConflict));
     }
-    if (CHIP_ERROR_INVALID_FABRIC_ID == err)
+    if (CHIP_ERROR_INVALID_FABRIC_INDEX == err)
     {
         return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidFabricIndex));
     }

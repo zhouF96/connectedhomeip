@@ -176,9 +176,6 @@ private:
 
 void DataSeriesGenerator::Generate(ForwardedDataCallbackValidator & dataCallbackValidator)
 {
-    System::PacketBufferHandle handle;
-    System::PacketBufferTLVWriter writer;
-    System::PacketBufferTLVReader reader;
     ReadClient::Callback * callback = mReadCallback;
     StatusIB status;
     callback->OnReportBegin();
@@ -187,8 +184,10 @@ void DataSeriesGenerator::Generate(ForwardedDataCallbackValidator & dataCallback
     for (auto & instruction : mInstructionList)
     {
         ConcreteDataAttributePath path(instruction.mEndpointId, Clusters::TestCluster::Id, 0);
-        handle = System::PacketBufferHandle::New(1000);
-        writer.Init(std::move(handle), true);
+        Platform::ScopedMemoryBufferWithSize<uint8_t> handle;
+        handle.Calloc(3000);
+        TLV::ScopedBufferTLVWriter writer(std::move(handle), 3000);
+
         status            = StatusIB();
         path.mAttributeId = instruction.GetAttributeId();
         path.mDataVersion.SetValue(1);
@@ -231,7 +230,8 @@ void DataSeriesGenerator::Generate(ForwardedDataCallbackValidator & dataCallback
             case AttributeInstruction::kAttributeD: {
                 ChipLogProgress(DataManagement, "\t -- Generating D");
 
-                Clusters::TestCluster::Structs::TestListStructOctet::Type buf[4];
+                // buf[200] is 1.6k
+                Clusters::TestCluster::Structs::TestListStructOctet::Type buf[200];
 
                 for (auto & i : buf)
                 {
@@ -250,8 +250,10 @@ void DataSeriesGenerator::Generate(ForwardedDataCallbackValidator & dataCallback
                 break;
             }
 
-            writer.Finalize(&handle);
-            reader.Init(std::move(handle));
+            uint32_t writtenLength = writer.GetLengthWritten();
+            writer.Finalize(handle);
+            TLV::ScopedBufferTLVReader reader;
+            reader.Init(std::move(handle), writtenLength);
             NL_TEST_ASSERT(gSuite, reader.Next() == CHIP_NO_ERROR);
             dataCallbackValidator.SetExpectation(reader, instruction.mEndpointId, instruction.mAttributeType);
             callback->OnAttributeData(path, &reader, status);
@@ -278,7 +280,7 @@ public:
     Clusters::TestCluster::Attributes::TypeInfo::DecodableType clusterValue;
 
 private:
-    void OnDone() override {}
+    void OnDone(ReadClient *) override {}
     void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override
     {
         ChipLogProgress(DataManagement, "\t\t -- Validating OnAttributeData callback");
@@ -313,7 +315,7 @@ private:
         case AttributeInstruction::kAttributeA: {
             ChipLogProgress(DataManagement, "\t\t -- Validating A");
 
-            Clusters::TestCluster::Attributes::Int16u::TypeInfo::DecodableType v;
+            Clusters::TestCluster::Attributes::Int16u::TypeInfo::DecodableType v = 0;
             err = cache->Get<Clusters::TestCluster::Attributes::Int16u::TypeInfo>(path, v);
             if (err == CHIP_ERROR_IM_STATUS_CODE_RECEIVED)
             {
@@ -625,7 +627,7 @@ nlTestSuite theSuite =
 {
     "TestClusterStateCache",
     &sTests[0],
-    TestContext::InitializeAsync,
+    TestContext::Initialize,
     TestContext::Finalize
 };
 

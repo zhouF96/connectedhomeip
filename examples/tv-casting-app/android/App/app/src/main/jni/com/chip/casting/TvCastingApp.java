@@ -17,28 +17,22 @@
  */
 package com.chip.casting;
 
-import android.util.Log;
-
 public class TvCastingApp {
-  private TvCastingAppCallback mCallback;
   private static final String TAG = TvCastingApp.class.getSimpleName();
 
-  public TvCastingApp(TvCastingAppCallback callback) {
-    mCallback = callback;
-    nativeInit();
-  }
+  public native void setDACProvider(DACProvider provider);
 
-  private void postClusterInit(int clusterId, int endpoint) {
-    Log.d(TAG, "postClusterInit for " + clusterId + " at " + endpoint);
-    if (mCallback != null) {
-      mCallback.onClusterInit(this, clusterId, endpoint);
-    }
-  }
+  public native boolean openBasicCommissioningWindow(
+      int duration, Object commissioningCompleteHandler);
 
-  public native void nativeInit();
+  public native boolean sendUserDirectedCommissioningRequest(String address, int port);
 
-  /** TBD: Temp dummy function for testing */
-  public native void doSomethingInCpp(int endpoint);
+  public native boolean discoverCommissioners();
+
+  public native void init();
+
+  public native boolean contentLauncherLaunchURL(
+      String contentUrl, String contentDisplayStr, Object launchURLHandler);
 
   static {
     System.loadLibrary("TvCastingApp");

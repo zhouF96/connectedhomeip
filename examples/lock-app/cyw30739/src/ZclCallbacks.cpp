@@ -20,6 +20,7 @@
 #include <BoltLockManager.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -32,14 +33,14 @@ void emberAfBasicClusterInitCallback(EndpointId endpoint)
     uint8_t dayOfMonth;
     char cString[16] = "00000000";
 
-    if (ConfigurationMgr().GetManufacturingDate(year, month, dayOfMonth) == CHIP_NO_ERROR)
+    if (GetDeviceInstanceInfoProvider()->GetManufacturingDate(year, month, dayOfMonth) == CHIP_NO_ERROR)
     {
         snprintf(cString, sizeof(cString), "%04u%02u%02u", year, month, dayOfMonth);
     }
     Basic::Attributes::ManufacturingDate::Set(endpoint, CharSpan(cString));
 }
 
-void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type, uint16_t size,
+void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 
 {

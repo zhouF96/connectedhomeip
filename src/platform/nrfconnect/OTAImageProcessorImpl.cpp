@@ -18,6 +18,7 @@
 #include "OTAImageProcessorImpl.h"
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemError.h>
@@ -35,6 +36,8 @@ namespace DeviceLayer {
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
     VerifyOrReturnError(mDownloader != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    TriggerFlashAction(FlashHandler::Action::WAKE_UP);
 
     return DeviceLayer::SystemLayer().ScheduleLambda([this] { mDownloader->OnPreparedForDownload(PrepareDownloadImpl()); });
 }
@@ -55,7 +58,10 @@ CHIP_ERROR OTAImageProcessorImpl::Finalize()
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
-    return System::MapErrorZephyr(dfu_target_reset());
+    CHIP_ERROR error = System::MapErrorZephyr(dfu_target_reset());
+
+    TriggerFlashAction(FlashHandler::Action::SLEEP);
+    return error;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Apply()
@@ -66,6 +72,8 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
         // schedule update of all possible targets by caling this function with argument -1
         err = dfu_target_schedule_update(-1);
     }
+
+    TriggerFlashAction(FlashHandler::Action::SLEEP);
 
 #ifdef CONFIG_CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
     if (!err)
@@ -160,7 +168,14 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
 
 bool OTAImageProcessorImpl::IsFirstImageRun()
 {
-    return mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT;
+    OTARequestorInterface * requestor = GetRequestorInstance();
+    ReturnErrorCodeIf(requestor == nullptr, false);
+
+    uint32_t currentVersion;
+    ReturnErrorCodeIf(ConfigurationMgr().GetSoftwareVersion(currentVersion) != CHIP_NO_ERROR, false);
+
+    return requestor->GetCurrentUpdateState() == OTARequestorInterface::OTAUpdateStateEnum::kApplying &&
+        requestor->GetTargetVersion() == currentVersion;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
@@ -206,8 +221,16 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & aBlock)
     return CHIP_NO_ERROR;
 }
 
+void OTAImageProcessorImpl::TriggerFlashAction(FlashHandler::Action action)
+{
+    if (mFlashHandler)
+    {
+        mFlashHandler->DoAction(action);
+    }
+}
+
 // external flash power consumption optimization
-void ExtFlashHandler::DoAction(Action aAction)
+void FlashHandler::DoAction(Action aAction)
 {
 #if CONFIG_PM_DEVICE && CONFIG_NORDIC_QSPI_NOR && !CONFIG_SOC_NRF52840 // nRF52 is optimized per default
     // utilize the QSPI driver sleep power mode
@@ -218,31 +241,6 @@ void ExtFlashHandler::DoAction(Action aAction)
         (void) pm_device_action_run(qspi_dev, requestedAction); // not much can be done in case of a failure
     }
 #endif
-}
-
-OTAImageProcessorImplPMDevice::OTAImageProcessorImplPMDevice(ExtFlashHandler & aHandler) : mHandler(aHandler)
-{
-    mHandler.DoAction(ExtFlashHandler::Action::SLEEP);
-}
-
-CHIP_ERROR OTAImageProcessorImplPMDevice::PrepareDownload()
-{
-    mHandler.DoAction(ExtFlashHandler::Action::WAKE_UP);
-    return OTAImageProcessorImpl::PrepareDownload();
-}
-
-CHIP_ERROR OTAImageProcessorImplPMDevice::Abort()
-{
-    auto status = OTAImageProcessorImpl::Abort();
-    mHandler.DoAction(ExtFlashHandler::Action::SLEEP);
-    return status;
-}
-
-CHIP_ERROR OTAImageProcessorImplPMDevice::Apply()
-{
-    auto status = OTAImageProcessorImpl::Apply();
-    mHandler.DoAction(ExtFlashHandler::Action::SLEEP);
-    return status;
 }
 
 } // namespace DeviceLayer

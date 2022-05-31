@@ -46,7 +46,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kLabel):
@@ -363,7 +366,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kIdentifyTime):
@@ -379,70 +385,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 } // namespace Identify.
-namespace IdentifyQueryResponse {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTimeout)), timeout));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kTimeout):
-            ReturnErrorOnFailure(DataModel::Decode(reader, timeout));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace IdentifyQueryResponse.
-namespace IdentifyQuery {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace IdentifyQuery.
 namespace TriggerEffect {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -462,7 +404,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kEffectIdentifier):
@@ -543,7 +488,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kGroupId):
@@ -581,7 +529,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStatus):
@@ -618,7 +569,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kGroupId):
@@ -654,7 +608,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStatus):
@@ -694,7 +651,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kGroupList):
@@ -729,7 +689,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCapacity):
@@ -766,7 +729,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kGroupId):
@@ -801,7 +767,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStatus):
@@ -837,7 +806,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -869,7 +841,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kGroupId):
@@ -927,14 +902,13 @@ namespace Events {
 } // namespace Groups
 namespace Scenes {
 namespace Structs {
-namespace SceneExtensionFieldSet {
+namespace AttributeValuePair {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kClusterId)), clusterId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kLength)), length));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kValue)), value));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAttributeId)), attributeId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAttributeValue)), attributeValue));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -948,17 +922,17 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kClusterId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, clusterId));
+        case to_underlying(Fields::kAttributeId):
+            ReturnErrorOnFailure(DataModel::Decode(reader, attributeId));
             break;
-        case to_underlying(Fields::kLength):
-            ReturnErrorOnFailure(DataModel::Decode(reader, length));
-            break;
-        case to_underlying(Fields::kValue):
-            ReturnErrorOnFailure(DataModel::Decode(reader, value));
+        case to_underlying(Fields::kAttributeValue):
+            ReturnErrorOnFailure(DataModel::Decode(reader, attributeValue));
             break;
         default:
             break;
@@ -971,7 +945,52 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace SceneExtensionFieldSet
+} // namespace AttributeValuePair
+namespace ExtensionFieldSet {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kClusterId)), clusterId));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAttributeValueList)), attributeValueList));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    err = reader.EnterContainer(outer);
+    ReturnErrorOnFailure(err);
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kClusterId):
+            ReturnErrorOnFailure(DataModel::Decode(reader, clusterId));
+            break;
+        case to_underlying(Fields::kAttributeValueList):
+            ReturnErrorOnFailure(DataModel::Decode(reader, attributeValueList));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+
+    return CHIP_NO_ERROR;
+}
+
+} // namespace ExtensionFieldSet
 } // namespace Structs
 
 namespace Commands {
@@ -998,7 +1017,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kGroupId):
@@ -1046,7 +1068,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStatus):
@@ -1087,7 +1112,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kGroupId):
@@ -1130,7 +1158,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStatus):
@@ -1180,7 +1211,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kGroupId):
@@ -1219,7 +1253,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStatus):
@@ -1259,7 +1296,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kGroupId):
@@ -1294,7 +1334,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStatus):
@@ -1332,7 +1375,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kGroupId):
@@ -1371,7 +1417,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStatus):
@@ -1413,7 +1462,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kGroupId):
@@ -1453,7 +1505,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kGroupId):
@@ -1477,7 +1532,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kStatus)), status));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kCapacity)), capacity));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupId)), groupId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneCount)), sceneCount));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSceneList)), sceneList));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
@@ -1491,7 +1545,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStatus):
@@ -1502,9 +1559,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         case to_underlying(Fields::kGroupId):
             ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
-            break;
-        case to_underlying(Fields::kSceneCount):
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneCount));
             break;
         case to_underlying(Fields::kSceneList):
             ReturnErrorOnFailure(DataModel::Decode(reader, sceneList));
@@ -1542,7 +1596,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kGroupId):
@@ -1590,7 +1647,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStatus):
@@ -1631,7 +1691,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kGroupId):
@@ -1674,7 +1737,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStatus):
@@ -1727,7 +1793,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kMode):
@@ -1775,7 +1844,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStatus):
@@ -1869,7 +1941,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -1899,7 +1974,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -1929,7 +2007,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -1961,7 +2042,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kEffectId):
@@ -1997,7 +2081,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -2030,7 +2117,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kOnOffControl):
@@ -2168,7 +2258,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kLevel):
@@ -2214,7 +2307,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kMoveMode):
@@ -2261,7 +2357,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStepMode):
@@ -2308,7 +2407,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kOptionMask):
@@ -2346,7 +2448,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kLevel):
@@ -2384,7 +2489,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kMoveMode):
@@ -2423,7 +2531,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStepMode):
@@ -2462,7 +2573,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -2573,7 +2687,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kAlarmCode):
@@ -2611,7 +2728,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kAlarmCode):
@@ -2647,7 +2767,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -2681,7 +2804,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStatus):
@@ -2723,7 +2849,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -2753,7 +2882,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -2959,7 +3091,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPowerProfileId):
@@ -3006,7 +3141,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kEnergyPhaseId):
@@ -3052,7 +3190,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kEnergyPhaseId):
@@ -3106,7 +3247,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPowerProfileId):
@@ -3144,7 +3288,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kTotalProfileNum):
@@ -3186,7 +3333,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -3221,7 +3371,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kTotalProfileNum):
@@ -3268,7 +3421,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPowerProfileId):
@@ -3313,7 +3469,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPowerProfileCount):
@@ -3353,7 +3512,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCurrency):
@@ -3393,7 +3555,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPowerProfileId):
@@ -3430,7 +3595,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPowerProfileId):
@@ -3472,7 +3640,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPowerProfileCount):
@@ -3512,7 +3683,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPowerProfileId):
@@ -3551,7 +3725,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -3582,7 +3759,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPowerProfileId):
@@ -3616,7 +3796,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPowerProfileId):
@@ -3650,7 +3833,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPowerProfileId):
@@ -3687,7 +3873,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPowerProfileId):
@@ -3731,7 +3920,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPowerProfileId):
@@ -3777,7 +3969,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPowerProfileId):
@@ -3819,7 +4014,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPowerProfileId):
@@ -3861,7 +4059,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPowerProfileId):
@@ -3904,7 +4105,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kOptions):
@@ -3996,7 +4200,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCommandId):
@@ -4033,7 +4240,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kApplianceStatus):
@@ -4072,7 +4282,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -4106,7 +4319,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kApplianceStatus):
@@ -4148,7 +4364,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kFunctionId):
@@ -4187,7 +4406,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -4217,7 +4439,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -4248,7 +4473,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kWarningEvent):
@@ -4366,7 +4594,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kType):
@@ -4474,7 +4705,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNode):
@@ -4567,7 +4801,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCluster):
@@ -4640,7 +4877,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPrivilege):
@@ -4707,7 +4947,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kData):
@@ -4800,7 +5043,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kAdminNodeID):
@@ -4851,7 +5097,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kAdminNodeID):
@@ -4902,7 +5151,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -4934,7 +5186,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStartFastPolling):
@@ -4970,7 +5225,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -5002,7 +5260,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNewLongPollInterval):
@@ -5037,7 +5298,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNewShortPollInterval):
@@ -5134,7 +5398,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kActionID):
@@ -5189,7 +5456,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kEndpointListID):
@@ -5238,7 +5508,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kActionID):
@@ -5277,7 +5550,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kActionID):
@@ -5318,7 +5594,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kActionID):
@@ -5357,7 +5636,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kActionID):
@@ -5398,7 +5680,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kActionID):
@@ -5436,7 +5721,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kActionID):
@@ -5475,7 +5763,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kActionID):
@@ -5516,7 +5807,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kActionID):
@@ -5554,7 +5848,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kActionID):
@@ -5593,7 +5890,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kActionID):
@@ -5634,7 +5934,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kActionID):
@@ -5673,7 +5976,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kActionID):
@@ -5755,7 +6061,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kActionID):
@@ -5798,7 +6107,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kActionID):
@@ -5850,7 +6162,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCaseSessionsPerFabric):
@@ -5891,7 +6206,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -6013,7 +6331,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kSoftwareVersion):
@@ -6046,7 +6367,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -6076,7 +6400,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -6107,7 +6434,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kReachableNewValue):
@@ -6157,7 +6487,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kVendorId):
@@ -6221,7 +6554,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStatus):
@@ -6277,7 +6613,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kUpdateToken):
@@ -6315,7 +6654,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kAction):
@@ -6353,7 +6695,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kUpdateToken):
@@ -6442,7 +6787,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kProviderNodeID):
@@ -6492,7 +6840,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kProviderNodeId):
@@ -6585,7 +6936,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPreviousState):
@@ -6629,7 +6983,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kSoftwareVersion):
@@ -6669,7 +7026,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kSoftwareVersion):
@@ -6888,7 +7248,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCurrent):
@@ -6929,7 +7292,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCurrent):
@@ -6970,7 +7336,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCurrent):
@@ -7143,7 +7512,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kFailSafeExpiryLengthSeconds):
@@ -7184,7 +7556,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kExpiryLengthSeconds):
@@ -7222,7 +7597,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kErrorCode):
@@ -7262,7 +7640,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNewRegulatoryConfig):
@@ -7303,7 +7684,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kErrorCode):
@@ -7339,7 +7723,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -7371,7 +7758,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kErrorCode):
@@ -7461,7 +7851,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNetworkID):
@@ -7508,7 +7901,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPanId):
@@ -7571,7 +7967,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kSecurity):
@@ -7626,7 +8025,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kSsid):
@@ -7666,7 +8068,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNetworkingStatus):
@@ -7711,7 +8116,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kSsid):
@@ -7753,7 +8161,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kOperationalDataset):
@@ -7791,7 +8202,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNetworkID):
@@ -7830,7 +8244,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNetworkingStatus):
@@ -7871,7 +8288,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNetworkID):
@@ -7910,7 +8330,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNetworkingStatus):
@@ -7952,7 +8375,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNetworkID):
@@ -8056,7 +8482,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kIntent):
@@ -8099,7 +8528,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStatus):
@@ -8188,7 +8620,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kName):
@@ -8230,6 +8665,47 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace Structs
 
 namespace Commands {
+namespace TestEventTrigger {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kEnableKey)), enableKey));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kEventTrigger)), eventTrigger));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    ReturnErrorOnFailure(reader.EnterContainer(outer));
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kEnableKey):
+            ReturnErrorOnFailure(DataModel::Decode(reader, enableKey));
+            break;
+        case to_underlying(Fields::kEventTrigger):
+            ReturnErrorOnFailure(DataModel::Decode(reader, eventTrigger));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+} // namespace TestEventTrigger.
 } // namespace Commands
 
 namespace Attributes {
@@ -8260,6 +8736,9 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         break;
     case Attributes::ActiveNetworkFaults::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, activeNetworkFaults));
+        break;
+    case Attributes::TestEventTriggersEnabled::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, testEventTriggersEnabled));
         break;
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
@@ -8304,7 +8783,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCurrent):
@@ -8342,7 +8824,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCurrent):
@@ -8380,7 +8865,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCurrent):
@@ -8417,7 +8905,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kBootReason):
@@ -8459,7 +8950,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kId):
@@ -8506,7 +9000,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kId):
@@ -8556,7 +9053,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -8630,7 +9130,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kSoftwareFault):
@@ -8683,7 +9186,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kExtAddress):
@@ -8777,7 +9283,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kActiveTimestampPresent):
@@ -8856,7 +9365,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kExtAddress):
@@ -8921,7 +9433,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kRotationTime):
@@ -8962,7 +9477,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -9213,7 +9731,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kConnectionStatus):
@@ -9252,7 +9773,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -9353,7 +9877,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kReasonCode):
@@ -9389,7 +9916,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kAssociationFailure):
@@ -9426,7 +9956,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kConnectionStatus):
@@ -9465,7 +9998,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -9673,7 +10209,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kSoftwareVersion):
@@ -9706,7 +10245,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -9736,7 +10278,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -9767,7 +10312,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kReachableNewValue):
@@ -9847,7 +10395,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNewPosition):
@@ -9881,7 +10432,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNewPosition):
@@ -9915,7 +10469,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNewPosition):
@@ -9949,7 +10506,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPreviousPosition):
@@ -9983,7 +10543,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPreviousPosition):
@@ -10019,7 +10582,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNewPosition):
@@ -10058,7 +10624,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNewPosition):
@@ -10106,7 +10675,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCommissioningTimeout):
@@ -10153,7 +10725,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCommissioningTimeout):
@@ -10186,7 +10761,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -10281,7 +10859,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kRootPublicKey):
@@ -10355,7 +10936,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNoc):
@@ -10400,7 +10984,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kAttestationNonce):
@@ -10436,7 +11023,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kAttestationElements):
@@ -10473,7 +11063,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCertificateType):
@@ -10507,7 +11100,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCertificate):
@@ -10541,7 +11137,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCSRNonce):
@@ -10577,7 +11176,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNOCSRElements):
@@ -10604,7 +11206,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNOCValue)), NOCValue));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kICACValue)), ICACValue));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kIPKValue)), IPKValue));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kCaseAdminNode)), caseAdminNode));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kCaseAdminSubject)), caseAdminSubject));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAdminVendorId)), adminVendorId));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
@@ -10618,7 +11220,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNOCValue):
@@ -10630,8 +11235,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kIPKValue):
             ReturnErrorOnFailure(DataModel::Decode(reader, IPKValue));
             break;
-        case to_underlying(Fields::kCaseAdminNode):
-            ReturnErrorOnFailure(DataModel::Decode(reader, caseAdminNode));
+        case to_underlying(Fields::kCaseAdminSubject):
+            ReturnErrorOnFailure(DataModel::Decode(reader, caseAdminSubject));
             break;
         case to_underlying(Fields::kAdminVendorId):
             ReturnErrorOnFailure(DataModel::Decode(reader, adminVendorId));
@@ -10665,7 +11270,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNOCValue):
@@ -10704,7 +11312,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStatusCode):
@@ -10744,7 +11355,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kLabel):
@@ -10778,7 +11392,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kFabricIndex):
@@ -10812,7 +11429,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kRootCertificate):
@@ -10847,7 +11467,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kTrustedRootIdentifier):
@@ -10952,7 +11575,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kGroupId):
@@ -11013,7 +11639,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kGroupId):
@@ -11064,7 +11693,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kGroupKeySetID):
@@ -11124,7 +11756,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kGroupKeySet):
@@ -11158,7 +11793,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kGroupKeySetID):
@@ -11192,7 +11830,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kGroupKeySet):
@@ -11226,7 +11867,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kGroupKeySetID):
@@ -11260,7 +11904,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kGroupKeySetIDs):
@@ -11294,7 +11941,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kGroupKeySetIDs):
@@ -11606,7 +12256,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStateValue):
@@ -11627,51 +12280,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace BooleanState
 namespace ModeSelect {
 namespace Structs {
-namespace ModeOptionStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kLabel)), label));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMode)), mode));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSemanticTag)), semanticTag));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kLabel):
-            ReturnErrorOnFailure(DataModel::Decode(reader, label));
-            break;
-        case to_underlying(Fields::kMode):
-            ReturnErrorOnFailure(DataModel::Decode(reader, mode));
-            break;
-        case to_underlying(Fields::kSemanticTag):
-            ReturnErrorOnFailure(DataModel::Decode(reader, semanticTag));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
-    return CHIP_NO_ERROR;
-}
-
-} // namespace ModeOptionStruct
 namespace SemanticTag {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -11692,7 +12300,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kMfgCode):
@@ -11713,6 +12324,54 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 
 } // namespace SemanticTag
+namespace ModeOptionStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kLabel)), label));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMode)), mode));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSemanticTags)), semanticTags));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    err = reader.EnterContainer(outer);
+    ReturnErrorOnFailure(err);
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kLabel):
+            ReturnErrorOnFailure(DataModel::Decode(reader, label));
+            break;
+        case to_underlying(Fields::kMode):
+            ReturnErrorOnFailure(DataModel::Decode(reader, mode));
+            break;
+        case to_underlying(Fields::kSemanticTags):
+            ReturnErrorOnFailure(DataModel::Decode(reader, semanticTags));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+
+    return CHIP_NO_ERROR;
+}
+
+} // namespace ModeOptionStruct
 } // namespace Structs
 
 namespace Commands {
@@ -11734,7 +12393,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNewMode):
@@ -11876,7 +12538,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCredentialType):
@@ -11918,7 +12583,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPinCode):
@@ -11952,7 +12620,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPinCode):
@@ -11987,7 +12658,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kTimeout):
@@ -12024,7 +12698,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kLogIndex):
@@ -12065,7 +12742,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kLogEntryId):
@@ -12120,7 +12800,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kUserId):
@@ -12163,7 +12846,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kUserId):
@@ -12200,7 +12886,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kUserId):
@@ -12243,7 +12932,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPinSlotIndex):
@@ -12276,7 +12968,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -12308,7 +13003,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kUserId):
@@ -12345,7 +13043,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kUserId):
@@ -12380,7 +13081,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kUserId):
@@ -12423,7 +13127,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kWeekDayIndex):
@@ -12476,7 +13183,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kWeekDayIndex):
@@ -12520,7 +13230,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kWeekDayIndex):
@@ -12576,7 +13289,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kWeekDayIndex):
@@ -12616,7 +13332,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kYearDayIndex):
@@ -12660,7 +13379,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kYearDayIndex):
@@ -12701,7 +13423,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kYearDayIndex):
@@ -12748,7 +13473,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kYearDayIndex):
@@ -12788,7 +13516,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kHolidayIndex):
@@ -12831,7 +13562,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kHolidayIndex):
@@ -12869,7 +13603,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kHolidayIndex):
@@ -12915,7 +13652,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kHolidayIndex):
@@ -12950,7 +13690,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kUserId):
@@ -12987,7 +13730,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kUserId):
@@ -13022,7 +13768,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kUserId):
@@ -13062,7 +13811,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kUserId):
@@ -13105,7 +13857,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kUserId):
@@ -13142,7 +13897,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kUserId):
@@ -13185,7 +13943,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kRfidSlotIndex):
@@ -13218,7 +13979,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -13255,7 +14019,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kOperationType):
@@ -13307,7 +14074,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kUserIndex):
@@ -13352,7 +14122,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kUserIndex):
@@ -13413,7 +14186,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kUserIndex):
@@ -13454,7 +14230,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kOperationEventSource):
@@ -13511,7 +14290,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kProgramEventSource):
@@ -13571,7 +14353,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kOperationType):
@@ -13623,7 +14408,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStatus):
@@ -13663,7 +14451,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCredential):
@@ -13687,6 +14478,10 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kCredentialExists)), credentialExists));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserIndex)), userIndex));
     ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kCreatorFabricIndex)), creatorFabricIndex));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kLastModifiedFabricIndex)), lastModifiedFabricIndex));
+    ReturnErrorOnFailure(
         DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNextCredentialIndex)), nextCredentialIndex));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
@@ -13700,7 +14495,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCredentialExists):
@@ -13708,6 +14506,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         case to_underlying(Fields::kUserIndex):
             ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
+            break;
+        case to_underlying(Fields::kCreatorFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, creatorFabricIndex));
+            break;
+        case to_underlying(Fields::kLastModifiedFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, lastModifiedFabricIndex));
             break;
         case to_underlying(Fields::kNextCredentialIndex):
             ReturnErrorOnFailure(DataModel::Decode(reader, nextCredentialIndex));
@@ -13740,7 +14544,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCredential):
@@ -13819,6 +14626,9 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         break;
     case Attributes::CredentialRulesSupport::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, credentialRulesSupport));
+        break;
+    case Attributes::NumberOfCredentialsSupportedPerUser::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, numberOfCredentialsSupportedPerUser));
         break;
     case Attributes::EnableLogging::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, enableLogging));
@@ -13940,7 +14750,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kAlarmCode):
@@ -13974,7 +14787,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kDoorState):
@@ -14013,7 +14829,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kLockOperationType):
@@ -14068,7 +14887,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kLockOperationType):
@@ -14126,7 +14948,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kLockDataType):
@@ -14183,7 +15008,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -14213,7 +15041,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -14243,7 +15074,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -14274,7 +15108,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kLiftValue):
@@ -14296,8 +15133,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kLiftPercentageValue)), liftPercentageValue));
-    ReturnErrorOnFailure(
         DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kLiftPercent100thsValue)), liftPercent100thsValue));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
@@ -14311,12 +15146,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kLiftPercentageValue):
-            ReturnErrorOnFailure(DataModel::Decode(reader, liftPercentageValue));
-            break;
         case to_underlying(Fields::kLiftPercent100thsValue):
             ReturnErrorOnFailure(DataModel::Decode(reader, liftPercent100thsValue));
             break;
@@ -14348,7 +15183,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kTiltValue):
@@ -14370,8 +15208,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTiltPercentageValue)), tiltPercentageValue));
-    ReturnErrorOnFailure(
         DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTiltPercent100thsValue)), tiltPercent100thsValue));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
@@ -14385,12 +15221,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kTiltPercentageValue):
-            ReturnErrorOnFailure(DataModel::Decode(reader, tiltPercentageValue));
-            break;
         case to_underlying(Fields::kTiltPercent100thsValue):
             ReturnErrorOnFailure(DataModel::Decode(reader, tiltPercent100thsValue));
             break;
@@ -14525,7 +15361,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPercentOpen):
@@ -14558,7 +15397,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -14714,9 +15556,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::ControlMode::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, controlMode));
         break;
-    case Attributes::AlarmMask::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, alarmMask));
-        break;
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
@@ -14758,7 +15597,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -14788,7 +15630,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -14818,7 +15663,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -14848,7 +15696,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -14878,7 +15729,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -14908,7 +15762,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -14938,7 +15795,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -14968,7 +15828,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -14998,7 +15861,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -15028,7 +15894,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -15058,7 +15927,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -15088,7 +15960,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -15118,7 +15993,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -15148,7 +16026,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -15178,7 +16059,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -15208,7 +16092,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -15238,7 +16125,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -15255,6 +16145,56 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace PumpConfigurationAndControl
 namespace Thermostat {
+namespace Structs {
+namespace ThermostatScheduleTransition {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTransitionTime)), transitionTime));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kHeatSetpoint)), heatSetpoint));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kCoolSetpoint)), coolSetpoint));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    err = reader.EnterContainer(outer);
+    ReturnErrorOnFailure(err);
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kTransitionTime):
+            ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
+            break;
+        case to_underlying(Fields::kHeatSetpoint):
+            ReturnErrorOnFailure(DataModel::Decode(reader, heatSetpoint));
+            break;
+        case to_underlying(Fields::kCoolSetpoint):
+            ReturnErrorOnFailure(DataModel::Decode(reader, coolSetpoint));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+
+    return CHIP_NO_ERROR;
+}
+
+} // namespace ThermostatScheduleTransition
+} // namespace Structs
 
 namespace Commands {
 namespace SetpointRaiseLower {
@@ -15276,7 +16216,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kMode):
@@ -15305,7 +16248,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(
         DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kDayOfWeekForSequence)), dayOfWeekForSequence));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kModeForSequence)), modeForSequence));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kPayload)), payload));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTransitions)), transitions));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -15318,7 +16261,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNumberOfTransitionsForSequence):
@@ -15330,8 +16276,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kModeForSequence):
             ReturnErrorOnFailure(DataModel::Decode(reader, modeForSequence));
             break;
-        case to_underlying(Fields::kPayload):
-            ReturnErrorOnFailure(DataModel::Decode(reader, payload));
+        case to_underlying(Fields::kTransitions):
+            ReturnErrorOnFailure(DataModel::Decode(reader, transitions));
             break;
         default:
             break;
@@ -15353,7 +16299,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(
         DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kDayOfWeekForSequence)), dayOfWeekForSequence));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kModeForSequence)), modeForSequence));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kPayload)), payload));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTransitions)), transitions));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -15366,7 +16312,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNumberOfTransitionsForSequence):
@@ -15378,8 +16327,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kModeForSequence):
             ReturnErrorOnFailure(DataModel::Decode(reader, modeForSequence));
             break;
-        case to_underlying(Fields::kPayload):
-            ReturnErrorOnFailure(DataModel::Decode(reader, payload));
+        case to_underlying(Fields::kTransitions):
+            ReturnErrorOnFailure(DataModel::Decode(reader, transitions));
             break;
         default:
             break;
@@ -15391,61 +16340,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 } // namespace SetWeeklySchedule.
-namespace GetRelayStatusLogResponse {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTimeOfDay)), timeOfDay));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kRelayStatus)), relayStatus));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kLocalTemperature)), localTemperature));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kHumidityInPercentage)), humidityInPercentage));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSetpoint)), setpoint));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUnreadEntries)), unreadEntries));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kTimeOfDay):
-            ReturnErrorOnFailure(DataModel::Decode(reader, timeOfDay));
-            break;
-        case to_underlying(Fields::kRelayStatus):
-            ReturnErrorOnFailure(DataModel::Decode(reader, relayStatus));
-            break;
-        case to_underlying(Fields::kLocalTemperature):
-            ReturnErrorOnFailure(DataModel::Decode(reader, localTemperature));
-            break;
-        case to_underlying(Fields::kHumidityInPercentage):
-            ReturnErrorOnFailure(DataModel::Decode(reader, humidityInPercentage));
-            break;
-        case to_underlying(Fields::kSetpoint):
-            ReturnErrorOnFailure(DataModel::Decode(reader, setpoint));
-            break;
-        case to_underlying(Fields::kUnreadEntries):
-            ReturnErrorOnFailure(DataModel::Decode(reader, unreadEntries));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace GetRelayStatusLogResponse.
 namespace GetWeeklySchedule {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -15465,7 +16359,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kDaysToReturn):
@@ -15501,7 +16398,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -15514,36 +16414,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 } // namespace ClearWeeklySchedule.
-namespace GetRelayStatusLog {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace GetRelayStatusLog.
 } // namespace Commands
 
 namespace Attributes {
@@ -15572,14 +16442,14 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::AbsMaxCoolSetpointLimit::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, absMaxCoolSetpointLimit));
         break;
-    case Attributes::PiCoolingDemand::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, piCoolingDemand));
+    case Attributes::PICoolingDemand::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, PICoolingDemand));
         break;
-    case Attributes::PiHeatingDemand::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, piHeatingDemand));
+    case Attributes::PIHeatingDemand::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, PIHeatingDemand));
         break;
-    case Attributes::HvacSystemTypeConfiguration::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, hvacSystemTypeConfiguration));
+    case Attributes::HVACSystemTypeConfiguration::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, HVACSystemTypeConfiguration));
         break;
     case Attributes::LocalTemperatureCalibration::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, localTemperatureCalibration));
@@ -15620,9 +16490,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::SystemMode::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, systemMode));
         break;
-    case Attributes::AlarmMask::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, alarmMask));
-        break;
     case Attributes::ThermostatRunningMode::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, thermostatRunningMode));
         break;
@@ -15656,29 +16523,50 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::SetpointChangeSourceTimestamp::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, setpointChangeSourceTimestamp));
         break;
-    case Attributes::AcType::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, acType));
+    case Attributes::OccupiedSetback::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, occupiedSetback));
         break;
-    case Attributes::AcCapacity::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, acCapacity));
+    case Attributes::OccupiedSetbackMin::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, occupiedSetbackMin));
         break;
-    case Attributes::AcRefrigerantType::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, acRefrigerantType));
+    case Attributes::OccupiedSetbackMax::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, occupiedSetbackMax));
         break;
-    case Attributes::AcCompressorType::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, acCompressorType));
+    case Attributes::UnoccupiedSetback::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, unoccupiedSetback));
         break;
-    case Attributes::AcErrorCode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, acErrorCode));
+    case Attributes::UnoccupiedSetbackMin::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, unoccupiedSetbackMin));
         break;
-    case Attributes::AcLouverPosition::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, acLouverPosition));
+    case Attributes::UnoccupiedSetbackMax::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, unoccupiedSetbackMax));
         break;
-    case Attributes::AcCoilTemperature::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, acCoilTemperature));
+    case Attributes::EmergencyHeatDelta::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, emergencyHeatDelta));
         break;
-    case Attributes::AcCapacityFormat::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, acCapacityFormat));
+    case Attributes::ACType::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, ACType));
+        break;
+    case Attributes::ACCapacity::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, ACCapacity));
+        break;
+    case Attributes::ACRefrigerantType::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, ACRefrigerantType));
+        break;
+    case Attributes::ACCompressorType::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, ACCompressorType));
+        break;
+    case Attributes::ACErrorCode::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, ACErrorCode));
+        break;
+    case Attributes::ACLouverPosition::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, ACLouverPosition));
+        break;
+    case Attributes::ACCoilTemperature::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, ACCoilTemperature));
+        break;
+    case Attributes::ACCapacityformat::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, ACCapacityformat));
         break;
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
@@ -15909,7 +16797,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kHue):
@@ -15958,7 +16849,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kMoveMode):
@@ -16005,7 +16899,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStepMode):
@@ -16054,7 +16951,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kSaturation):
@@ -16100,7 +17000,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kMoveMode):
@@ -16147,7 +17050,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStepMode):
@@ -16197,7 +17103,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kHue):
@@ -16247,7 +17156,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kColorX):
@@ -16296,7 +17208,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kRateX):
@@ -16343,7 +17258,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStepX):
@@ -16392,7 +17310,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kColorTemperature):
@@ -16439,7 +17360,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kEnhancedHue):
@@ -16488,7 +17412,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kMoveMode):
@@ -16535,7 +17462,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStepMode):
@@ -16585,7 +17515,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kEnhancedHue):
@@ -16637,7 +17570,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kUpdateFlags):
@@ -16690,7 +17626,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kOptionsMask):
@@ -16716,10 +17655,10 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMoveMode)), moveMode));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kRate)), rate));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kColorTemperatureMinimum)), colorTemperatureMinimum));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kColorTemperatureMaximum)), colorTemperatureMaximum));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kColorTemperatureMinimumMireds)),
+                                           colorTemperatureMinimumMireds));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kColorTemperatureMaximumMireds)),
+                                           colorTemperatureMaximumMireds));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionsMask)), optionsMask));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionsOverride)), optionsOverride));
     ReturnErrorOnFailure(writer.EndContainer(outer));
@@ -16734,7 +17673,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kMoveMode):
@@ -16743,11 +17685,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kRate):
             ReturnErrorOnFailure(DataModel::Decode(reader, rate));
             break;
-        case to_underlying(Fields::kColorTemperatureMinimum):
-            ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperatureMinimum));
+        case to_underlying(Fields::kColorTemperatureMinimumMireds):
+            ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperatureMinimumMireds));
             break;
-        case to_underlying(Fields::kColorTemperatureMaximum):
-            ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperatureMaximum));
+        case to_underlying(Fields::kColorTemperatureMaximumMireds):
+            ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperatureMaximumMireds));
             break;
         case to_underlying(Fields::kOptionsMask):
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
@@ -16773,10 +17715,10 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kStepMode)), stepMode));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kStepSize)), stepSize));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTransitionTime)), transitionTime));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kColorTemperatureMinimum)), colorTemperatureMinimum));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kColorTemperatureMaximum)), colorTemperatureMaximum));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kColorTemperatureMinimumMireds)),
+                                           colorTemperatureMinimumMireds));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kColorTemperatureMaximumMireds)),
+                                           colorTemperatureMaximumMireds));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionsMask)), optionsMask));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionsOverride)), optionsOverride));
     ReturnErrorOnFailure(writer.EndContainer(outer));
@@ -16791,7 +17733,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStepMode):
@@ -16803,11 +17748,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kTransitionTime):
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
             break;
-        case to_underlying(Fields::kColorTemperatureMinimum):
-            ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperatureMinimum));
+        case to_underlying(Fields::kColorTemperatureMinimumMireds):
+            ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperatureMinimumMireds));
             break;
-        case to_underlying(Fields::kColorTemperatureMaximum):
-            ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperatureMaximum));
+        case to_underlying(Fields::kColorTemperatureMaximumMireds):
+            ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperatureMaximumMireds));
             break;
         case to_underlying(Fields::kOptionsMask):
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
@@ -16859,8 +17804,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::ColorMode::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, colorMode));
         break;
-    case Attributes::ColorControlOptions::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, colorControlOptions));
+    case Attributes::Options::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, options));
         break;
     case Attributes::NumberOfPrimaries::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, numberOfPrimaries));
@@ -16976,11 +17921,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::ColorCapabilities::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, colorCapabilities));
         break;
-    case Attributes::ColorTempPhysicalMin::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, colorTempPhysicalMin));
+    case Attributes::ColorTempPhysicalMinMireds::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, colorTempPhysicalMinMireds));
         break;
-    case Attributes::ColorTempPhysicalMax::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, colorTempPhysicalMax));
+    case Attributes::ColorTempPhysicalMaxMireds::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, colorTempPhysicalMaxMireds));
         break;
     case Attributes::CoupleColorTempToLevelMinMireds::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, coupleColorTempToLevelMinMireds));
@@ -18929,7 +19874,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kEnrollResponseCode):
@@ -18969,7 +19917,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kZoneStatus):
@@ -19011,7 +19962,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -19043,7 +19997,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kZoneType):
@@ -19082,7 +20039,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kTestModeDuration):
@@ -19118,7 +20078,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -19148,7 +20111,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -19238,7 +20204,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kZoneId):
@@ -19282,7 +20251,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArmMode):
@@ -19322,7 +20294,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArmNotification):
@@ -19358,7 +20333,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNumberOfZones):
@@ -19413,7 +20391,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kSection0):
@@ -19491,7 +20472,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -19525,7 +20509,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kZoneId):
@@ -19567,7 +20554,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -19602,7 +20592,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kZoneId):
@@ -19644,7 +20637,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -19679,7 +20675,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPanelStatus):
@@ -19721,7 +20720,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -19756,7 +20758,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPanelStatus):
@@ -19799,7 +20804,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kZoneId):
@@ -19834,7 +20842,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNumberOfZones):
@@ -19870,7 +20881,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -19902,7 +20916,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNumberOfZones):
@@ -19938,7 +20955,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -19972,7 +20992,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kZoneStatusComplete):
@@ -20017,7 +21040,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStartingZoneId):
@@ -20100,7 +21126,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kWarningInfo):
@@ -20143,7 +21172,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kSquawkInfo):
@@ -20261,7 +21293,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kMajorNumber):
@@ -20313,7 +21348,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kOperatorName):
@@ -20361,7 +21399,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kMatch):
@@ -20396,7 +21437,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStatus):
@@ -20434,7 +21478,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kMajorNumber):
@@ -20471,7 +21518,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCount):
@@ -20552,7 +21602,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kIdentifier):
@@ -20595,7 +21648,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kTarget):
@@ -20633,7 +21689,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStatus):
@@ -20714,7 +21773,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kUpdatedAt):
@@ -20755,7 +21817,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -20785,7 +21850,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -20815,7 +21883,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -20845,7 +21916,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -20875,7 +21949,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -20905,7 +21982,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -20935,7 +22015,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -20965,7 +22048,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -20997,7 +22083,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kDeltaPositionMilliseconds):
@@ -21032,7 +22121,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kDeltaPositionMilliseconds):
@@ -21067,7 +22159,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStatus):
@@ -21104,7 +22199,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kPosition):
@@ -21199,7 +22297,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kIndex):
@@ -21247,7 +22348,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kIndex):
@@ -21280,7 +22384,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -21310,7 +22417,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -21342,7 +22452,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kIndex):
@@ -21421,7 +22534,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -21489,7 +22605,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kKeyCode):
@@ -21523,7 +22642,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStatus):
@@ -21596,7 +22718,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kWidth):
@@ -21640,7 +22765,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kName):
@@ -21682,7 +22810,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kType):
@@ -21725,7 +22856,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kParameterList):
@@ -21764,7 +22898,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kImageUrl):
@@ -21812,7 +22949,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kProviderName):
@@ -21868,7 +23008,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kSearch):
@@ -21911,7 +23054,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kContentURL):
@@ -21952,7 +23098,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStatus):
@@ -22034,7 +23183,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kIndex):
@@ -22079,7 +23231,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kIndex):
@@ -22114,7 +23269,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kIndex):
@@ -22195,7 +23353,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCatalogVendorId):
@@ -22236,7 +23397,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kApplication):
@@ -22279,7 +23443,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kApplication):
@@ -22316,7 +23483,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kApplication):
@@ -22350,7 +23520,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kApplication):
@@ -22385,7 +23558,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStatus):
@@ -22466,7 +23642,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kCatalogVendorId):
@@ -22570,7 +23749,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kTempAccountIdentifier):
@@ -22604,7 +23786,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kSetupPIN):
@@ -22640,7 +23825,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kTempAccountIdentifier):
@@ -22676,7 +23864,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -22751,7 +23942,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kA):
@@ -22859,7 +24053,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kFabricSensitiveInt8u):
@@ -22932,7 +24129,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNullableInt):
@@ -23004,7 +24204,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kA):
@@ -23053,7 +24256,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kA):
@@ -23108,7 +24314,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kA):
@@ -23146,7 +24355,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(err);
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kFabricIndex):
@@ -23187,7 +24399,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -23218,7 +24433,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kReturnValue):
@@ -23251,7 +24469,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -23282,7 +24503,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kReturnValue):
@@ -23315,7 +24539,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -23346,7 +24573,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kReturnValue):
@@ -23379,7 +24609,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -23415,7 +24648,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArg1):
@@ -23465,7 +24701,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArg1):
@@ -23502,7 +24741,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArg1):
@@ -23536,7 +24778,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArg1):
@@ -23571,7 +24816,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArg1):
@@ -23613,7 +24861,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArg1):
@@ -23665,7 +24916,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kWasPresent):
@@ -23708,7 +24962,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArg1):
@@ -23793,7 +25050,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNullableIntWasNull):
@@ -23908,7 +25168,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArg1):
@@ -23942,7 +25205,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kValue):
@@ -23976,7 +25242,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArg1):
@@ -24010,7 +25279,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArg1):
@@ -24044,7 +25316,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArg1):
@@ -24078,7 +25353,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kValue):
@@ -24112,7 +25390,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArg1):
@@ -24146,7 +25427,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kValue):
@@ -24180,7 +25464,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArg1):
@@ -24214,7 +25501,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArg1):
@@ -24249,7 +25539,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArg1):
@@ -24286,7 +25579,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArg1):
@@ -24335,7 +25631,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kNullableInt):
@@ -24402,7 +25701,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArg1):
@@ -24435,7 +25737,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -24466,7 +25771,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArg1):
@@ -24502,7 +25810,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArg1):
@@ -24542,7 +25853,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArg1):
@@ -24855,7 +26169,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArg1):
@@ -24904,7 +26221,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kArg1):
@@ -24950,7 +26270,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kMessageId):
@@ -24998,7 +26321,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -25030,7 +26356,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kMessageId):
@@ -25071,7 +26400,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kMessageId):
@@ -25120,7 +26452,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kMessageId):
@@ -25170,7 +26505,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kEarliestImplementationTime):
@@ -25205,7 +26543,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kImplementationDateTime):
@@ -25421,7 +26762,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -25453,7 +26797,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kAlertsCount):
@@ -25491,7 +26838,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kAlertsCount):
@@ -25529,7 +26879,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kEventHeader):
@@ -25606,7 +26959,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kTimeStamp):
@@ -25649,7 +27005,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kLogId):
@@ -25686,7 +27045,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kTimeStamp):
@@ -25728,7 +27090,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -25760,7 +27125,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kLogQueueSize):
@@ -25798,7 +27166,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kLogQueueSize):
@@ -25883,7 +27254,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kProfileCount):
@@ -25925,7 +27299,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         default:
@@ -25963,7 +27340,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kStartTime):
@@ -26014,7 +27394,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Fields::kAttributeId):

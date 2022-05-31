@@ -54,9 +54,9 @@ static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 class TestContext : public chip::Test::AppContext
 {
 public:
-    static int InitializeAsync(void * context)
+    static int Initialize(void * context)
     {
-        if (AppContext::InitializeAsync(context) != SUCCESS)
+        if (AppContext::Initialize(context) != SUCCESS)
             return FAILURE;
 
         auto * ctx = static_cast<TestContext *>(context);
@@ -90,7 +90,7 @@ public:
     }
 
 private:
-    MonotonicallyIncreasingCounter mEventCounter;
+    MonotonicallyIncreasingCounter<EventNumber> mEventCounter;
 };
 
 nlTestSuite * gSuite = nullptr;
@@ -126,7 +126,7 @@ class TestReadCallback : public app::ClusterStateCache::Callback
 {
 public:
     TestReadCallback() : mClusterCacheAdapter(*this) {}
-    void OnDone() {}
+    void OnDone(app::ReadClient *) {}
 
     app::ClusterStateCache mClusterCacheAdapter;
 };
@@ -454,7 +454,7 @@ nlTestSuite sSuite =
 {
     "TestEventCaching",
     &sTests[0],
-    TestContext::InitializeAsync,
+    TestContext::Initialize,
     TestContext::Finalize
 };
 // clang-format on

@@ -17,7 +17,7 @@
 [submodule "mbedtls"]
 	path = third_party/mbedtls/repo
 	url = https://github.com/ARMmbed/mbedtls.git
-	branch  = mbedtls-2.25.0
+	branch = mbedtls-2.28
 [submodule "qrcode"]
 	path = examples/common/QRCode/repo
 	url = https://github.com/nayuki/QR-Code-generator.git
@@ -39,11 +39,6 @@
 	path = third_party/ot-br-posix/repo
 	url = https://github.com/openthread/ot-br-posix.git
 	branch  = main
-	platforms = linux
-[submodule "bluez"]
-	path = third_party/bluez/repo
-	url = https://github.com/bluez/bluez.git
-	branch  = master
 	platforms = linux
 [submodule "cirque"]
 	path = third_party/cirque/repo
@@ -230,9 +225,6 @@
 	path = third_party/mbed-mcu-boot/repo
 	url = https://github.com/ATmobica/mcuboot.git
 	platforms = mbed
-[submodule "perfetto"]
-	path = third_party/perfetto/repo
-	url = https://github.com/google/perfetto
 [submodule "p6/serial-flash"]
 	path = third_party/p6/p6_sdk/libs/serial-flash
 	url = https://github.com/Infineon/serial-flash

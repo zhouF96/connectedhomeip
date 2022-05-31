@@ -5,9 +5,12 @@ import android.net.nsd.NsdServiceInfo;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import androidx.annotation.VisibleForTesting;
 import com.chip.casting.app.CastingContext;
+import com.chip.casting.app.CommissionerDiscoveryFragment;
+import com.chip.casting.util.GlobalCastingConstants;
 import java.util.List;
 
 public class CommissionerResolveListener implements NsdManager.ResolveListener {
@@ -25,15 +28,30 @@ public class CommissionerResolveListener implements NsdManager.ResolveListener {
   @Override
   public void onServiceResolved(NsdServiceInfo serviceInfo) {
     DiscoveredNodeData commissioner = new DiscoveredNodeData(serviceInfo);
-    commissioners.add(commissioner);
     Log.d(TAG, "Commissioner resolved: " + commissioner);
 
-    String buttonText = getCommissionerButtonText(commissioner);
-    if (!buttonText.isEmpty()) {
-      Button commissionerButton = new Button(castingContext.getApplicationContext());
-      commissionerButton.setText(buttonText);
-      new Handler(Looper.getMainLooper())
-          .post(() -> castingContext.getCommissionersLayout().addView(commissionerButton));
+    if (isPassingDeviceTypeFilter(commissioner)) {
+      commissioners.add(commissioner);
+      String buttonText = getCommissionerButtonText(commissioner);
+      if (!buttonText.isEmpty()) {
+        Button commissionerButton = new Button(castingContext.getApplicationContext());
+        commissionerButton.setText(buttonText);
+        CommissionerDiscoveryFragment.Callback callback =
+            (CommissionerDiscoveryFragment.Callback) castingContext.getFragmentActivity();
+        commissionerButton.setOnClickListener(
+            new View.OnClickListener() {
+              @Override
+              public void onClick(View v) {
+                Log.d(
+                    TAG,
+                    "CommissionerResolveListener.onServiceResolved.OnClickListener.onClick called for "
+                        + commissioner);
+                callback.handleCommissioningButtonClicked(commissioner);
+              }
+            });
+        new Handler(Looper.getMainLooper())
+            .post(() -> castingContext.getCommissionersLayout().addView(commissionerButton));
+      }
     } else Log.e(TAG, "Skipped displaying " + commissioner);
   }
 
@@ -71,5 +89,12 @@ public class CommissionerResolveListener implements NsdManager.ResolveListener {
             : "";
     aux = aux.isEmpty() ? aux : "\n[" + aux + "]";
     return main + aux;
+  }
+
+  private boolean isPassingDeviceTypeFilter(DiscoveredNodeData commissioner) {
+    return GlobalCastingConstants.CommissionerDeviceTypeFilter == null
+        || GlobalCastingConstants.CommissionerDeviceTypeFilter.isEmpty()
+        || GlobalCastingConstants.CommissionerDeviceTypeFilter.contains(
+            commissioner.getDeviceType());
   }
 }

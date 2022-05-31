@@ -63,7 +63,6 @@ public:
     {
         kMaxVendorNameLength            = 32,
         kMaxProductNameLength           = 32,
-        kMaxNodeLabelLength             = 32,
         kMaxLocationLength              = 2,
         kMaxHardwareVersionStringLength = 64,
         kMaxSoftwareVersionStringLength = 64,
@@ -86,52 +85,38 @@ public:
         kMaxLanguageTagLength = 5 // ISO 639-1 standard language codes
     };
 
-    virtual CHIP_ERROR GetVendorName(char * buf, size_t bufSize)                                    = 0;
-    virtual CHIP_ERROR GetVendorId(uint16_t & vendorId)                                             = 0;
-    virtual CHIP_ERROR GetProductName(char * buf, size_t bufSize)                                   = 0;
-    virtual CHIP_ERROR GetProductId(uint16_t & productId)                                           = 0;
-    virtual CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize)                         = 0;
-    virtual CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVer)                                   = 0;
-    virtual CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize)                                  = 0;
-    virtual CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf)                                    = 0;
-    virtual CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf)                                      = 0;
-    virtual CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf)                                    = 0;
-    virtual CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth) = 0;
-    virtual CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize)                         = 0;
-    virtual CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer)                                   = 0;
+    virtual CHIP_ERROR GetVendorName(char * buf, size_t bufSize)            = 0;
+    virtual CHIP_ERROR GetVendorId(uint16_t & vendorId)                     = 0;
+    virtual CHIP_ERROR GetProductName(char * buf, size_t bufSize)           = 0;
+    virtual CHIP_ERROR GetProductId(uint16_t & productId)                   = 0;
+    virtual CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf)            = 0;
+    virtual CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf)              = 0;
+    virtual CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf)            = 0;
+    virtual CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) = 0;
+    virtual CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer)           = 0;
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     // Lifetime counter is monotonic counter that is incremented upon each commencement of advertising
-    virtual CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) = 0;
-    virtual CHIP_ERROR IncrementLifetimeCounter()                     = 0;
-    // Unique ID is identifier utilized for the rotating device ID calculation purpose as an input key. It is separate identifier
-    // from the Basic cluster unique ID.
-    virtual CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) = 0;
+    virtual CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter)             = 0;
+    virtual CHIP_ERROR IncrementLifetimeCounter()                                 = 0;
+    virtual CHIP_ERROR SetRotatingDeviceIdUniqueId(const ByteSpan & uniqueIdSpan) = 0;
 #endif
     virtual CHIP_ERROR GetRegulatoryLocation(uint8_t & location)                       = 0;
     virtual CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)    = 0;
-    virtual CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb)                            = 0;
     virtual CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen)  = 0;
-    virtual CHIP_ERROR StorePrimaryWiFiMACAddress(const uint8_t * buf)                 = 0;
-    virtual CHIP_ERROR StorePrimary802154MACAddress(const uint8_t * buf)               = 0;
     virtual CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) = 0;
     virtual CHIP_ERROR StoreSoftwareVersion(uint32_t softwareVer)                      = 0;
     virtual CHIP_ERROR StoreHardwareVersion(uint16_t hardwareVer)                      = 0;
     virtual CHIP_ERROR StoreRegulatoryLocation(uint8_t location)                       = 0;
     virtual CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen)             = 0;
-    virtual CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb)                            = 0;
     virtual CHIP_ERROR GetRebootCount(uint32_t & rebootCount)                          = 0;
     virtual CHIP_ERROR StoreRebootCount(uint32_t rebootCount)                          = 0;
     virtual CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours)      = 0;
     virtual CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours)      = 0;
     virtual CHIP_ERROR GetBootReason(uint32_t & bootReason)                            = 0;
     virtual CHIP_ERROR StoreBootReason(uint32_t bootReason)                            = 0;
-    virtual CHIP_ERROR GetNodeLabel(char * buf, size_t bufSize)                        = 0;
-    virtual CHIP_ERROR StoreNodeLabel(const char * buf, size_t bufSize)                = 0;
     virtual CHIP_ERROR GetPartNumber(char * buf, size_t bufSize)                       = 0;
     virtual CHIP_ERROR GetProductURL(char * buf, size_t bufSize)                       = 0;
     virtual CHIP_ERROR GetProductLabel(char * buf, size_t bufSize)                     = 0;
-    virtual CHIP_ERROR GetLocalConfigDisabled(bool & disabled)                         = 0;
-    virtual CHIP_ERROR GetReachable(bool & reachable)                                  = 0;
     virtual CHIP_ERROR GetUniqueId(char * buf, size_t bufSize)                         = 0;
     virtual CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen)        = 0;
     virtual CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize)                    = 0;

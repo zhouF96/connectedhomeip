@@ -45,6 +45,7 @@
 #include <app/server/Dnssd.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
 #include "Display.h"
 #include "QRCodeScreen.h"
@@ -78,7 +79,7 @@ void DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
     case DeviceEventType::kInternetConnectivityChange:
         if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
         {
-            ChipLogProgress(Shell, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
+            ChipLogProgress(Shell, "IPv4 Server ready...");
             chip::app::DnssdServer::Instance().StartServer();
         }
         else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
@@ -137,7 +138,9 @@ const char * TAG = "chef-app";
 #if CONFIG_HAVE_DISPLAY
 void printQRCode()
 {
-    std::string qrCodeText;
+    // Create buffer for QR code that can fit max size and null terminator.
+    char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
+    chip::MutableCharSpan qrCodeText(qrCodeBuffer);
 
     GetQRCode(qrCodeText, chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
 
@@ -153,8 +156,8 @@ void printQRCode()
     ScreenManager::Init();
 
     ESP_LOGI(TAG, "Opening QR code screen");
-    ESP_LOGI(TAG, "QR CODE Text: '%s'", qrCodeText.c_str());
-    ScreenManager::PushScreen(chip::Platform::New<QRCodeScreen>(qrCodeText));
+    ESP_LOGI(TAG, "QR CODE Text: '%s'", qrCodeText.data());
+    ScreenManager::PushScreen(chip::Platform::New<QRCodeScreen>(qrCodeText.data()));
 }
 #endif // CONFIG_HAVE_DISPLAY
 

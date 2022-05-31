@@ -428,6 +428,7 @@ dropdown
 dryrun
 DS
 duplicative
+DUT
 DV
 dynload
 eabi
@@ -585,6 +586,7 @@ hardknott
 hardwarever
 HardwareVersion
 HardwareVersionString
+hasValue
 hci
 hciattach
 hciconfig
@@ -769,6 +771,7 @@ ManufacturingDate
 masterkey
 matterBuildSrcDir
 matterc
+MatterCustomTrace
 matterd
 MatterLock
 matterSdkSourceBuild
@@ -876,6 +879,7 @@ nongnu
 nordicsemi
 NotAvailable
 notValue
+npm
 nRF
 nrfconnect
 nrfdks
@@ -984,6 +988,7 @@ PlatformManagerImpl
 plt
 png
 PollControl
+pollInterval
 polymorphism
 POSIX
 PosixConfig
@@ -1270,6 +1275,7 @@ timedInteractionTimeoutMs
 TimeFormatLocalization
 timeoutMs
 TimeSynchronization
+Tizen
 TKIP
 tlsr
 TLV
@@ -1286,6 +1292,7 @@ tos
 TotalColiformBacteriaConcentrationMeasurement
 totalTests
 TotalTrihalomethanesConcentrationMeasurement
+TPK
 trackAlloc
 trackFree
 TransferSession
@@ -1347,6 +1354,7 @@ UTF
 util
 utils
 UUID
+ux
 VCP
 Vectorcall
 VendorID
@@ -1422,6 +1430,7 @@ xFF
 xFFF
 xFFFF
 xfffff
+xFFFFFFEFFFFFFFFF
 xtensa
 xwayland
 xyz

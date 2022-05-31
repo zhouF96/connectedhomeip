@@ -33,6 +33,12 @@ public class ContentLaunchManagerStub implements ContentLaunchManager {
       ContentLaunchSearchParameter[] search, boolean autoplay, String data) {
     Log.d(TAG, "launchContent:" + data + " autoplay=" + autoplay + " at " + endpoint);
 
+    if (search != null && search.length > 0) {
+      Log.d(TAG, " TEST CASE found match=Example TV Show");
+    } else {
+      Log.d(TAG, " TEST CASE did not find a match");
+    }
+
     if ("err".equals(data)) {
       return new ContentLaunchResponse(
           ContentLaunchResponse.STATUS_URL_NOT_AVAILABLE, "Error data in Java");
@@ -43,11 +49,24 @@ public class ContentLaunchManagerStub implements ContentLaunchManager {
   @Override
   public ContentLaunchResponse launchUrl(
       String url, String display, ContentLaunchBrandingInformation branding) {
-    Log.d(TAG, "launchUrl:" + url + " display=" + display + " at " + endpoint);
+    Log.d(
+        TAG,
+        "launchUrl:"
+            + url
+            + " display="
+            + display
+            + " branding.providerName="
+            + (branding == null ? "NULL" : branding.providerName)
+            + " at "
+            + endpoint);
 
     if ("err".equals(display)) {
       return new ContentLaunchResponse(
           ContentLaunchResponse.STATUS_URL_NOT_AVAILABLE, "Error data in Java");
+    } else if (url.equals("https://badurl")) {
+      return new ContentLaunchResponse(ContentLaunchResponse.STATUS_URL_NOT_AVAILABLE, "Bad URL");
+    } else if (url.equals("https://csa-iot.org/badauth")) {
+      return new ContentLaunchResponse(ContentLaunchResponse.STATUS_AUTH_FAILED, "Auth Failed");
     }
     return new ContentLaunchResponse(ContentLaunchResponse.STATUS_SUCCESS, "Example data in Java");
   }

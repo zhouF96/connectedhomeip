@@ -31,6 +31,7 @@
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
 std::map<std::string, std::unique_ptr<chip::Controller::DeviceCommissioner>> CHIPCommand::mCommissioners;
+std::set<CHIPCommand *> CHIPCommand::sDeferredCleanups;
 
 using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
 
@@ -180,7 +181,18 @@ CHIP_ERROR CHIPCommand::Run()
 
     CHIP_ERROR err = StartWaiting(GetWaitDuration());
 
+    bool deferCleanup = (IsInteractive() && DeferInteractiveCleanup());
+
     Shutdown();
+
+    if (deferCleanup)
+    {
+        sDeferredCleanups.insert(this);
+    }
+    else
+    {
+        Cleanup();
+    }
 
     ReturnErrorOnFailure(MaybeTearDownStack());
 
@@ -287,6 +299,12 @@ chip::Controller::DeviceCommissioner & CHIPCommand::CurrentCommissioner()
     return *item->second;
 }
 
+chip::Controller::DeviceCommissioner & CHIPCommand::GetCommissioner(const char * identity)
+{
+    auto item = mCommissioners.find(identity);
+    return *item->second;
+}
+
 CHIP_ERROR CHIPCommand::ShutdownCommissioner(std::string key)
 {
     return mCommissioners[key].get()->Shutdown();
@@ -303,7 +321,6 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
     chip::Controller::SetupParams commissionerParams;
 
     ReturnLogErrorOnFailure(mCredIssuerCmds->SetupDeviceAttestation(commissionerParams, trustStore));
-    chip::Credentials::SetDeviceAttestationVerifier(commissionerParams.deviceAttestationVerifier);
 
     VerifyOrReturnError(noc.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(icac.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
@@ -326,7 +343,6 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
 
         ReturnLogErrorOnFailure(ephemeralKey.Initialize());
         chip::NodeId nodeId = mCommissionerNodeId.ValueOr(mCommissionerStorage.GetLocalNodeId());
-        fabricId            = mCommissionerFabricId.ValueOr(fabricId);
 
         ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(
             nodeId, fabricId, mCommissionerStorage.GetCommissionerCATs(), ephemeralKey, rcacSpan, icacSpan, nocSpan));
@@ -417,4 +433,13 @@ void CHIPCommand::StopWaiting()
 #else  // CONFIG_USE_SEPARATE_EVENTLOOP
     LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
 #endif // CONFIG_USE_SEPARATE_EVENTLOOP
+}
+
+void CHIPCommand::ExecuteDeferredCleanups()
+{
+    for (auto * cmd : sDeferredCleanups)
+    {
+        cmd->Cleanup();
+    }
+    sDeferredCleanups.clear();
 }

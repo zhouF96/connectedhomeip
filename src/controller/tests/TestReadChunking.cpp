@@ -128,11 +128,11 @@ public:
     void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                          const app::StatusIB & aStatus) override;
 
-    void OnDone() override;
+    void OnDone(app::ReadClient * apReadClient) override;
 
     void OnReportEnd() override { mOnReportEnd = true; }
 
-    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override { mOnSubscriptionEstablished = true; }
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override { mOnSubscriptionEstablished = true; }
 
     uint32_t mAttributeCount        = 0;
     bool mOnReportEnd               = false;
@@ -198,7 +198,7 @@ void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aP
     mAttributeCount++;
 }
 
-void TestReadCallback::OnDone() {}
+void TestReadCallback::OnDone(app::ReadClient *) {}
 
 class TestMutableAttrAccess
 {
@@ -295,13 +295,13 @@ public:
     void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                          const app::StatusIB & aStatus) override;
 
-    void OnDone() override {}
+    void OnDone(app::ReadClient *) override {}
 
     void OnReportBegin() override { mAttributeCount = 0; }
 
     void OnReportEnd() override { mOnReportEnd = true; }
 
-    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override { mOnSubscriptionEstablished = true; }
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override { mOnSubscriptionEstablished = true; }
 
     uint32_t mAttributeCount = 0;
     // We record every dataversion field from every attribute IB.
@@ -908,7 +908,7 @@ nlTestSuite sSuite =
 {
     "TestReadChunking",
     &sTests[0],
-    TestContext::InitializeAsync,
+    TestContext::Initialize,
     TestContext::Finalize
 };
 // clang-format on

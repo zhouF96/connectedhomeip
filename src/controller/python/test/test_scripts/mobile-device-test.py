@@ -70,22 +70,19 @@ def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: 
     else:
         address = address.decode("utf-8")
 
-    logger.info("Testing key exchange")
-    FailIfNot(test.TestKeyExchange(ip=address,
-                                   setuppin=setup_pin,
-                                   nodeid=device_nodeid),
+    logger.info("Testing commissioning")
+    FailIfNot(test.TestCommissioning(ip=address,
+                                     setuppin=setup_pin,
+                                     nodeid=device_nodeid),
               "Failed to finish key exchange")
 
     ok = asyncio.run(test.TestMultiFabric(ip=address,
                                           setuppin=20202021,
                                           nodeid=1))
     FailIfNot(ok, "Failed to commission multi-fabric")
-    #
-    # The server will crash if we are aborting / closing it too fast.
-    # Issue: #15987
-    # logger.info("Testing closing sessions")
-    # FailIfNot(test.TestCloseSession(nodeid=device_nodeid),
-    #           "Failed to close sessions")
+
+    logger.info("Testing closing sessions")
+    FailIfNot(test.TestCloseSession(nodeid=device_nodeid), "Failed to close sessions")
 
 
 @base.test_case

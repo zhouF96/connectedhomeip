@@ -45,7 +45,6 @@ constexpr const char kIdentityNull[] = "null-fabric-commissioner";
 class CHIPCommand : public Command
 {
 public:
-    using ChipDevice             = ::chip::DeviceProxy;
     using ChipDeviceCommissioner = ::chip::Controller::DeviceCommissioner;
     using ChipDeviceController   = ::chip::Controller::DeviceController;
     using IPAddress              = ::chip::Inet::IPAddress;
@@ -59,10 +58,14 @@ public:
     CHIPCommand(const char * commandName, CredentialIssuerCommands * credIssuerCmds) :
         Command(commandName), mCredIssuerCmds(credIssuerCmds)
     {
-        AddArgument("paa-trust-store-path", &mPaaTrustStorePath);
-        AddArgument("commissioner-name", &mCommissionerName);
-        AddArgument("commissioner-nodeid", 0, UINT64_MAX, &mCommissionerNodeId);
-        AddArgument("commissioner-fabricid", 0, UINT64_MAX, &mCommissionerNodeId);
+        AddArgument("paa-trust-store-path", &mPaaTrustStorePath,
+                    "Path to directory holding PAA certificate information.  Can be absolute or relative to the current working "
+                    "directory.");
+        AddArgument(
+            "commissioner-name", &mCommissionerName,
+            "Name of fabric to use. Valid values are \"alpha\", \"beta\", \"gamma\", and integers greater than or equal to 4.");
+        AddArgument("commissioner-nodeid", 0, UINT64_MAX, &mCommissionerNodeId,
+                    "The node id to use for chip-tool.  If not provided, kTestControllerNodeId (112233, 0x1B669) will be used.");
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("trace_file", &mTraceFile);
         AddArgument("trace_log", 0, 1, &mTraceLog);
@@ -91,9 +94,23 @@ protected:
     // Get the wait duration, in seconds, before the command times out.
     virtual chip::System::Clock::Timeout GetWaitDuration() const = 0;
 
-    // Shut down the command, in case any work needs to be done after the event
-    // loop has been stopped.
+    // Shut down the command.  After a Shutdown call the command object is ready
+    // to be used for another command invocation.
     virtual void Shutdown() {}
+
+    // Clean up any resources allocated by the command.  Some commands may hold
+    // on to resources after Shutdown(), but Cleanup() will guarantee those are
+    // cleaned up.
+    virtual void Cleanup() {}
+
+    // If true, skip calling Cleanup() when in interactive mode, so the command
+    // can keep doing work as needed.  Cleanup() will be called when quitting
+    // interactive mode.  This method will be called before Shutdown, so it can
+    // use member values that Shutdown will normally reset.
+    virtual bool DeferInteractiveCleanup() { return false; }
+
+    // Execute any deferred cleanups.  Used when exiting interactive mode.
+    void ExecuteDeferredCleanups();
 
     PersistentStorage mDefaultStorage;
     PersistentStorage mCommissionerStorage;
@@ -108,6 +125,8 @@ protected:
     // --identity "instance name" when running a command.
     ChipDeviceCommissioner & CurrentCommissioner();
 
+    ChipDeviceCommissioner & GetCommissioner(const char * identity);
+
 private:
     CHIP_ERROR MaybeSetUpStack();
     CHIP_ERROR MaybeTearDownStack();
@@ -117,9 +136,10 @@ private:
     CHIP_ERROR ShutdownCommissioner(std::string key);
     chip::FabricId CurrentCommissionerId();
     static std::map<std::string, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
+    static std::set<CHIPCommand *> sDeferredCleanups;
+
     chip::Optional<char *> mCommissionerName;
     chip::Optional<chip::NodeId> mCommissionerNodeId;
-    chip::Optional<chip::FabricId> mCommissionerFabricId;
     chip::Optional<uint16_t> mBleAdapterId;
     chip::Optional<char *> mPaaTrustStorePath;
 

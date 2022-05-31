@@ -41,8 +41,16 @@ jobs:
         runs-on: macos-latest
 
         steps:
+            - uses: Wandalen/wretry.action@v1.0.15
+              name: Checkout
+              with:
+                  action: actions/checkout@v3
+                  with: |
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
             - name: Checkout submodules
-               run: scripts/checkout_submodules.py --shallow --platform darwin
+              run: scripts/checkout_submodules.py --shallow --platform darwin
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install openssl pkg-config coreutils
@@ -78,8 +86,12 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                        --target darwin-x64-chip-tool-darwin-${BUILD_VARIANT} \
+                        --target darwin-x64-darwin-framework-tool-${BUILD_VARIANT} \
                         --target darwin-x64-all-clusters-${BUILD_VARIANT} \
+                        --target darwin-x64-lock-${BUILD_VARIANT} \
+                        --target darwin-x64-ota-provider-${BUILD_VARIANT} \
+                        --target darwin-x64-ota-requestor-${BUILD_VARIANT} \
+                        --target darwin-x64-tv-app-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
@@ -88,11 +100,15 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
-                     --chip-tool ./out/darwin-x64-chip-tool-darwin-${BUILD_VARIANT}/chip-tool-darwin \
-                     --target-skip-glob '{TestGroupMessaging,TV_*}' \
+                     --chip-tool ./out/darwin-x64-darwin-framework-tool-${BUILD_VARIANT}/darwin-framework-tool \
+                     --target-skip-glob '{TestGroupMessaging}' \
                      run \
                      --iterations 1 \
                      --all-clusters-app ./out/darwin-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --lock-app ./out/darwin-x64-lock-${BUILD_VARIANT}/chip-lock-app \
+                     --ota-provider-app ./out/darwin-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
+                     --ota-requestor-app ./out/darwin-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --tv-app ./out/darwin-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                   "
             - name: Uploading core files
               uses: actions/upload-artifact@v2

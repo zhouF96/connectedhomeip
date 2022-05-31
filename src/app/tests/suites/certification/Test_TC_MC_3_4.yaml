@@ -28,80 +28,81 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Send RootMenu"
-      disabled: true
+    #Issue 17510
+    - label: "TH sends same KeyPad input codes to DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
               - name: "keyCode"
                 value: 0x09
 
-    - label: "Send RootMenu"
-      disabled: true
+    - label: "TH sends same KeyPad input codes to DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
               - name: "keyCode"
                 value: 0x09
 
-    - label: "Send RootMenu"
-      disabled: true
+    - label: "TH sends same KeyPad input codes to DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
               - name: "keyCode"
                 value: 0x09
 
-    - label: "Send RootMenu"
-      disabled: true
+    - label: "TH sends same KeyPad input codes to DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
               - name: "keyCode"
                 value: 0x09
 
-    - label: "Send RootMenu"
-      disabled: true
+    - label: "TH sends same KeyPad input codes to DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
               - name: "keyCode"
                 value: 0x09
 
-    - label: "Send RootMenu"
-      disabled: true
+    - label: "TH sends same KeyPad input codes to DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
               - name: "keyCode"
                 value: 0x09
 
-    - label: "Send RootMenu"
-      disabled: true
+    - label: "TH sends same KeyPad input codes to DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
               - name: "keyCode"
                 value: 0x09
 
-    - label: "Send RootMenu"
-      disabled: true
+    - label: "TH sends same KeyPad input codes to DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
               - name: "keyCode"
                 value: 0x09
 
-    - label: "Send RootMenu"
-      disabled: true
+    - label: "TH sends same KeyPad input codes to DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
               - name: "keyCode"
                 value: 0x09
 
-    - label: "Send RootMenu"
-      disabled: true
+    - label: "TH sends same KeyPad input codes to DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:

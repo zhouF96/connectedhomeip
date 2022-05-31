@@ -229,6 +229,11 @@ if (CONFIG_CHIP_ENABLE_DNSSD_SRP)
     chip_gn_arg_string("chip_mdns" "platform")
 endif()
 
+if (CONFIG_CHIP_FIRMWARE_BUILD_UNIX_TIME)
+    string(TIMESTAMP CHIP_FIRMWARE_BUILD_UNIX_TIME "%s")
+    chip_gn_arg_string("chip_device_config_firmware_build_unix_time" ${CHIP_FIRMWARE_BUILD_UNIX_TIME})
+endif()
+
 if (CHIP_PROJECT_CONFIG)
     chip_gn_arg_string("chip_project_config_include"        ${CHIP_PROJECT_CONFIG})
     chip_gn_arg_string("chip_system_project_config_include" ${CHIP_PROJECT_CONFIG})
@@ -255,6 +260,11 @@ if (CONFIG_CHIP_PW_RPC)
     chip_gn_arg_string("pw_assert_BACKEND" ${PIGWEED_DIR}/pw_assert_log)
     chip_gn_arg_string("pw_log_BACKEND" ${PIGWEED_DIR}/pw_log_basic)
     chip_gn_arg("pw_build_LINK_DEPS" [\"${PIGWEED_DIR}/pw_assert:impl\",\ \"${PIGWEED_DIR}/pw_log:impl\"])
+endif()
+
+if (CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER)
+    chip_gn_arg_bool("chip_build_example_providers" "true")
+    list(APPEND CHIP_LIBRARIES -lMatterDeviceInfoProviderExample)
 endif()
 
 file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/args.tmp" CONTENT ${CHIP_GN_ARGS})
@@ -304,6 +314,10 @@ target_include_directories(chip INTERFACE
 target_link_directories(chip INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/lib)
 if (CONFIG_CHIP_LIB_SHELL)
     target_link_options(chip INTERFACE -Wl,--whole-archive -lCHIPShell -Wl,--no-whole-archive)
+endif()
+
+if (CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER)
+    target_include_directories(chip INTERFACE ${CHIP_ROOT}/examples/providers)
 endif()
 
 if (CONFIG_CHIP_MALLOC_SYS_HEAP_OVERRIDE)

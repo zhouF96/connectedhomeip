@@ -72,7 +72,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 
     // Set callback functions from chip_porting
     chip_connmgr_set_callback_func((chip_connmgr_callback)(conn_callback_dispatcher), this);
-    
+
     // Register WiFi event handlers
     wifi_reg_event_handler(WIFI_EVENT_CONNECT, ConnectivityManagerImpl::RtkWiFiStationConnectedHandler, NULL);
     wifi_reg_event_handler(WIFI_EVENT_DISCONNECT, ConnectivityManagerImpl::RtkWiFiStationDisconnectedHandler, NULL);
@@ -699,10 +699,11 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
 
         // Alert other components of the state change.
         ChipDeviceEvent event;
-        event.Type                            = DeviceEventType::kInternetConnectivityChange;
-        event.InternetConnectivityChange.IPv4 = GetConnectivityChange(hadIPv4Conn, haveIPv4Conn);
-        event.InternetConnectivityChange.IPv6 = GetConnectivityChange(hadIPv6Conn, haveIPv6Conn);
-        addr.ToString(event.InternetConnectivityChange.address);
+        event.Type                                 = DeviceEventType::kInternetConnectivityChange;
+        event.InternetConnectivityChange.IPv4      = GetConnectivityChange(hadIPv4Conn, haveIPv4Conn);
+        event.InternetConnectivityChange.IPv6      = GetConnectivityChange(hadIPv6Conn, haveIPv6Conn);
+        event.InternetConnectivityChange.ipAddress = addr;
+
         PlatformMgr().PostEventOrDie(&event);
 
         if (haveIPv4Conn != hadIPv4Conn)

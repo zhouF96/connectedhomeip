@@ -49,7 +49,13 @@ struct AttributePathParams
 
     AttributePathParams() {}
 
-    bool HasAttributeWildcard() const { return HasWildcardEndpointId() || HasWildcardClusterId() || HasWildcardAttributeId(); }
+    bool IsWildcardPath() const { return HasWildcardEndpointId() || HasWildcardClusterId() || HasWildcardAttributeId(); }
+
+    bool operator==(const AttributePathParams & aOther) const
+    {
+        return mEndpointId == aOther.mEndpointId && mClusterId == aOther.mClusterId && mAttributeId == aOther.mAttributeId &&
+            mListIndex == aOther.mListIndex;
+    }
 
     /**
      * SPEC 8.9.2.2
@@ -63,6 +69,13 @@ struct AttributePathParams
     inline bool HasWildcardClusterId() const { return mClusterId == kInvalidClusterId; }
     inline bool HasWildcardAttributeId() const { return mAttributeId == kInvalidAttributeId; }
     inline bool HasWildcardListIndex() const { return mListIndex == kInvalidListIndex; }
+    inline void SetWildcardEndpointId() { mEndpointId = kInvalidEndpointId; }
+    inline void SetWildcardClusterId() { mClusterId = kInvalidClusterId; }
+    inline void SetWildcardAttributeId()
+    {
+        mAttributeId = kInvalidAttributeId;
+        mListIndex   = kInvalidListIndex;
+    }
 
     bool IsAttributePathSupersetOf(const AttributePathParams & other) const
     {
@@ -80,6 +93,15 @@ struct AttributePathParams
         VerifyOrReturnError(HasWildcardClusterId() || mClusterId == other.mClusterId, false);
         VerifyOrReturnError(HasWildcardAttributeId() || mAttributeId == other.mAttributeId, false);
 
+        return true;
+    }
+
+    bool Intersects(const AttributePathParams & other) const
+    {
+        VerifyOrReturnError(HasWildcardEndpointId() || other.HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
+        VerifyOrReturnError(HasWildcardClusterId() || other.HasWildcardClusterId() || mClusterId == other.mClusterId, false);
+        VerifyOrReturnError(HasWildcardAttributeId() || other.HasWildcardAttributeId() || mAttributeId == other.mAttributeId,
+                            false);
         return true;
     }
 

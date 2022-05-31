@@ -421,6 +421,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     const uint32_t kReservedSizeForEventReportIBs = 3; // type, tag, end of container
 
     VerifyOrExit(apReadHandler != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(apReadHandler->GetSession() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(!bufHandle.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     if (bufHandle->AvailableDataLength() > kMaxSecureSduLengthBytes)
@@ -445,7 +446,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 
     if (apReadHandler->IsType(ReadHandler::InteractionType::Subscribe))
     {
-        uint64_t subscriptionId = 0;
+        SubscriptionId subscriptionId = 0;
         apReadHandler->GetSubscriptionId(subscriptionId);
         reportDataBuilder.SubscriptionId(subscriptionId);
     }
@@ -658,42 +659,147 @@ bool Engine::MergeOverlappedAttributePath(const AttributePathParams & aAttribute
     });
 }
 
+bool Engine::ClearTombPaths()
+{
+    bool pathReleased = false;
+    mGlobalDirtySet.ForEachActiveObject([&](auto * path) {
+        if (path->mGeneration == 0)
+        {
+            mGlobalDirtySet.ReleaseObject(path);
+            pathReleased = true;
+        }
+        return Loop::Continue;
+    });
+    return pathReleased;
+}
+
+bool Engine::MergeDirtyPathsUnderSameCluster()
+{
+    mGlobalDirtySet.ForEachActiveObject([&](auto * outerPath) {
+        if (outerPath->HasWildcardClusterId() || outerPath->mGeneration == 0)
+        {
+            return Loop::Continue;
+        }
+        mGlobalDirtySet.ForEachActiveObject([&](auto * innerPath) {
+            if (innerPath == outerPath)
+            {
+                return Loop::Continue;
+            }
+            // We don't support paths with a wildcard endpoint + a concrete cluster in global dirty set, so we do a simple == check
+            // here.
+            if (innerPath->mEndpointId != outerPath->mEndpointId || innerPath->mClusterId != outerPath->mClusterId)
+            {
+                return Loop::Continue;
+            }
+            if (innerPath->mGeneration > outerPath->mGeneration)
+            {
+                outerPath->mGeneration = innerPath->mGeneration;
+            }
+            outerPath->SetWildcardAttributeId();
+
+            // The object pool does not allow us to release objects in a nested iteration, mark the path as a tomb by setting its
+            // generation to 0 and then clear it later.
+            innerPath->mGeneration = 0;
+            return Loop::Continue;
+        });
+        return Loop::Continue;
+    });
+
+    return ClearTombPaths();
+}
+
+bool Engine::MergeDirtyPathsUnderSameEndpoint()
+{
+    mGlobalDirtySet.ForEachActiveObject([&](auto * outerPath) {
+        if (outerPath->HasWildcardEndpointId() || outerPath->mGeneration == 0)
+        {
+            return Loop::Continue;
+        }
+        mGlobalDirtySet.ForEachActiveObject([&](auto * innerPath) {
+            if (innerPath == outerPath)
+            {
+                return Loop::Continue;
+            }
+            if (innerPath->mEndpointId != outerPath->mEndpointId)
+            {
+                return Loop::Continue;
+            }
+            if (innerPath->mGeneration > outerPath->mGeneration)
+            {
+                outerPath->mGeneration = innerPath->mGeneration;
+            }
+            outerPath->SetWildcardClusterId();
+            outerPath->SetWildcardAttributeId();
+
+            // The object pool does not allow us to release objects in a nested iteration, mark the path as a tomb by setting its
+            // generation to 0 and then clear it later.
+            innerPath->mGeneration = 0;
+            return Loop::Continue;
+        });
+        return Loop::Continue;
+    });
+    return ClearTombPaths();
+}
+
+CHIP_ERROR Engine::InsertPathIntoDirtySet(const AttributePathParams & aAttributePath)
+{
+    ReturnErrorCodeIf(MergeOverlappedAttributePath(aAttributePath), CHIP_NO_ERROR);
+
+    if (mGlobalDirtySet.Exhausted() && !MergeDirtyPathsUnderSameCluster() && !MergeDirtyPathsUnderSameEndpoint())
+    {
+        ChipLogDetail(DataManagement, "Global dirty set pool exhausted, merge all paths.");
+        mGlobalDirtySet.ReleaseAll();
+        auto object         = mGlobalDirtySet.CreateObject();
+        object->mGeneration = GetDirtySetGeneration();
+    }
+
+    ReturnErrorCodeIf(MergeOverlappedAttributePath(aAttributePath), CHIP_NO_ERROR);
+    ChipLogDetail(DataManagement, "Cannot merge the new path into any existing path, create one.");
+
+    auto object = mGlobalDirtySet.CreateObject();
+    if (object == nullptr)
+    {
+        // This should not happen, this path should be merged into the wildcard endpoint at least.
+        ChipLogError(DataManagement, "mGlobalDirtySet pool full, cannot handle more entries!");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    *object             = aAttributePath;
+    object->mGeneration = GetDirtySetGeneration();
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
 {
     BumpDirtySetGeneration();
 
-    InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([&aAttributePath](ReadHandler * handler) {
-        // We call SetDirty for both read interactions and subscribe interactions, since we may sent inconsistent attribute data
-        // between two chunks. SetDirty will be ignored automatically by read handlers which is waiting for response to last message
-        // chunk for read interactions.
-        if (handler->IsGeneratingReports() || handler->IsAwaitingReportResponse())
-        {
-            for (auto object = handler->GetAttributePathList(); object != nullptr; object = object->mpNext)
+    bool intersectsInterestPath = false;
+    InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject(
+        [&aAttributePath, &intersectsInterestPath](ReadHandler * handler) {
+            // We call SetDirty for both read interactions and subscribe interactions, since we may send inconsistent attribute data
+            // between two chunks. SetDirty will be ignored automatically by read handlers which are waiting for a response to the
+            // last message chunk for read interactions.
+            if (handler->IsGeneratingReports() || handler->IsAwaitingReportResponse())
             {
-                if (aAttributePath.IsAttributePathSupersetOf(object->mValue) ||
-                    object->mValue.IsAttributePathSupersetOf(aAttributePath))
+                for (auto object = handler->GetAttributePathList(); object != nullptr; object = object->mpNext)
                 {
-                    handler->SetDirty(aAttributePath);
-                    break;
+                    if (object->mValue.Intersects(aAttributePath))
+                    {
+                        handler->SetDirty(aAttributePath);
+                        intersectsInterestPath = true;
+                        break;
+                    }
                 }
             }
-        }
 
-        return Loop::Continue;
-    });
+            return Loop::Continue;
+        });
 
-    if (!MergeOverlappedAttributePath(aAttributePath) &&
-        InteractionModelEngine::GetInstance()->IsOverlappedAttributePath(aAttributePath))
+    if (!intersectsInterestPath)
     {
-        auto object = mGlobalDirtySet.CreateObject();
-        if (object == nullptr)
-        {
-            ChipLogError(DataManagement, "mGlobalDirtySet pool full, cannot handle more entries!");
-            return CHIP_ERROR_NO_MEMORY;
-        }
-        *object             = aAttributePath;
-        object->mGeneration = GetDirtySetGeneration();
+        return CHIP_NO_ERROR;
     }
+    ReturnErrorOnFailure(InsertPathIntoDirtySet(aAttributePath));
 
     // Schedule work to run asynchronously on the CHIP thread. The scheduled
     // work won't execute until the current execution context has
@@ -722,8 +828,7 @@ void Engine::UpdateReadHandlerDirty(ReadHandler & aReadHandler)
     for (auto object = aReadHandler.GetAttributePathList(); object != nullptr; object = object->mpNext)
     {
         mGlobalDirtySet.ForEachActiveObject([&](auto * path) {
-            if ((path->IsAttributePathSupersetOf(object->mValue) || object->mValue.IsAttributePathSupersetOf(*path)) &&
-                path->mGeneration > aReadHandler.mPreviousReportsBeginGeneration)
+            if (path->Intersects(object->mValue) && path->mGeneration > aReadHandler.mPreviousReportsBeginGeneration)
             {
                 intersected = true;
                 return Loop::Break;
@@ -799,6 +904,15 @@ CHIP_ERROR Engine::ScheduleBufferPressureEventDelivery(uint32_t aBytesWritten)
 
 CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBytesWritten)
 {
+    // If we literally have no read handlers right now that care about any events,
+    // we don't need to call schedule run for event.
+    // If schedule run is called, actually we would not delivery events as well.
+    // Just wanna save one schedule run here
+    if (InteractionModelEngine::GetInstance()->mEventPathPool.Allocated() == 0)
+    {
+        return CHIP_NO_ERROR;
+    }
+
     bool isUrgentEvent = false;
     InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([&aPath, &isUrgentEvent](ReadHandler * handler) {
         if (handler->IsType(ReadHandler::InteractionType::Read))

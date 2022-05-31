@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os
 from enum import Enum, auto
+from xml.etree import ElementTree as ET
 
 from .gn import GnBuilder
 
@@ -32,6 +34,15 @@ class TizenApp(Enum):
             return 'chip-lighting-app'
         else:
             raise Exception('Unknown app type: %r' % self)
+
+    def PackageName(self):
+        return self.manifest.get('package')
+
+    def PackageVersion(self):
+        return self.manifest.get('version')
+
+    def parse_manifest(self, manifest: str):
+        self.manifest = ET.parse(manifest).getroot()
 
 
 class TizenBoard(Enum):
@@ -57,12 +68,22 @@ class TizenBuilder(GnBuilder):
                  use_tsan: bool = False,
                  ):
         super(TizenBuilder, self).__init__(
-            root=os.path.join(root, 'examples', app.ExampleName(), 'linux'),
+            root=os.path.join(root, 'examples', app.ExampleName(), 'tizen'),
             runner=runner)
 
         self.app = app
         self.board = board
         self.extra_gn_options = []
+
+        try:
+            # Try to load Tizen application XML manifest. We have to use
+            # try/except here, because of TestBuilder test. This test runs
+            # in a fake build root /TEST/BUILD/ROOT which obviously does
+            # not have Tizen manifest file.
+            self.app.parse_manifest(
+                os.path.join(self.root, "tizen-manifest.xml"))
+        except FileNotFoundError:
+            pass
 
         if not enable_ble:
             self.extra_gn_options.append('chip_config_network_layer_ble=false')
@@ -74,14 +95,23 @@ class TizenBuilder(GnBuilder):
             raise Exception("TSAN sanitizer not supported by Tizen toolchain")
 
     def GnBuildArgs(self):
-        if 'TIZEN_HOME' not in os.environ:
-            raise Exception(
-                "Environment TIZEN_HOME missing, cannot build Tizen target")
+        # Make sure that required ENV variables are defined
+        for env in ('TIZEN_SDK_ROOT', 'TIZEN_SDK_SYSROOT'):
+            if env not in os.environ:
+                raise Exception(
+                    "Environment %s missing, cannot build Tizen target" % env)
+
         return self.extra_gn_options + [
             'target_os="tizen"',
             'target_cpu="%s"' % self.board.TargetCpuName(),
-            'sysroot="%s"' % os.environ['TIZEN_HOME'],
+            'tizen_sdk_root="%s"' % os.environ['TIZEN_SDK_ROOT'],
+            'sysroot="%s"' % os.environ['TIZEN_SDK_SYSROOT'],
         ]
+
+    def _generate_flashbundle(self):
+        logging.info('Packaging %s', self.output_dir)
+        cmd = ['ninja', '-C', self.output_dir, self.app.AppName() + ':tpk']
+        self._Execute(cmd, title='Packaging ' + self.identifier)
 
     def build_outputs(self):
         return {
@@ -89,4 +119,10 @@ class TizenBuilder(GnBuilder):
                 os.path.join(self.output_dir, self.app.AppName()),
             '%s.map' % self.app.AppName():
                 os.path.join(self.output_dir, '%s.map' % self.app.AppName()),
+        }
+
+    def flashbundle(self):
+        tpk = f'{self.app.PackageName()}-{self.app.PackageVersion()}.tpk'
+        return {
+            tpk: os.path.join(self.output_dir, 'package', 'out', tpk),
         }

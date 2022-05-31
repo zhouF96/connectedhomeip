@@ -54,9 +54,9 @@ static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 class TestContext : public chip::Test::AppContext
 {
 public:
-    static int InitializeAsync(void * context)
+    static int Initialize(void * context)
     {
-        if (AppContext::InitializeAsync(context) != SUCCESS)
+        if (AppContext::Initialize(context) != SUCCESS)
             return FAILURE;
 
         auto * ctx = static_cast<TestContext *>(context);
@@ -90,7 +90,7 @@ public:
     }
 
 private:
-    MonotonicallyIncreasingCounter mEventCounter;
+    MonotonicallyIncreasingCounter<EventNumber> mEventCounter;
 };
 
 uint32_t gIterationCount = 0;
@@ -150,11 +150,11 @@ public:
 
     void OnEventData(const app::EventHeader & aEventHeader, TLV::TLVReader * apData, const app::StatusIB * apStatus) override;
 
-    void OnDone() override;
+    void OnDone(app::ReadClient * apReadClient) override;
 
     void OnReportEnd() override { mOnReportEnd = true; }
 
-    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override { mOnSubscriptionEstablished = true; }
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override { mOnSubscriptionEstablished = true; }
 
     uint32_t mAttributeCount        = 0;
     uint32_t mEventCount            = 0;
@@ -222,7 +222,7 @@ void TestReadCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::T
     mEventCount++;
 }
 
-void TestReadCallback::OnDone() {}
+void TestReadCallback::OnDone(app::ReadClient *) {}
 
 class TestAttrAccess : public app::AttributeAccessInterface
 {
@@ -534,7 +534,7 @@ nlTestSuite sSuite =
 {
     "TestEventChunking",
     &sTests[0],
-    TestContext::InitializeAsync,
+    TestContext::Initialize,
     TestContext::Finalize
 };
 // clang-format on

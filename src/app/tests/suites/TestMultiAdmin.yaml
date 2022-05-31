@@ -34,9 +34,15 @@ config:
         defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
 
 tests:
-    - label: "Reboot target device"
+    - label: "Stop target device"
       cluster: "SystemCommands"
-      command: "Reboot"
+      command: "Stop"
+
+    - label:
+          "Start target device with the provided discriminator for basic
+          commissioning advertisement"
+      cluster: "SystemCommands"
+      command: "Start"
       arguments:
           values:
               - name: "discriminator"
@@ -53,7 +59,7 @@ tests:
     - label: "Commission from alpha when the commissioning window is not opened"
       identity: "alpha"
       cluster: "CommissionerCommands"
-      command: "PairWithQRCode"
+      command: "PairWithCode"
       arguments:
           values:
               - name: "nodeId"
@@ -75,7 +81,7 @@ tests:
     - label: "Commission from alpha again"
       identity: "alpha"
       cluster: "CommissionerCommands"
-      command: "PairWithQRCode"
+      command: "PairWithCode"
       arguments:
           values:
               - name: "nodeId"
@@ -112,7 +118,7 @@ tests:
     - label: "Commission from beta"
       identity: "beta"
       cluster: "CommissionerCommands"
-      command: "PairWithQRCode"
+      command: "PairWithCode"
       arguments:
           values:
               - name: "nodeId"
@@ -142,7 +148,7 @@ tests:
     - label: "Commission from gamma"
       identity: "gamma"
       cluster: "CommissionerCommands"
-      command: "PairWithQRCode"
+      command: "PairWithCode"
       arguments:
           values:
               - name: "nodeId"

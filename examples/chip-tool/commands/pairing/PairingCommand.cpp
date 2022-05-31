@@ -45,14 +45,10 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     case PairingMode::None:
         err = Unpair(remoteId);
         break;
-    case PairingMode::QRCode:
+    case PairingMode::Code:
         err = PairWithCode(remoteId);
         break;
-    case PairingMode::ManualCode:
-        err = PairWithCode(remoteId);
-        break;
-    case PairingMode::QRCodePaseOnly:
-    case PairingMode::ManualCodePaseOnly:
+    case PairingMode::CodePaseOnly:
         err = PaseWithCode(remoteId);
         break;
     case PairingMode::Ble:
@@ -160,7 +156,7 @@ void PairingCommand::OnPairingComplete(CHIP_ERROR err)
     if (err == CHIP_NO_ERROR)
     {
         ChipLogProgress(chipTool, "Pairing Success");
-        if (mPairingMode == PairingMode::QRCodePaseOnly || mPairingMode == PairingMode::ManualCodePaseOnly)
+        if (mPairingMode == PairingMode::CodePaseOnly)
         {
             SetCommandExitStatus(err);
         }
@@ -207,19 +203,20 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)
 {
     // Ignore nodes with closed comissioning window
-    VerifyOrReturn(nodeData.commissioningMode != 0);
+    VerifyOrReturn(nodeData.commissionData.commissioningMode != 0);
 
-    const uint16_t port = nodeData.port;
+    const uint16_t port = nodeData.resolutionData.port;
     char buf[chip::Inet::IPAddress::kMaxStringLength];
-    nodeData.ipAddress[0].ToString(buf);
+    nodeData.resolutionData.ipAddress[0].ToString(buf);
     ChipLogProgress(chipTool, "Discovered Device: %s:%u", buf, port);
 
     // Stop Mdns discovery. Is it the right method ?
     CurrentCommissioner().RegisterDeviceDiscoveryDelegate(nullptr);
 
-    Inet::InterfaceId interfaceId = nodeData.ipAddress[0].IsIPv6LinkLocal() ? nodeData.interfaceId : Inet::InterfaceId::Null();
-    PeerAddress peerAddress       = PeerAddress::UDP(nodeData.ipAddress[0], port, interfaceId);
-    CHIP_ERROR err                = Pair(mNodeId, peerAddress);
+    Inet::InterfaceId interfaceId =
+        nodeData.resolutionData.ipAddress[0].IsIPv6LinkLocal() ? nodeData.resolutionData.interfaceId : Inet::InterfaceId::Null();
+    PeerAddress peerAddress = PeerAddress::UDP(nodeData.resolutionData.ipAddress[0], port, interfaceId);
+    CHIP_ERROR err          = Pair(mNodeId, peerAddress);
     if (CHIP_NO_ERROR != err)
     {
         SetCommandExitStatus(err);

@@ -260,6 +260,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
         case Attributes::ClusterRevision::Id: {
             using TypeInfo = Attributes::ClusterRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -356,6 +367,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -487,6 +509,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -694,6 +727,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
         case Attributes::ClusterRevision::Id: {
             using TypeInfo = Attributes::ClusterRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -843,6 +887,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
         case Attributes::ClusterRevision::Id: {
             using TypeInfo = Attributes::ClusterRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -983,6 +1038,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
         case Attributes::ClusterRevision::Id: {
             using TypeInfo = Attributes::ClusterRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -1034,6 +1100,72 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
             value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::BarrierOpenEvents::Id: {
+            using TypeInfo = Attributes::BarrierOpenEvents::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::BarrierCloseEvents::Id: {
+            using TypeInfo = Attributes::BarrierCloseEvents::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::BarrierCommandOpenEvents::Id: {
+            using TypeInfo = Attributes::BarrierCommandOpenEvents::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::BarrierCommandCloseEvents::Id: {
+            using TypeInfo = Attributes::BarrierCommandCloseEvents::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::BarrierOpenPeriod::Id: {
+            using TypeInfo = Attributes::BarrierOpenPeriod::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::BarrierClosePeriod::Id: {
+            using TypeInfo = Attributes::BarrierClosePeriod::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
             return value;
         }
         case Attributes::BarrierPosition::Id: {
@@ -1123,6 +1255,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -1445,6 +1588,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
         case Attributes::ClusterRevision::Id: {
             using TypeInfo = Attributes::ClusterRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -1465,6 +1619,39 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::BinaryInputBasic::Id: {
         using namespace Clusters::BinaryInputBasic;
         switch (aPath.mAttributeId) {
+        case Attributes::ActiveText::Id: {
+            using TypeInfo = Attributes::ActiveText::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSString * _Nonnull value;
+            value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
+            return value;
+        }
+        case Attributes::Description::Id: {
+            using TypeInfo = Attributes::Description::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSString * _Nonnull value;
+            value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
+            return value;
+        }
+        case Attributes::InactiveText::Id: {
+            using TypeInfo = Attributes::InactiveText::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSString * _Nonnull value;
+            value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
+            return value;
+        }
         case Attributes::OutOfService::Id: {
             using TypeInfo = Attributes::OutOfService::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -1474,6 +1661,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
             value = [NSNumber numberWithBool:cppValue];
+            return value;
+        }
+        case Attributes::Polarity::Id: {
+            using TypeInfo = Attributes::Polarity::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
             return value;
         }
         case Attributes::PresentValue::Id: {
@@ -1487,6 +1685,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithBool:cppValue];
             return value;
         }
+        case Attributes::Reliability::Id: {
+            using TypeInfo = Attributes::Reliability::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
         case Attributes::StatusFlags::Id: {
             using TypeInfo = Attributes::StatusFlags::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -1496,6 +1705,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
             value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::ApplicationType::Id: {
+            using TypeInfo = Attributes::ApplicationType::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -1574,6 +1794,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -1721,6 +1952,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
         case Attributes::ClusterRevision::Id: {
             using TypeInfo = Attributes::ClusterRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -1828,6 +2070,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -2018,6 +2271,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -2283,6 +2547,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
         case Attributes::ClusterRevision::Id: {
             using TypeInfo = Attributes::ClusterRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -2501,6 +2776,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
         case Attributes::ClusterRevision::Id: {
             using TypeInfo = Attributes::ClusterRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -2620,8 +2906,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedChar:cppValue];
             return value;
         }
-        case Attributes::ColorControlOptions::Id: {
-            using TypeInfo = Attributes::ColorControlOptions::TypeInfo;
+        case Attributes::Options::Id: {
+            using TypeInfo = Attributes::Options::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -2638,8 +2924,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::Primary1X::Id: {
@@ -2671,8 +2961,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::Primary2X::Id: {
@@ -2704,8 +2998,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::Primary3X::Id: {
@@ -2737,8 +3035,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::Primary4X::Id: {
@@ -2770,8 +3072,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::Primary5X::Id: {
@@ -2803,8 +3109,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::Primary6X::Id: {
@@ -2836,8 +3146,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::WhitePointX::Id: {
@@ -2891,8 +3205,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::ColorPointGX::Id: {
@@ -2924,8 +3242,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::ColorPointBX::Id: {
@@ -2957,8 +3279,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::EnhancedCurrentHue::Id: {
@@ -3049,8 +3375,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedShort:cppValue];
             return value;
         }
-        case Attributes::ColorTempPhysicalMin::Id: {
-            using TypeInfo = Attributes::ColorTempPhysicalMin::TypeInfo;
+        case Attributes::ColorTempPhysicalMinMireds::Id: {
+            using TypeInfo = Attributes::ColorTempPhysicalMinMireds::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -3060,8 +3386,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedShort:cppValue];
             return value;
         }
-        case Attributes::ColorTempPhysicalMax::Id: {
-            using TypeInfo = Attributes::ColorTempPhysicalMax::TypeInfo;
+        case Attributes::ColorTempPhysicalMaxMireds::Id: {
+            using TypeInfo = Attributes::ColorTempPhysicalMaxMireds::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -3169,6 +3495,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -3306,6 +3643,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -3512,6 +3860,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
         case Attributes::ClusterRevision::Id: {
             using TypeInfo = Attributes::ClusterRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -3610,6 +3969,28 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
+        case Attributes::ClusterRevision::Id: {
+            using TypeInfo = Attributes::ClusterRevision::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
             break;
@@ -3669,6 +4050,50 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             } else {
                 value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value())];
             }
+            return value;
+        }
+        case Attributes::DoorOpenEvents::Id: {
+            using TypeInfo = Attributes::DoorOpenEvents::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
+        case Attributes::DoorClosedEvents::Id: {
+            using TypeInfo = Attributes::DoorClosedEvents::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
+        case Attributes::OpenPeriod::Id: {
+            using TypeInfo = Attributes::OpenPeriod::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::NumberOfLogRecordsSupported::Id: {
+            using TypeInfo = Attributes::NumberOfLogRecordsSupported::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
             return value;
         }
         case Attributes::NumberOfTotalUsersSupported::Id: {
@@ -3781,6 +4206,39 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedChar:cppValue];
             return value;
         }
+        case Attributes::CredentialRulesSupport::Id: {
+            using TypeInfo = Attributes::CredentialRulesSupport::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
+            return value;
+        }
+        case Attributes::NumberOfCredentialsSupportedPerUser::Id: {
+            using TypeInfo = Attributes::NumberOfCredentialsSupportedPerUser::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::EnableLogging::Id: {
+            using TypeInfo = Attributes::EnableLogging::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithBool:cppValue];
+            return value;
+        }
         case Attributes::Language::Id: {
             using TypeInfo = Attributes::Language::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -3790,6 +4248,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSString * _Nonnull value;
             value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
+            return value;
+        }
+        case Attributes::LEDSettings::Id: {
+            using TypeInfo = Attributes::LEDSettings::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
             return value;
         }
         case Attributes::AutoRelockTime::Id: {
@@ -3836,8 +4305,41 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
             return value;
         }
+        case Attributes::DefaultConfigurationRegister::Id: {
+            using TypeInfo = Attributes::DefaultConfigurationRegister::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
+            return value;
+        }
+        case Attributes::EnableLocalProgramming::Id: {
+            using TypeInfo = Attributes::EnableLocalProgramming::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithBool:cppValue];
+            return value;
+        }
         case Attributes::EnableOneTouchLocking::Id: {
             using TypeInfo = Attributes::EnableOneTouchLocking::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithBool:cppValue];
+            return value;
+        }
+        case Attributes::EnableInsideStatusLED::Id: {
+            using TypeInfo = Attributes::EnableInsideStatusLED::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -3856,6 +4358,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
             value = [NSNumber numberWithBool:cppValue];
+            return value;
+        }
+        case Attributes::LocalProgrammingFeatures::Id: {
+            using TypeInfo = Attributes::LocalProgrammingFeatures::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
             return value;
         }
         case Attributes::WrongCodeEntryLimit::Id: {
@@ -3880,6 +4393,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedChar:cppValue];
             return value;
         }
+        case Attributes::SendPINOverTheAir::Id: {
+            using TypeInfo = Attributes::SendPINOverTheAir::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithBool:cppValue];
+            return value;
+        }
         case Attributes::RequirePINforRemoteOperation::Id: {
             using TypeInfo = Attributes::RequirePINforRemoteOperation::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -3889,6 +4413,105 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
             value = [NSNumber numberWithBool:cppValue];
+            return value;
+        }
+        case Attributes::ExpiringUserTimeout::Id: {
+            using TypeInfo = Attributes::ExpiringUserTimeout::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::AlarmMask::Id: {
+            using TypeInfo = Attributes::AlarmMask::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
+            return value;
+        }
+        case Attributes::KeypadOperationEventMask::Id: {
+            using TypeInfo = Attributes::KeypadOperationEventMask::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
+            return value;
+        }
+        case Attributes::RemoteOperationEventMask::Id: {
+            using TypeInfo = Attributes::RemoteOperationEventMask::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
+            return value;
+        }
+        case Attributes::ManualOperationEventMask::Id: {
+            using TypeInfo = Attributes::ManualOperationEventMask::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
+            return value;
+        }
+        case Attributes::RFIDOperationEventMask::Id: {
+            using TypeInfo = Attributes::RFIDOperationEventMask::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
+            return value;
+        }
+        case Attributes::KeypadProgrammingEventMask::Id: {
+            using TypeInfo = Attributes::KeypadProgrammingEventMask::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
+            return value;
+        }
+        case Attributes::RemoteProgrammingEventMask::Id: {
+            using TypeInfo = Attributes::RemoteProgrammingEventMask::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
+            return value;
+        }
+        case Attributes::RFIDProgrammingEventMask::Id: {
+            using TypeInfo = Attributes::RFIDProgrammingEventMask::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -3969,6 +4592,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
         case Attributes::ClusterRevision::Id: {
             using TypeInfo = Attributes::ClusterRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -4000,6 +4634,215 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
+        case Attributes::DcVoltage::Id: {
+            using TypeInfo = Attributes::DcVoltage::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::DcVoltageMin::Id: {
+            using TypeInfo = Attributes::DcVoltageMin::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::DcVoltageMax::Id: {
+            using TypeInfo = Attributes::DcVoltageMax::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::DcCurrent::Id: {
+            using TypeInfo = Attributes::DcCurrent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::DcCurrentMin::Id: {
+            using TypeInfo = Attributes::DcCurrentMin::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::DcCurrentMax::Id: {
+            using TypeInfo = Attributes::DcCurrentMax::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::DcPower::Id: {
+            using TypeInfo = Attributes::DcPower::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::DcPowerMin::Id: {
+            using TypeInfo = Attributes::DcPowerMin::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::DcPowerMax::Id: {
+            using TypeInfo = Attributes::DcPowerMax::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::DcVoltageMultiplier::Id: {
+            using TypeInfo = Attributes::DcVoltageMultiplier::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::DcVoltageDivisor::Id: {
+            using TypeInfo = Attributes::DcVoltageDivisor::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::DcCurrentMultiplier::Id: {
+            using TypeInfo = Attributes::DcCurrentMultiplier::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::DcCurrentDivisor::Id: {
+            using TypeInfo = Attributes::DcCurrentDivisor::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::DcPowerMultiplier::Id: {
+            using TypeInfo = Attributes::DcPowerMultiplier::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::DcPowerDivisor::Id: {
+            using TypeInfo = Attributes::DcPowerDivisor::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::AcFrequency::Id: {
+            using TypeInfo = Attributes::AcFrequency::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::AcFrequencyMin::Id: {
+            using TypeInfo = Attributes::AcFrequencyMin::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::AcFrequencyMax::Id: {
+            using TypeInfo = Attributes::AcFrequencyMax::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::NeutralCurrent::Id: {
+            using TypeInfo = Attributes::NeutralCurrent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
         case Attributes::TotalActivePower::Id: {
             using TypeInfo = Attributes::TotalActivePower::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -4009,6 +4852,281 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
             value = [NSNumber numberWithInt:cppValue];
+            return value;
+        }
+        case Attributes::TotalReactivePower::Id: {
+            using TypeInfo = Attributes::TotalReactivePower::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithInt:cppValue];
+            return value;
+        }
+        case Attributes::TotalApparentPower::Id: {
+            using TypeInfo = Attributes::TotalApparentPower::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
+        case Attributes::Measured1stHarmonicCurrent::Id: {
+            using TypeInfo = Attributes::Measured1stHarmonicCurrent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::Measured3rdHarmonicCurrent::Id: {
+            using TypeInfo = Attributes::Measured3rdHarmonicCurrent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::Measured5thHarmonicCurrent::Id: {
+            using TypeInfo = Attributes::Measured5thHarmonicCurrent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::Measured7thHarmonicCurrent::Id: {
+            using TypeInfo = Attributes::Measured7thHarmonicCurrent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::Measured9thHarmonicCurrent::Id: {
+            using TypeInfo = Attributes::Measured9thHarmonicCurrent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::Measured11thHarmonicCurrent::Id: {
+            using TypeInfo = Attributes::Measured11thHarmonicCurrent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::MeasuredPhase1stHarmonicCurrent::Id: {
+            using TypeInfo = Attributes::MeasuredPhase1stHarmonicCurrent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::MeasuredPhase3rdHarmonicCurrent::Id: {
+            using TypeInfo = Attributes::MeasuredPhase3rdHarmonicCurrent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::MeasuredPhase5thHarmonicCurrent::Id: {
+            using TypeInfo = Attributes::MeasuredPhase5thHarmonicCurrent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::MeasuredPhase7thHarmonicCurrent::Id: {
+            using TypeInfo = Attributes::MeasuredPhase7thHarmonicCurrent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::MeasuredPhase9thHarmonicCurrent::Id: {
+            using TypeInfo = Attributes::MeasuredPhase9thHarmonicCurrent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::MeasuredPhase11thHarmonicCurrent::Id: {
+            using TypeInfo = Attributes::MeasuredPhase11thHarmonicCurrent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::AcFrequencyMultiplier::Id: {
+            using TypeInfo = Attributes::AcFrequencyMultiplier::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::AcFrequencyDivisor::Id: {
+            using TypeInfo = Attributes::AcFrequencyDivisor::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::PowerMultiplier::Id: {
+            using TypeInfo = Attributes::PowerMultiplier::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
+        case Attributes::PowerDivisor::Id: {
+            using TypeInfo = Attributes::PowerDivisor::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
+        case Attributes::HarmonicCurrentMultiplier::Id: {
+            using TypeInfo = Attributes::HarmonicCurrentMultiplier::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithChar:cppValue];
+            return value;
+        }
+        case Attributes::PhaseHarmonicCurrentMultiplier::Id: {
+            using TypeInfo = Attributes::PhaseHarmonicCurrentMultiplier::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithChar:cppValue];
+            return value;
+        }
+        case Attributes::InstantaneousVoltage::Id: {
+            using TypeInfo = Attributes::InstantaneousVoltage::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::InstantaneousLineCurrent::Id: {
+            using TypeInfo = Attributes::InstantaneousLineCurrent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::InstantaneousActiveCurrent::Id: {
+            using TypeInfo = Attributes::InstantaneousActiveCurrent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::InstantaneousReactiveCurrent::Id: {
+            using TypeInfo = Attributes::InstantaneousReactiveCurrent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::InstantaneousPower::Id: {
+            using TypeInfo = Attributes::InstantaneousPower::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
             return value;
         }
         case Attributes::RmsVoltage::Id: {
@@ -4110,6 +5228,809 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithShort:cppValue];
             return value;
         }
+        case Attributes::ReactivePower::Id: {
+            using TypeInfo = Attributes::ReactivePower::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::ApparentPower::Id: {
+            using TypeInfo = Attributes::ApparentPower::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::PowerFactor::Id: {
+            using TypeInfo = Attributes::PowerFactor::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithChar:cppValue];
+            return value;
+        }
+        case Attributes::AverageRmsVoltageMeasurementPeriod::Id: {
+            using TypeInfo = Attributes::AverageRmsVoltageMeasurementPeriod::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::AverageRmsUnderVoltageCounter::Id: {
+            using TypeInfo = Attributes::AverageRmsUnderVoltageCounter::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsExtremeOverVoltagePeriod::Id: {
+            using TypeInfo = Attributes::RmsExtremeOverVoltagePeriod::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsExtremeUnderVoltagePeriod::Id: {
+            using TypeInfo = Attributes::RmsExtremeUnderVoltagePeriod::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsVoltageSagPeriod::Id: {
+            using TypeInfo = Attributes::RmsVoltageSagPeriod::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsVoltageSwellPeriod::Id: {
+            using TypeInfo = Attributes::RmsVoltageSwellPeriod::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::AcVoltageMultiplier::Id: {
+            using TypeInfo = Attributes::AcVoltageMultiplier::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::AcVoltageDivisor::Id: {
+            using TypeInfo = Attributes::AcVoltageDivisor::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::AcCurrentMultiplier::Id: {
+            using TypeInfo = Attributes::AcCurrentMultiplier::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::AcCurrentDivisor::Id: {
+            using TypeInfo = Attributes::AcCurrentDivisor::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::AcPowerMultiplier::Id: {
+            using TypeInfo = Attributes::AcPowerMultiplier::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::AcPowerDivisor::Id: {
+            using TypeInfo = Attributes::AcPowerDivisor::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::OverloadAlarmsMask::Id: {
+            using TypeInfo = Attributes::OverloadAlarmsMask::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::VoltageOverload::Id: {
+            using TypeInfo = Attributes::VoltageOverload::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::CurrentOverload::Id: {
+            using TypeInfo = Attributes::CurrentOverload::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::AcOverloadAlarmsMask::Id: {
+            using TypeInfo = Attributes::AcOverloadAlarmsMask::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::AcVoltageOverload::Id: {
+            using TypeInfo = Attributes::AcVoltageOverload::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::AcCurrentOverload::Id: {
+            using TypeInfo = Attributes::AcCurrentOverload::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::AcActivePowerOverload::Id: {
+            using TypeInfo = Attributes::AcActivePowerOverload::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::AcReactivePowerOverload::Id: {
+            using TypeInfo = Attributes::AcReactivePowerOverload::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::AverageRmsOverVoltage::Id: {
+            using TypeInfo = Attributes::AverageRmsOverVoltage::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::AverageRmsUnderVoltage::Id: {
+            using TypeInfo = Attributes::AverageRmsUnderVoltage::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsExtremeOverVoltage::Id: {
+            using TypeInfo = Attributes::RmsExtremeOverVoltage::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsExtremeUnderVoltage::Id: {
+            using TypeInfo = Attributes::RmsExtremeUnderVoltage::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsVoltageSag::Id: {
+            using TypeInfo = Attributes::RmsVoltageSag::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsVoltageSwell::Id: {
+            using TypeInfo = Attributes::RmsVoltageSwell::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::LineCurrentPhaseB::Id: {
+            using TypeInfo = Attributes::LineCurrentPhaseB::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::ActiveCurrentPhaseB::Id: {
+            using TypeInfo = Attributes::ActiveCurrentPhaseB::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::ReactiveCurrentPhaseB::Id: {
+            using TypeInfo = Attributes::ReactiveCurrentPhaseB::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsVoltagePhaseB::Id: {
+            using TypeInfo = Attributes::RmsVoltagePhaseB::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsVoltageMinPhaseB::Id: {
+            using TypeInfo = Attributes::RmsVoltageMinPhaseB::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsVoltageMaxPhaseB::Id: {
+            using TypeInfo = Attributes::RmsVoltageMaxPhaseB::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsCurrentPhaseB::Id: {
+            using TypeInfo = Attributes::RmsCurrentPhaseB::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsCurrentMinPhaseB::Id: {
+            using TypeInfo = Attributes::RmsCurrentMinPhaseB::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsCurrentMaxPhaseB::Id: {
+            using TypeInfo = Attributes::RmsCurrentMaxPhaseB::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::ActivePowerPhaseB::Id: {
+            using TypeInfo = Attributes::ActivePowerPhaseB::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::ActivePowerMinPhaseB::Id: {
+            using TypeInfo = Attributes::ActivePowerMinPhaseB::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::ActivePowerMaxPhaseB::Id: {
+            using TypeInfo = Attributes::ActivePowerMaxPhaseB::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::ReactivePowerPhaseB::Id: {
+            using TypeInfo = Attributes::ReactivePowerPhaseB::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::ApparentPowerPhaseB::Id: {
+            using TypeInfo = Attributes::ApparentPowerPhaseB::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::PowerFactorPhaseB::Id: {
+            using TypeInfo = Attributes::PowerFactorPhaseB::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithChar:cppValue];
+            return value;
+        }
+        case Attributes::AverageRmsVoltageMeasurementPeriodPhaseB::Id: {
+            using TypeInfo = Attributes::AverageRmsVoltageMeasurementPeriodPhaseB::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::AverageRmsOverVoltageCounterPhaseB::Id: {
+            using TypeInfo = Attributes::AverageRmsOverVoltageCounterPhaseB::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::AverageRmsUnderVoltageCounterPhaseB::Id: {
+            using TypeInfo = Attributes::AverageRmsUnderVoltageCounterPhaseB::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsExtremeOverVoltagePeriodPhaseB::Id: {
+            using TypeInfo = Attributes::RmsExtremeOverVoltagePeriodPhaseB::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsExtremeUnderVoltagePeriodPhaseB::Id: {
+            using TypeInfo = Attributes::RmsExtremeUnderVoltagePeriodPhaseB::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsVoltageSagPeriodPhaseB::Id: {
+            using TypeInfo = Attributes::RmsVoltageSagPeriodPhaseB::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsVoltageSwellPeriodPhaseB::Id: {
+            using TypeInfo = Attributes::RmsVoltageSwellPeriodPhaseB::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::LineCurrentPhaseC::Id: {
+            using TypeInfo = Attributes::LineCurrentPhaseC::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::ActiveCurrentPhaseC::Id: {
+            using TypeInfo = Attributes::ActiveCurrentPhaseC::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::ReactiveCurrentPhaseC::Id: {
+            using TypeInfo = Attributes::ReactiveCurrentPhaseC::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsVoltagePhaseC::Id: {
+            using TypeInfo = Attributes::RmsVoltagePhaseC::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsVoltageMinPhaseC::Id: {
+            using TypeInfo = Attributes::RmsVoltageMinPhaseC::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsVoltageMaxPhaseC::Id: {
+            using TypeInfo = Attributes::RmsVoltageMaxPhaseC::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsCurrentPhaseC::Id: {
+            using TypeInfo = Attributes::RmsCurrentPhaseC::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsCurrentMinPhaseC::Id: {
+            using TypeInfo = Attributes::RmsCurrentMinPhaseC::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsCurrentMaxPhaseC::Id: {
+            using TypeInfo = Attributes::RmsCurrentMaxPhaseC::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::ActivePowerPhaseC::Id: {
+            using TypeInfo = Attributes::ActivePowerPhaseC::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::ActivePowerMinPhaseC::Id: {
+            using TypeInfo = Attributes::ActivePowerMinPhaseC::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::ActivePowerMaxPhaseC::Id: {
+            using TypeInfo = Attributes::ActivePowerMaxPhaseC::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::ReactivePowerPhaseC::Id: {
+            using TypeInfo = Attributes::ReactivePowerPhaseC::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::ApparentPowerPhaseC::Id: {
+            using TypeInfo = Attributes::ApparentPowerPhaseC::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::PowerFactorPhaseC::Id: {
+            using TypeInfo = Attributes::PowerFactorPhaseC::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithChar:cppValue];
+            return value;
+        }
+        case Attributes::AverageRmsVoltageMeasurementPeriodPhaseC::Id: {
+            using TypeInfo = Attributes::AverageRmsVoltageMeasurementPeriodPhaseC::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::AverageRmsOverVoltageCounterPhaseC::Id: {
+            using TypeInfo = Attributes::AverageRmsOverVoltageCounterPhaseC::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::AverageRmsUnderVoltageCounterPhaseC::Id: {
+            using TypeInfo = Attributes::AverageRmsUnderVoltageCounterPhaseC::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsExtremeOverVoltagePeriodPhaseC::Id: {
+            using TypeInfo = Attributes::RmsExtremeOverVoltagePeriodPhaseC::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsExtremeUnderVoltagePeriodPhaseC::Id: {
+            using TypeInfo = Attributes::RmsExtremeUnderVoltagePeriodPhaseC::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsVoltageSagPeriodPhaseC::Id: {
+            using TypeInfo = Attributes::RmsVoltageSagPeriodPhaseC::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::RmsVoltageSwellPeriodPhaseC::Id: {
+            using TypeInfo = Attributes::RmsVoltageSwellPeriodPhaseC::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
         case Attributes::GeneratedCommandList::Id: {
             using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -4186,6 +6107,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -4436,7 +6368,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
         case Attributes::FanModeSequence::Id: {
@@ -4447,7 +6379,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
         case Attributes::PercentSetting::Id: {
@@ -4457,8 +6389,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::PercentCurrent::Id: {
@@ -4490,8 +6426,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::SpeedCurrent::Id: {
@@ -4768,6 +6708,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
         case Attributes::ClusterRevision::Id: {
             using TypeInfo = Attributes::ClusterRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -4922,6 +6873,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
         case Attributes::ClusterRevision::Id: {
             using TypeInfo = Attributes::ClusterRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -5074,6 +7036,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -5295,6 +7268,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::TestEventTriggersEnabled::Id: {
+            using TypeInfo = Attributes::TestEventTriggersEnabled::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithBool:cppValue];
+            return value;
+        }
         case Attributes::GeneratedCommandList::Id: {
             using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -5371,6 +7355,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -5573,6 +7568,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
         case Attributes::ClusterRevision::Id: {
             using TypeInfo = Attributes::ClusterRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -5680,6 +7686,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -5800,6 +7817,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -5971,6 +7999,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
         case Attributes::ClusterRevision::Id: {
             using TypeInfo = Attributes::ClusterRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -6067,6 +8106,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -6463,6 +8513,43 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::AttributeList::Id: {
+            using TypeInfo = Attributes::AttributeList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_0;
+            }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
         case Attributes::ClusterRevision::Id: {
             using TypeInfo = Attributes::ClusterRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -6559,6 +8646,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -6702,6 +8800,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -6905,6 +9014,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
         case Attributes::ClusterRevision::Id: {
             using TypeInfo = Attributes::ClusterRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -6970,7 +9090,24 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                                                                   length:entry_0.label.size()
                                                                 encoding:NSUTF8StringEncoding];
                     newElement_0.mode = [NSNumber numberWithUnsignedChar:entry_0.mode];
-                    newElement_0.semanticTag = [NSNumber numberWithUnsignedInt:entry_0.semanticTag];
+                    { // Scope for our temporary variables
+                        auto * array_2 = [NSMutableArray new];
+                        auto iter_2 = entry_0.semanticTags.begin();
+                        while (iter_2.Next()) {
+                            auto & entry_2 = iter_2.GetValue();
+                            CHIPModeSelectClusterSemanticTag * newElement_2;
+                            newElement_2 = [CHIPModeSelectClusterSemanticTag new];
+                            newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:entry_2.mfgCode];
+                            newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
+                            [array_2 addObject:newElement_2];
+                        }
+                        CHIP_ERROR err = iter_2.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        newElement_0.semanticTags = array_2;
+                    }
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -7301,6 +9438,32 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::AttributeList::Id: {
+            using TypeInfo = Attributes::AttributeList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_0;
+            }
+            return value;
+        }
         case Attributes::FeatureMap::Id: {
             using TypeInfo = Attributes::FeatureMap::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -7332,6 +9495,58 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::OtaSoftwareUpdateProvider::Id: {
         using namespace Clusters::OtaSoftwareUpdateProvider;
         switch (aPath.mAttributeId) {
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_0;
+            }
+            return value;
+        }
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_0;
+            }
+            return value;
+        }
         case Attributes::AttributeList::Id: {
             using TypeInfo = Attributes::AttributeList::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -7356,6 +9571,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -7444,6 +9670,58 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_0;
+            }
+            return value;
+        }
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_0;
+            }
+            return value;
+        }
         case Attributes::AttributeList::Id: {
             using TypeInfo = Attributes::AttributeList::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -7468,6 +9746,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -7514,6 +9803,105 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
         }
         case Attributes::OccupancySensorTypeBitmap::Id: {
             using TypeInfo = Attributes::OccupancySensorTypeBitmap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::PirOccupiedToUnoccupiedDelay::Id: {
+            using TypeInfo = Attributes::PirOccupiedToUnoccupiedDelay::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::PirUnoccupiedToOccupiedDelay::Id: {
+            using TypeInfo = Attributes::PirUnoccupiedToOccupiedDelay::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::PirUnoccupiedToOccupiedThreshold::Id: {
+            using TypeInfo = Attributes::PirUnoccupiedToOccupiedThreshold::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id: {
+            using TypeInfo = Attributes::UltrasonicOccupiedToUnoccupiedDelay::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::UltrasonicUnoccupiedToOccupiedDelay::Id: {
+            using TypeInfo = Attributes::UltrasonicUnoccupiedToOccupiedDelay::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::UltrasonicUnoccupiedToOccupiedThreshold::Id: {
+            using TypeInfo = Attributes::UltrasonicUnoccupiedToOccupiedThreshold::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id: {
+            using TypeInfo = Attributes::PhysicalContactOccupiedToUnoccupiedDelay::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::PhysicalContactUnoccupiedToOccupiedDelay::Id: {
+            using TypeInfo = Attributes::PhysicalContactUnoccupiedToOccupiedDelay::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::Id: {
+            using TypeInfo = Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -7599,6 +9987,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -7889,6 +10288,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
         case Attributes::ClusterRevision::Id: {
             using TypeInfo = Attributes::ClusterRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -7959,7 +10369,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                     newElement_0 = [CHIPOperationalCredentialsClusterFabricDescriptor new];
                     newElement_0.rootPublicKey = [NSData dataWithBytes:entry_0.rootPublicKey.data()
                                                                 length:entry_0.rootPublicKey.size()];
-                    newElement_0.vendorId = [NSNumber numberWithUnsignedShort:entry_0.vendorId];
+                    newElement_0.vendorId = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0.vendorId)];
                     newElement_0.fabricId = [NSNumber numberWithUnsignedLongLong:entry_0.fabricId];
                     newElement_0.nodeId = [NSNumber numberWithUnsignedLongLong:entry_0.nodeId];
                     newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
@@ -8114,6 +10524,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
         case Attributes::ClusterRevision::Id: {
             using TypeInfo = Attributes::ClusterRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -8167,6 +10588,109 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
             return value;
         }
+        case Attributes::WiredAssessedInputVoltage::Id: {
+            using TypeInfo = Attributes::WiredAssessedInputVoltage::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
+        case Attributes::WiredAssessedInputFrequency::Id: {
+            using TypeInfo = Attributes::WiredAssessedInputFrequency::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::WiredCurrentType::Id: {
+            using TypeInfo = Attributes::WiredCurrentType::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::WiredAssessedCurrent::Id: {
+            using TypeInfo = Attributes::WiredAssessedCurrent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
+        case Attributes::WiredNominalVoltage::Id: {
+            using TypeInfo = Attributes::WiredNominalVoltage::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
+        case Attributes::WiredMaximumCurrent::Id: {
+            using TypeInfo = Attributes::WiredMaximumCurrent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
+        case Attributes::WiredPresent::Id: {
+            using TypeInfo = Attributes::WiredPresent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithBool:cppValue];
+            return value;
+        }
+        case Attributes::ActiveWiredFaults::Id: {
+            using TypeInfo = Attributes::ActiveWiredFaults::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_0;
+            }
+            return value;
+        }
         case Attributes::BatteryVoltage::Id: {
             using TypeInfo = Attributes::BatteryVoltage::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -8211,6 +10735,39 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedChar:cppValue];
             return value;
         }
+        case Attributes::BatteryReplacementNeeded::Id: {
+            using TypeInfo = Attributes::BatteryReplacementNeeded::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithBool:cppValue];
+            return value;
+        }
+        case Attributes::BatteryReplaceability::Id: {
+            using TypeInfo = Attributes::BatteryReplaceability::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::BatteryPresent::Id: {
+            using TypeInfo = Attributes::BatteryPresent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithBool:cppValue];
+            return value;
+        }
         case Attributes::ActiveBatteryFaults::Id: {
             using TypeInfo = Attributes::ActiveBatteryFaults::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -8237,6 +10794,83 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::BatteryReplacementDescription::Id: {
+            using TypeInfo = Attributes::BatteryReplacementDescription::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSString * _Nonnull value;
+            value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
+            return value;
+        }
+        case Attributes::BatteryCommonDesignation::Id: {
+            using TypeInfo = Attributes::BatteryCommonDesignation::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
+        case Attributes::BatteryANSIDesignation::Id: {
+            using TypeInfo = Attributes::BatteryANSIDesignation::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSString * _Nonnull value;
+            value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
+            return value;
+        }
+        case Attributes::BatteryIECDesignation::Id: {
+            using TypeInfo = Attributes::BatteryIECDesignation::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSString * _Nonnull value;
+            value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
+            return value;
+        }
+        case Attributes::BatteryApprovedChemistry::Id: {
+            using TypeInfo = Attributes::BatteryApprovedChemistry::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
+        case Attributes::BatteryCapacity::Id: {
+            using TypeInfo = Attributes::BatteryCapacity::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
+        case Attributes::BatteryQuantity::Id: {
+            using TypeInfo = Attributes::BatteryQuantity::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
         case Attributes::BatteryChargeState::Id: {
             using TypeInfo = Attributes::BatteryChargeState::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -8246,6 +10880,65 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
             value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::BatteryTimeToFullCharge::Id: {
+            using TypeInfo = Attributes::BatteryTimeToFullCharge::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
+        case Attributes::BatteryFunctionalWhileCharging::Id: {
+            using TypeInfo = Attributes::BatteryFunctionalWhileCharging::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithBool:cppValue];
+            return value;
+        }
+        case Attributes::BatteryChargingCurrent::Id: {
+            using TypeInfo = Attributes::BatteryChargingCurrent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
+        case Attributes::ActiveBatteryChargeFaults::Id: {
+            using TypeInfo = Attributes::ActiveBatteryChargeFaults::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_0;
+            }
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -8461,6 +11154,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
         case Attributes::ClusterRevision::Id: {
             using TypeInfo = Attributes::ClusterRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -8526,6 +11230,136 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::Tolerance::Id: {
+            using TypeInfo = Attributes::Tolerance::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::ScaledValue::Id: {
+            using TypeInfo = Attributes::ScaledValue::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithShort:cppValue.Value()];
+            }
+            return value;
+        }
+        case Attributes::MinScaledValue::Id: {
+            using TypeInfo = Attributes::MinScaledValue::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithShort:cppValue.Value()];
+            }
+            return value;
+        }
+        case Attributes::MaxScaledValue::Id: {
+            using TypeInfo = Attributes::MaxScaledValue::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithShort:cppValue.Value()];
+            }
+            return value;
+        }
+        case Attributes::ScaledTolerance::Id: {
+            using TypeInfo = Attributes::ScaledTolerance::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::Scale::Id: {
+            using TypeInfo = Attributes::Scale::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithChar:cppValue];
+            return value;
+        }
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_0;
+            }
+            return value;
+        }
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_0;
+            }
+            return value;
+        }
         case Attributes::AttributeList::Id: {
             using TypeInfo = Attributes::AttributeList::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -8550,6 +11384,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -8775,7 +11620,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
+            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
             return value;
         }
         case Attributes::EffectiveOperationMode::Id: {
@@ -8897,17 +11742,6 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
-        case Attributes::AlarmMask::Id: {
-            using TypeInfo = Attributes::AlarmMask::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
-            return value;
-        }
         case Attributes::GeneratedCommandList::Id: {
             using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -9024,8 +11858,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::MinMeasuredValue::Id: {
@@ -9035,8 +11873,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::MaxMeasuredValue::Id: {
@@ -9046,8 +11888,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::Tolerance::Id: {
@@ -9139,6 +11985,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
         case Attributes::ClusterRevision::Id: {
             using TypeInfo = Attributes::ClusterRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -9212,6 +12069,21 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
             value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::LastConfiguredBy::Id: {
+            using TypeInfo = Attributes::LastConfiguredBy::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedLongLong:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -9290,6 +12162,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -9748,6 +12631,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
         case Attributes::ClusterRevision::Id: {
             using TypeInfo = Attributes::ClusterRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -9824,6 +12718,58 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedShort:cppValue];
             return value;
         }
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_0;
+            }
+            return value;
+        }
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_0;
+            }
+            return value;
+        }
         case Attributes::AttributeList::Id: {
             using TypeInfo = Attributes::AttributeList::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -9848,6 +12794,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -11313,6 +14270,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
         case Attributes::ClusterRevision::Id: {
             using TypeInfo = Attributes::ClusterRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -11340,8 +14308,38 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithShort:cppValue.Value()];
+            }
+            return value;
+        }
+        case Attributes::OutdoorTemperature::Id: {
+            using TypeInfo = Attributes::OutdoorTemperature::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithShort:cppValue.Value()];
+            }
+            return value;
+        }
+        case Attributes::Occupancy::Id: {
+            using TypeInfo = Attributes::Occupancy::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithShort:cppValue];
+            value = [NSNumber numberWithUnsignedChar:cppValue];
             return value;
         }
         case Attributes::AbsMinHeatSetpointLimit::Id: {
@@ -11388,6 +14386,50 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithShort:cppValue];
             return value;
         }
+        case Attributes::PICoolingDemand::Id: {
+            using TypeInfo = Attributes::PICoolingDemand::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::PIHeatingDemand::Id: {
+            using TypeInfo = Attributes::PIHeatingDemand::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::HVACSystemTypeConfiguration::Id: {
+            using TypeInfo = Attributes::HVACSystemTypeConfiguration::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::LocalTemperatureCalibration::Id: {
+            using TypeInfo = Attributes::LocalTemperatureCalibration::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithChar:cppValue];
+            return value;
+        }
         case Attributes::OccupiedCoolingSetpoint::Id: {
             using TypeInfo = Attributes::OccupiedCoolingSetpoint::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -11401,6 +14443,28 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
         }
         case Attributes::OccupiedHeatingSetpoint::Id: {
             using TypeInfo = Attributes::OccupiedHeatingSetpoint::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::UnoccupiedCoolingSetpoint::Id: {
+            using TypeInfo = Attributes::UnoccupiedCoolingSetpoint::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithShort:cppValue];
+            return value;
+        }
+        case Attributes::UnoccupiedHeatingSetpoint::Id: {
+            using TypeInfo = Attributes::UnoccupiedHeatingSetpoint::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -11465,6 +14529,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithChar:cppValue];
             return value;
         }
+        case Attributes::RemoteSensing::Id: {
+            using TypeInfo = Attributes::RemoteSensing::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
         case Attributes::ControlSequenceOfOperation::Id: {
             using TypeInfo = Attributes::ControlSequenceOfOperation::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -11478,6 +14553,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
         }
         case Attributes::SystemMode::Id: {
             using TypeInfo = Attributes::SystemMode::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::ThermostatRunningMode::Id: {
+            using TypeInfo = Attributes::ThermostatRunningMode::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -11518,6 +14604,336 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
             value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::TemperatureSetpointHold::Id: {
+            using TypeInfo = Attributes::TemperatureSetpointHold::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::TemperatureSetpointHoldDuration::Id: {
+            using TypeInfo = Attributes::TemperatureSetpointHoldDuration::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
+            }
+            return value;
+        }
+        case Attributes::ThermostatProgrammingOperationMode::Id: {
+            using TypeInfo = Attributes::ThermostatProgrammingOperationMode::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::ThermostatRunningState::Id: {
+            using TypeInfo = Attributes::ThermostatRunningState::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::SetpointChangeSource::Id: {
+            using TypeInfo = Attributes::SetpointChangeSource::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::SetpointChangeAmount::Id: {
+            using TypeInfo = Attributes::SetpointChangeAmount::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithShort:cppValue.Value()];
+            }
+            return value;
+        }
+        case Attributes::SetpointChangeSourceTimestamp::Id: {
+            using TypeInfo = Attributes::SetpointChangeSourceTimestamp::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
+        case Attributes::OccupiedSetback::Id: {
+            using TypeInfo = Attributes::OccupiedSetback::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
+            return value;
+        }
+        case Attributes::OccupiedSetbackMin::Id: {
+            using TypeInfo = Attributes::OccupiedSetbackMin::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
+            return value;
+        }
+        case Attributes::OccupiedSetbackMax::Id: {
+            using TypeInfo = Attributes::OccupiedSetbackMax::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
+            return value;
+        }
+        case Attributes::UnoccupiedSetback::Id: {
+            using TypeInfo = Attributes::UnoccupiedSetback::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
+            return value;
+        }
+        case Attributes::UnoccupiedSetbackMin::Id: {
+            using TypeInfo = Attributes::UnoccupiedSetbackMin::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
+            return value;
+        }
+        case Attributes::UnoccupiedSetbackMax::Id: {
+            using TypeInfo = Attributes::UnoccupiedSetbackMax::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
+            return value;
+        }
+        case Attributes::EmergencyHeatDelta::Id: {
+            using TypeInfo = Attributes::EmergencyHeatDelta::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::ACType::Id: {
+            using TypeInfo = Attributes::ACType::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::ACCapacity::Id: {
+            using TypeInfo = Attributes::ACCapacity::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::ACRefrigerantType::Id: {
+            using TypeInfo = Attributes::ACRefrigerantType::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::ACCompressorType::Id: {
+            using TypeInfo = Attributes::ACCompressorType::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::ACErrorCode::Id: {
+            using TypeInfo = Attributes::ACErrorCode::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
+        case Attributes::ACLouverPosition::Id: {
+            using TypeInfo = Attributes::ACLouverPosition::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::ACCoilTemperature::Id: {
+            using TypeInfo = Attributes::ACCoilTemperature::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithShort:cppValue.Value()];
+            }
+            return value;
+        }
+        case Attributes::ACCapacityformat::Id: {
+            using TypeInfo = Attributes::ACCapacityformat::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_0;
+            }
+            return value;
+        }
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_0;
+            }
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -11688,6 +15104,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
         case Attributes::ClusterRevision::Id: {
             using TypeInfo = Attributes::ClusterRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -11715,8 +15142,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::RoutingRole::Id: {
@@ -11726,8 +15157,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::NetworkName::Id: {
@@ -11737,8 +15172,14 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSString * _Nonnull value;
-            value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
+            NSString * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [[NSString alloc] initWithBytes:cppValue.Value().data()
+                                                 length:cppValue.Value().size()
+                                               encoding:NSUTF8StringEncoding];
+            }
             return value;
         }
         case Attributes::PanId::Id: {
@@ -11748,8 +15189,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::ExtendedPanId::Id: {
@@ -11759,8 +15204,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedLongLong:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedLongLong:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::MeshLocalPrefix::Id: {
@@ -11770,8 +15219,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSData * _Nonnull value;
-            value = [NSData dataWithBytes:cppValue.data() length:cppValue.size()];
+            NSData * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSData dataWithBytes:cppValue.Value().data() length:cppValue.Value().size()];
+            }
             return value;
         }
         case Attributes::OverrunCount::Id: {
@@ -11806,8 +15259,16 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                     newElement_0.linkFrameCounter = [NSNumber numberWithUnsignedInt:entry_0.linkFrameCounter];
                     newElement_0.mleFrameCounter = [NSNumber numberWithUnsignedInt:entry_0.mleFrameCounter];
                     newElement_0.lqi = [NSNumber numberWithUnsignedChar:entry_0.lqi];
-                    newElement_0.averageRssi = [NSNumber numberWithChar:entry_0.averageRssi];
-                    newElement_0.lastRssi = [NSNumber numberWithChar:entry_0.lastRssi];
+                    if (entry_0.averageRssi.IsNull()) {
+                        newElement_0.averageRssi = nil;
+                    } else {
+                        newElement_0.averageRssi = [NSNumber numberWithChar:entry_0.averageRssi.Value()];
+                    }
+                    if (entry_0.lastRssi.IsNull()) {
+                        newElement_0.lastRssi = nil;
+                    } else {
+                        newElement_0.lastRssi = [NSNumber numberWithChar:entry_0.lastRssi.Value()];
+                    }
                     newElement_0.frameErrorRate = [NSNumber numberWithUnsignedChar:entry_0.frameErrorRate];
                     newElement_0.messageErrorRate = [NSNumber numberWithUnsignedChar:entry_0.messageErrorRate];
                     newElement_0.rxOnWhenIdle = [NSNumber numberWithBool:entry_0.rxOnWhenIdle];
@@ -11868,8 +15329,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::Weighting::Id: {
@@ -11879,8 +15344,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::DataVersion::Id: {
@@ -11890,8 +15359,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::StableDataVersion::Id: {
@@ -11901,8 +15374,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::LeaderRouterId::Id: {
@@ -11912,8 +15389,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::DetachedRoleCount::Id: {
@@ -12385,8 +15866,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedLongLong:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedLongLong:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::PendingTimestamp::Id: {
@@ -12396,8 +15881,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedLongLong:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedLongLong:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::Delay::Id: {
@@ -12407,8 +15896,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::SecurityPolicy::Id: {
@@ -12418,24 +15911,28 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSArray * _Nonnull value;
-            { // Scope for our temporary variables
-                auto * array_0 = [NSMutableArray new];
-                auto iter_0 = cppValue.begin();
-                while (iter_0.Next()) {
-                    auto & entry_0 = iter_0.GetValue();
-                    CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * newElement_0;
-                    newElement_0 = [CHIPThreadNetworkDiagnosticsClusterSecurityPolicy new];
-                    newElement_0.rotationTime = [NSNumber numberWithUnsignedShort:entry_0.rotationTime];
-                    newElement_0.flags = [NSNumber numberWithUnsignedShort:entry_0.flags];
-                    [array_0 addObject:newElement_0];
+            NSArray * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                { // Scope for our temporary variables
+                    auto * array_1 = [NSMutableArray new];
+                    auto iter_1 = cppValue.Value().begin();
+                    while (iter_1.Next()) {
+                        auto & entry_1 = iter_1.GetValue();
+                        CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * newElement_1;
+                        newElement_1 = [CHIPThreadNetworkDiagnosticsClusterSecurityPolicy new];
+                        newElement_1.rotationTime = [NSNumber numberWithUnsignedShort:entry_1.rotationTime];
+                        newElement_1.flags = [NSNumber numberWithUnsignedShort:entry_1.flags];
+                        [array_1 addObject:newElement_1];
+                    }
+                    CHIP_ERROR err = iter_1.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    value = array_1;
                 }
-                CHIP_ERROR err = iter_0.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    *aError = err;
-                    return nil;
-                }
-                value = array_0;
             }
             return value;
         }
@@ -12446,8 +15943,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSData * _Nonnull value;
-            value = [NSData dataWithBytes:cppValue.data() length:cppValue.size()];
+            NSData * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSData dataWithBytes:cppValue.Value().data() length:cppValue.Value().size()];
+            }
             return value;
         }
         case Attributes::OperationalDatasetComponents::Id: {
@@ -12457,34 +15958,38 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSArray * _Nonnull value;
-            { // Scope for our temporary variables
-                auto * array_0 = [NSMutableArray new];
-                auto iter_0 = cppValue.begin();
-                while (iter_0.Next()) {
-                    auto & entry_0 = iter_0.GetValue();
-                    CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents * newElement_0;
-                    newElement_0 = [CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents new];
-                    newElement_0.activeTimestampPresent = [NSNumber numberWithBool:entry_0.activeTimestampPresent];
-                    newElement_0.pendingTimestampPresent = [NSNumber numberWithBool:entry_0.pendingTimestampPresent];
-                    newElement_0.masterKeyPresent = [NSNumber numberWithBool:entry_0.masterKeyPresent];
-                    newElement_0.networkNamePresent = [NSNumber numberWithBool:entry_0.networkNamePresent];
-                    newElement_0.extendedPanIdPresent = [NSNumber numberWithBool:entry_0.extendedPanIdPresent];
-                    newElement_0.meshLocalPrefixPresent = [NSNumber numberWithBool:entry_0.meshLocalPrefixPresent];
-                    newElement_0.delayPresent = [NSNumber numberWithBool:entry_0.delayPresent];
-                    newElement_0.panIdPresent = [NSNumber numberWithBool:entry_0.panIdPresent];
-                    newElement_0.channelPresent = [NSNumber numberWithBool:entry_0.channelPresent];
-                    newElement_0.pskcPresent = [NSNumber numberWithBool:entry_0.pskcPresent];
-                    newElement_0.securityPolicyPresent = [NSNumber numberWithBool:entry_0.securityPolicyPresent];
-                    newElement_0.channelMaskPresent = [NSNumber numberWithBool:entry_0.channelMaskPresent];
-                    [array_0 addObject:newElement_0];
+            NSArray * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                { // Scope for our temporary variables
+                    auto * array_1 = [NSMutableArray new];
+                    auto iter_1 = cppValue.Value().begin();
+                    while (iter_1.Next()) {
+                        auto & entry_1 = iter_1.GetValue();
+                        CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents * newElement_1;
+                        newElement_1 = [CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents new];
+                        newElement_1.activeTimestampPresent = [NSNumber numberWithBool:entry_1.activeTimestampPresent];
+                        newElement_1.pendingTimestampPresent = [NSNumber numberWithBool:entry_1.pendingTimestampPresent];
+                        newElement_1.masterKeyPresent = [NSNumber numberWithBool:entry_1.masterKeyPresent];
+                        newElement_1.networkNamePresent = [NSNumber numberWithBool:entry_1.networkNamePresent];
+                        newElement_1.extendedPanIdPresent = [NSNumber numberWithBool:entry_1.extendedPanIdPresent];
+                        newElement_1.meshLocalPrefixPresent = [NSNumber numberWithBool:entry_1.meshLocalPrefixPresent];
+                        newElement_1.delayPresent = [NSNumber numberWithBool:entry_1.delayPresent];
+                        newElement_1.panIdPresent = [NSNumber numberWithBool:entry_1.panIdPresent];
+                        newElement_1.channelPresent = [NSNumber numberWithBool:entry_1.channelPresent];
+                        newElement_1.pskcPresent = [NSNumber numberWithBool:entry_1.pskcPresent];
+                        newElement_1.securityPolicyPresent = [NSNumber numberWithBool:entry_1.securityPolicyPresent];
+                        newElement_1.channelMaskPresent = [NSNumber numberWithBool:entry_1.channelMaskPresent];
+                        [array_1 addObject:newElement_1];
+                    }
+                    CHIP_ERROR err = iter_1.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    value = array_1;
                 }
-                CHIP_ERROR err = iter_0.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    *aError = err;
-                    return nil;
-                }
-                value = array_0;
             }
             return value;
         }
@@ -12723,6 +16228,43 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::AttributeList::Id: {
+            using TypeInfo = Attributes::AttributeList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_0;
+            }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
         case Attributes::ClusterRevision::Id: {
             using TypeInfo = Attributes::ClusterRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -12752,6 +16294,58 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
             value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+            return value;
+        }
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_0;
+            }
+            return value;
+        }
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_0;
+            }
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -12895,6 +16489,43 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
+        case Attributes::AttributeList::Id: {
+            using TypeInfo = Attributes::AttributeList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_0;
+            }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+            return value;
+        }
         case Attributes::ClusterRevision::Id: {
             using TypeInfo = Attributes::ClusterRevision::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -13002,6 +16633,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -13307,6 +16949,28 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
+        case Attributes::PhysicalClosedLimitLift::Id: {
+            using TypeInfo = Attributes::PhysicalClosedLimitLift::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::PhysicalClosedLimitTilt::Id: {
+            using TypeInfo = Attributes::PhysicalClosedLimitTilt::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
         case Attributes::CurrentPositionLift::Id: {
             using TypeInfo = Attributes::CurrentPositionLift::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -13335,6 +16999,28 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             } else {
                 value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
             }
+            return value;
+        }
+        case Attributes::NumberOfActuationsLift::Id: {
+            using TypeInfo = Attributes::NumberOfActuationsLift::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::NumberOfActuationsTilt::Id: {
+            using TypeInfo = Attributes::NumberOfActuationsTilt::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
             return value;
         }
         case Attributes::ConfigStatus::Id: {

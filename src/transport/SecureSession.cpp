@@ -16,13 +16,37 @@
 
 #include <access/AuthMode.h>
 #include <transport/SecureSession.h>
+#include <transport/SecureSessionTable.h>
 
 namespace chip {
 namespace Transport {
 
-ScopedNodeId SecureSession::GetPeer() const
+void SecureSessionDeleter::Release(SecureSession * entry)
 {
-    return ScopedNodeId(mPeerNodeId, GetFabricIndex());
+    entry->mTable.ReleaseSession(entry);
+}
+
+void SecureSession::MarkForRemoval()
+{
+    ChipLogDetail(Inet, "SecureSession MarkForRemoval %p Type:%d LSID:%d", this, to_underlying(mSecureSessionType),
+                  mLocalSessionId);
+    ReferenceCountedHandle<Transport::Session> ref(*this);
+    switch (mState)
+    {
+    case State::kPairing:
+        mState = State::kPendingRemoval;
+        // Interrupt the pairing
+        NotifySessionReleased();
+        return;
+    case State::kActive:
+        Release(); // Decrease the ref which is retained at Activate
+        mState = State::kPendingRemoval;
+        NotifySessionReleased();
+        return;
+    case State::kPendingRemoval:
+        // Do nothing
+        return;
+    }
 }
 
 Access::SubjectDescriptor SecureSession::GetSubjectDescriptor() const
@@ -37,9 +61,14 @@ Access::SubjectDescriptor SecureSession::GetSubjectDescriptor() const
     }
     else if (IsPAKEKeyId(mPeerNodeId))
     {
-        subjectDescriptor.authMode    = Access::AuthMode::kPase;
-        subjectDescriptor.subject     = mPeerNodeId;
-        subjectDescriptor.fabricIndex = GetFabricIndex();
+        // Responder (aka commissionee) gets subject descriptor filled in.
+        // Initiator (aka commissioner) leaves subject descriptor unfilled.
+        if (GetCryptoContext().IsResponder())
+        {
+            subjectDescriptor.authMode    = Access::AuthMode::kPase;
+            subjectDescriptor.subject     = mPeerNodeId;
+            subjectDescriptor.fabricIndex = GetFabricIndex();
+        }
     }
     else
     {

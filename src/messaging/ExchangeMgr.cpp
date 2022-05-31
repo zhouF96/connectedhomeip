@@ -111,6 +111,8 @@ CHIP_ERROR ExchangeManager::Shutdown()
 
 ExchangeContext * ExchangeManager::NewContext(const SessionHandle & session, ExchangeDelegate * delegate)
 {
+    // Disallow creating exchange on an inactive session
+    VerifyOrReturnError(session->IsActiveSession(), nullptr);
     return mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
 }
 
@@ -182,8 +184,8 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgT
 }
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                        const SessionHandle & session, const Transport::PeerAddress & source,
-                                        DuplicateMessage isDuplicate, System::PacketBufferHandle && msgBuf)
+                                        const SessionHandle & session, DuplicateMessage isDuplicate,
+                                        System::PacketBufferHandle && msgBuf)
 {
     UnsolicitedMessageHandlerSlot * matchingUMH = nullptr;
 
@@ -208,18 +210,11 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         mContextPool.ForEachActiveObject([&](auto * ec) {
             if (ec->MatchExchange(session, packetHeader, payloadHeader))
             {
-                // Found a matching exchange. Set flag for correct subsequent MRP
-                // retransmission timeout selection.
-                if (!ec->HasRcvdMsgFromPeer())
-                {
-                    ec->SetMsgRcvdFromPeer(true);
-                }
-
                 ChipLogDetail(ExchangeManager, "Found matching exchange: " ChipLogFormatExchange ", Delegate: %p",
                               ChipLogValueExchange(ec), ec->GetDelegate());
 
                 // Matched ExchangeContext; send to message handler.
-                ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, source, msgFlags, std::move(msgBuf));
+                ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, msgFlags, std::move(msgBuf));
                 found = true;
                 return Loop::Break;
             }
@@ -237,10 +232,11 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
                         packetHeader.GetDestinationGroupId().Value());
     }
 
+    // Do not handle unsolicited messages on a inactive session.
     // If it's not a duplicate message, search for an unsolicited message handler if it is marked as being sent by an initiator.
     // Since we didn't find an existing exchange that matches the message, it must be an unsolicited message. However all
     // unsolicited messages must be marked as being from an initiator.
-    if (!msgFlags.Has(MessageFlagValues::kDuplicateMessage) && payloadHeader.IsInitiator())
+    if (session->IsActiveSession() && !msgFlags.Has(MessageFlagValues::kDuplicateMessage) && payloadHeader.IsInitiator())
     {
         // Search for an unsolicited message handler that can handle the message. Prefer handlers that can explicitly
         // handle the message type over handlers that handle all messages for a profile.
@@ -317,7 +313,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             return;
         }
 
-        CHIP_ERROR err = ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, source, msgFlags, std::move(msgBuf));
+        CHIP_ERROR err = ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, msgFlags, std::move(msgBuf));
         if (err != CHIP_NO_ERROR)
         {
             // Using same error message for all errors to reduce code size.

@@ -34,6 +34,7 @@
 #include <nlunit-test.h>
 
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 
 using namespace chip;
 using namespace chip::Logging;
@@ -73,7 +74,7 @@ static void TestConfigurationMgr_SerialNumber(nlTestSuite * inSuite, void * inCo
     err = ConfigurationMgr().StoreSerialNumber(serialNumber, strlen(serialNumber));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = ConfigurationMgr().GetSerialNumber(buf, 64);
+    err = GetDeviceInstanceInfoProvider()->GetSerialNumber(buf, 64);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, strlen(buf) == 12);
@@ -82,7 +83,7 @@ static void TestConfigurationMgr_SerialNumber(nlTestSuite * inSuite, void * inCo
     err = ConfigurationMgr().StoreSerialNumber(serialNumber, 5);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = ConfigurationMgr().GetSerialNumber(buf, 64);
+    err = GetDeviceInstanceInfoProvider()->GetSerialNumber(buf, 64);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, strlen(buf) == 5);
@@ -127,7 +128,7 @@ static void TestConfigurationMgr_ManufacturingDate(nlTestSuite * inSuite, void *
     err = ConfigurationMgr().StoreManufacturingDate(mfgDate, strlen(mfgDate));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = ConfigurationMgr().GetManufacturingDate(year, month, dayOfMonth);
+    err = GetDeviceInstanceInfoProvider()->GetManufacturingDate(year, month, dayOfMonth);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, year == 2008);
@@ -143,7 +144,7 @@ static void TestConfigurationMgr_HardwareVersion(nlTestSuite * inSuite, void * i
     err = ConfigurationMgr().StoreHardwareVersion(1234);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = ConfigurationMgr().GetHardwareVersion(hardwareVer);
+    err = GetDeviceInstanceInfoProvider()->GetHardwareVersion(hardwareVer);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, hardwareVer == 1234);
@@ -165,20 +166,6 @@ static void TestConfigurationMgr_CountryCode(nlTestSuite * inSuite, void * inCon
 
     NL_TEST_ASSERT(inSuite, countryCodeLen == strlen(countryCode));
     NL_TEST_ASSERT(inSuite, strcmp(buf, countryCode) == 0);
-}
-
-static void TestConfigurationMgr_Breadcrumb(nlTestSuite * inSuite, void * inContext)
-{
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    uint64_t breadcrumb = 0;
-
-    err = ConfigurationMgr().StoreBreadcrumb(12345);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = ConfigurationMgr().GetBreadcrumb(breadcrumb);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, breadcrumb == 12345);
 }
 
 static void TestConfigurationMgr_GetPrimaryMACAddress(nlTestSuite * inSuite, void * inContext)
@@ -237,7 +224,6 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ConfigurationMgr::ManufacturingDate", TestConfigurationMgr_ManufacturingDate),
     NL_TEST_DEF("Test ConfigurationMgr::HardwareVersion", TestConfigurationMgr_HardwareVersion),
     NL_TEST_DEF("Test ConfigurationMgr::CountryCode", TestConfigurationMgr_CountryCode),
-    NL_TEST_DEF("Test ConfigurationMgr::Breadcrumb", TestConfigurationMgr_Breadcrumb),
     NL_TEST_DEF("Test ConfigurationMgr::GetPrimaryMACAddress", TestConfigurationMgr_GetPrimaryMACAddress),
     NL_TEST_DEF("Test ConfigurationMgr::GetFailSafeArmed", TestConfigurationMgr_GetFailSafeArmed),
     NL_TEST_SENTINEL()

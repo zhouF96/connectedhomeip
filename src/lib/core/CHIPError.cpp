@@ -206,6 +206,15 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_TLV_TAG_NOT_FOUND.AsInteger():
         desc = "TLV tag not found";
         break;
+    case CHIP_ERROR_MISSING_SECURE_SESSION.AsInteger():
+        desc = "Missing secure session";
+        break;
+    case CHIP_ERROR_INVALID_ADMIN_SUBJECT.AsInteger():
+        desc = "CaseAdminSubject is not valid";
+        break;
+    case CHIP_ERROR_INSUFFICIENT_PRIVILEGE.AsInteger():
+        desc = "Required privilege was insufficient during an operation";
+        break;
     case CHIP_ERROR_INVALID_PATH_LIST.AsInteger():
         desc = "Invalid TLV path list";
         break;
@@ -401,8 +410,8 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR.AsInteger():
         desc = "Unsolicited msg with originator bit clear";
         break;
-    case CHIP_ERROR_INVALID_FABRIC_ID.AsInteger():
-        desc = "Invalid Fabric Id";
+    case CHIP_ERROR_INVALID_FABRIC_INDEX.AsInteger():
+        desc = "Invalid Fabric Index";
         break;
     case CHIP_ERROR_TOO_MANY_CONNECTIONS.AsInteger():
         desc = "Too many connections";

@@ -156,7 +156,7 @@ void ReadClient::Close(CHIP_ERROR aError)
         StopResubscription();
     }
 
-    mpCallback.OnDone();
+    mpCallback.OnDone(this);
 }
 
 const char * ReadClient::GetStateStr() const
@@ -269,7 +269,9 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
     ReturnErrorOnFailure(request.EndOfReadRequestMessage().GetError());
     ReturnErrorOnFailure(writer.Finalize(&msgBuf));
 
-    mpExchangeCtx = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHolder.Get(), this);
+    VerifyOrReturnError(aReadPrepareParams.mSessionHolder, CHIP_ERROR_MISSING_SECURE_SESSION);
+
+    mpExchangeCtx = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHolder.Get().Value(), this);
     VerifyOrReturnError(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     mpExchangeCtx->SetResponseTimeout(aReadPrepareParams.mTimeout);
@@ -459,8 +461,8 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReportDataMessage::Parser report;
 
-    bool suppressResponse   = true;
-    uint64_t subscriptionId = 0;
+    bool suppressResponse         = true;
+    SubscriptionId subscriptionId = 0;
     EventReportIBs::Parser eventReportIBs;
     AttributeReportIBs::Parser attributeReportIBs;
     System::PacketBufferTLVReader reader;
@@ -735,10 +737,10 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
     System::Clock::Timeout timeout =
         System::Clock::Seconds16(mMaxIntervalCeilingSeconds) + mpExchangeCtx->GetSessionHandle()->GetAckTimeout();
     // EFR32/MBED/INFINION/K32W's chrono count return long unsinged, but other platform returns unsigned
-    ChipLogProgress(
-        DataManagement,
-        "Refresh LivenessCheckTime for %lu milliseconds with SubscriptionId = 0x" ChipLogFormatX64 " Peer = %02x:" ChipLogFormatX64,
-        static_cast<long unsigned>(timeout.count()), ChipLogValueX64(mSubscriptionId), mFabricIndex, ChipLogValueX64(mPeerNodeId));
+    ChipLogProgress(DataManagement,
+                    "Refresh LivenessCheckTime for %lu milliseconds with SubscriptionId = 0x%08" PRIx32
+                    " Peer = %02x:" ChipLogFormatX64,
+                    static_cast<long unsigned>(timeout.count()), mSubscriptionId, mFabricIndex, ChipLogValueX64(mPeerNodeId));
     err = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
         timeout, OnLivenessTimeoutCallback, this);
 
@@ -774,8 +776,8 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
     VerifyOrDie(_this->mpImEngine->InActiveReadClientList(_this));
 
     ChipLogError(DataManagement,
-                 "Subscription Liveness timeout with SubscriptionID = 0x" ChipLogFormatX64 ", Peer = %02x:" ChipLogFormatX64,
-                 ChipLogValueX64(_this->mSubscriptionId), _this->mFabricIndex, ChipLogValueX64(_this->mPeerNodeId));
+                 "Subscription Liveness timeout with SubscriptionID = 0x%08" PRIx32 ", Peer = %02x:" ChipLogFormatX64,
+                 _this->mSubscriptionId, _this->mFabricIndex, ChipLogValueX64(_this->mPeerNodeId));
 
     // TODO: add a more specific error here for liveness timeout failure to distinguish between other classes of timeouts (i.e
     // response timeouts).
@@ -794,16 +796,16 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
     ReturnErrorOnFailure(subscribeResponse.CheckSchemaValidity());
 #endif
 
-    uint64_t subscriptionId = 0;
+    SubscriptionId subscriptionId = 0;
     ReturnErrorOnFailure(subscribeResponse.GetSubscriptionId(&subscriptionId));
     VerifyOrReturnError(IsMatchingClient(subscriptionId), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(subscribeResponse.GetMinIntervalFloorSeconds(&mMinIntervalFloorSeconds));
     ReturnErrorOnFailure(subscribeResponse.GetMaxIntervalCeilingSeconds(&mMaxIntervalCeilingSeconds));
 
     ChipLogProgress(DataManagement,
-                    "Subscription established with SubscriptionID = 0x" ChipLogFormatX64 " MinInterval = %u"
+                    "Subscription established with SubscriptionID = 0x%08" PRIx32 " MinInterval = %u"
                     "s MaxInterval = %us Peer = %02x:" ChipLogFormatX64,
-                    ChipLogValueX64(mSubscriptionId), mMinIntervalFloorSeconds, mMaxIntervalCeilingSeconds, mFabricIndex,
+                    mSubscriptionId, mMinIntervalFloorSeconds, mMaxIntervalCeilingSeconds, mFabricIndex,
                     ChipLogValueX64(mPeerNodeId));
 
     ReturnErrorOnFailure(subscribeResponse.ExitContainer());
@@ -838,11 +840,16 @@ CHIP_ERROR ReadClient::SendAutoResubscribeRequest(ReadPrepareParams && aReadPrep
     return err;
 }
 
-CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams)
+CHIP_ERROR ReadClient::SendSubscribeRequest(const ReadPrepareParams & aReadPrepareParams)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrReturnError(aReadPrepareParams.mMinIntervalFloorSeconds <= aReadPrepareParams.mMaxIntervalCeilingSeconds,
+                        CHIP_ERROR_INVALID_ARGUMENT);
+    return SendSubscribeRequestImpl(aReadPrepareParams);
+}
 
-    VerifyOrReturnError(ClientState::Idle == mState, err = CHIP_ERROR_INCORRECT_STATE);
+CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadPrepareParams)
+{
+    VerifyOrReturnError(ClientState::Idle == mState, CHIP_ERROR_INCORRECT_STATE);
 
     // Todo: Remove the below, Update span in ReadPrepareParams
     Span<AttributePathParams> attributePaths(aReadPrepareParams.mpAttributePathParamsList,
@@ -850,9 +857,6 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
     Span<EventPathParams> eventPaths(aReadPrepareParams.mpEventPathParamsList, aReadPrepareParams.mEventPathParamsListSize);
     Span<DataVersionFilter> dataVersionFilters(aReadPrepareParams.mpDataVersionFilterList,
                                                aReadPrepareParams.mDataVersionFilterListSize);
-
-    VerifyOrReturnError(aReadPrepareParams.mMinIntervalFloorSeconds <= aReadPrepareParams.mMaxIntervalCeilingSeconds,
-                        err = CHIP_ERROR_INVALID_ARGUMENT);
 
     System::PacketBufferHandle msgBuf;
     System::PacketBufferTLVWriter writer;
@@ -868,14 +872,14 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
     if (!attributePaths.empty())
     {
         AttributePathIBs::Builder & attributePathListBuilder = request.CreateAttributeRequests();
-        ReturnErrorOnFailure(err = attributePathListBuilder.GetError());
+        ReturnErrorOnFailure(attributePathListBuilder.GetError());
         ReturnErrorOnFailure(GenerateAttributePaths(attributePathListBuilder, attributePaths));
     }
 
     if (!eventPaths.empty())
     {
         EventPathIBs::Builder & eventPathListBuilder = request.CreateEventRequests();
-        ReturnErrorOnFailure(err = eventPathListBuilder.GetError());
+        ReturnErrorOnFailure(eventPathListBuilder.GetError());
         ReturnErrorOnFailure(GenerateEventPaths(eventPathListBuilder, eventPaths));
 
         Optional<EventNumber> eventMin;
@@ -883,12 +887,12 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
         if (eventMin.HasValue())
         {
             EventFilterIBs::Builder & eventFilters = request.CreateEventFilters();
-            ReturnErrorOnFailure(err = request.GetError());
+            ReturnErrorOnFailure(request.GetError());
             ReturnErrorOnFailure(eventFilters.GenerateEventFilter(eventMin.Value()));
         }
     }
 
-    ReturnErrorOnFailure(err = request.IsFabricFiltered(aReadPrepareParams.mIsFabricFiltered).GetError());
+    ReturnErrorOnFailure(request.IsFabricFiltered(aReadPrepareParams.mIsFabricFiltered).GetError());
 
     bool encodedDataVersionList = false;
     TLV::TLVWriter backup;
@@ -910,11 +914,13 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
         request.Rollback(backup);
     }
 
-    ReturnErrorOnFailure(err = request.EndOfSubscribeRequestMessage().GetError());
+    ReturnErrorOnFailure(request.EndOfSubscribeRequestMessage().GetError());
     ReturnErrorOnFailure(writer.Finalize(&msgBuf));
 
-    mpExchangeCtx = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHolder.Get(), this);
-    VerifyOrReturnError(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(aReadPrepareParams.mSessionHolder, CHIP_ERROR_MISSING_SECURE_SESSION);
+
+    mpExchangeCtx = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHolder.Get().Value(), this);
+    VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
 
     ReturnErrorOnFailure(mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeRequest, std::move(msgBuf),

@@ -30,12 +30,6 @@ if (chip_enable_openthread) {
   }
 }
 
-if (chip_device_platform == "linux" && chip_mdns != "none") {
-  pkg_config("avahi_client_config") {
-    packages = [ "avahi-client" ]
-  }
-}
-
 if (chip_device_platform != "none" && chip_device_platform != "external") {
   declare_args() {
     # Extra header to include in CHIPDeviceConfig.h for project.
@@ -47,11 +41,18 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     # Time the firmware was built.
     chip_device_config_firmware_build_time = ""
 
+    # Unix time the firmware was built at (seconds since the epoch)
+    chip_device_config_firmware_build_unix_time = ""
+
     # Use OpenThread ftd or mtd library
     chip_device_config_thread_ftd = chip_openthread_ftd
 
     # Enable including the additional data in the advertisement packets
     chip_enable_additional_data_advertising = false
+
+    # Enable default/generic test-mode DeviceInstanceInfoProvider in GenericConfigurationManagerImpl
+    # === FOR TRANSITION UNTIL ALL EXAMPLES PROVIDE THEIR OWN ===
+    chip_use_transitional_device_instance_info_provider = true
 
     # Enable default/generic test-mode CommissionableDataProvider in GenericConfigurationManagerImpl
     # === FOR TRANSITION UNTIL ALL EXAMPLES PROVIDE THEIR OWN ===
@@ -108,11 +109,12 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "CHIP_STACK_LOCK_TRACKING_ERROR_FATAL=${chip_stack_lock_tracking_fatal}",
       "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING=${chip_enable_additional_data_advertising}",
       "CHIP_DEVICE_CONFIG_RUN_AS_ROOT=${chip_device_config_run_as_root}",
+      "CHIP_DISABLE_PLATFORM_KVS=${chip_disable_platform_kvs}",
     ]
 
     if (chip_device_platform == "linux" || chip_device_platform == "darwin" ||
         chip_device_platform == "tizen" || chip_device_platform == "android" ||
-        chip_device_platform == "k32w0") {
+        chip_device_platform == "k32w0" || chip_device_platform == "webos") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
     }
 
@@ -140,11 +142,20 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     if (chip_device_config_firmware_build_time != "") {
       defines += [ "CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME=\"${chip_device_config_firmware_build_time}\"" ]
     }
+    if (chip_device_config_firmware_build_unix_time != "") {
+      defines += [ "CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_UNIX_TIME=${chip_device_config_firmware_build_unix_time}" ]
+    }
 
     if (chip_use_transitional_commissionable_data_provider) {
       defines += [ "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=1" ]
     } else {
       defines += [ "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=0" ]
+    }
+
+    if (chip_use_transitional_device_instance_info_provider) {
+      defines += [ "CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER=1" ]
+    } else {
+      defines += [ "CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER=0" ]
     }
 
     if (chip_device_platform == "cc13x2_26x2") {
@@ -242,7 +253,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     } else if (chip_device_platform == "webos") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_WEBOS=1",
-        "CHIP_DEVICE_LAYER_TARGET=Linux",
+        "CHIP_DEVICE_LAYER_TARGET=webos",
         "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
       ]
       defines -=
@@ -296,6 +307,7 @@ if (chip_device_platform != "none") {
       "../include/platform/ConfigurationManager.h",
       "../include/platform/ConnectivityManager.h",
       "../include/platform/DeviceControlServer.h",
+      "../include/platform/DeviceInstanceInfoProvider.h",
       "../include/platform/FailSafeContext.h",
       "../include/platform/GeneralUtils.h",
       "../include/platform/KeyValueStoreManager.h",
@@ -332,6 +344,7 @@ if (chip_device_platform != "none") {
       "CommissionableDataProvider.cpp",
       "DeviceControlServer.cpp",
       "DeviceInfoProvider.cpp",
+      "DeviceInstanceInfoProvider.cpp",
       "DiagnosticDataProvider.cpp",
       "Entropy.cpp",
       "FailSafeContext.cpp",
@@ -343,7 +356,8 @@ if (chip_device_platform != "none") {
     ]
 
     # Linux has its own NetworkCommissioningThreadDriver
-    if (chip_enable_openthread && chip_device_platform != "linux") {
+    if (chip_enable_openthread && chip_device_platform != "linux" &&
+        chip_device_platform != "tizen" && chip_device_platform != "webos") {
       sources += [
         "OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
         "OpenThread/GenericNetworkCommissioningThreadDriver.h",
