@@ -66,6 +66,9 @@ Silicon Labs platform.
     MG12 boards:
 
     -   BRD4161A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
+    -   BRD4162A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4163A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm,
+        868MHz@19dBm
     -   BRD4164A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
     -   BRD4166A / SLTB004A / Thunderboard Sense 2 / 2.4GHz@10dBm
     -   BRD4170A / SLWSTK6000B / Multiband Wireless Starter Kit / 2.4GHz@19dBm,
@@ -78,8 +81,12 @@ Silicon Labs platform.
 
     MG24 boards :
 
+    -   BRD2601B / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD2703A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
     -   BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
     -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+    -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
 *   Build the example application:
 
@@ -215,7 +222,7 @@ combination with JLinkRTTClient as follows:
           a URL can be found in the RTT logs.
 
           <info  > [SVR] Copy/paste the below URL in a browser to see the QR Code:
-          <info  > [SVR] https://dhrishi.github.io/connectedhomeip/qrcode.html?data=CH%3AI34NM%20-00%200C9SS0
+          <info  > [SVR] https://project-chip.github.io/connectedhomeip/qrcode.html?data=CH%3AI34NM%20-00%200C9SS0
 
     **LED 0** shows the overall state of the device and its connectivity. The
     following states are possible:

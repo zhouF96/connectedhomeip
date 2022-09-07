@@ -31,7 +31,11 @@ endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/ota-image.cmake)
 
-set(CHIP_REQURIE_COMPONENTS freertos lwip bt mdns mbedtls fatfs app_update console openthread)
+set(CHIP_REQURIE_COMPONENTS freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash)
+
+if(NOT "${IDF_TARGET}" STREQUAL "esp32h2")
+    list(APPEND CHIP_REQURIE_COMPONENTS mdns)
+endif()
 
 if (NOT CMAKE_BUILD_EARLY_EXPANSION)
     if (CONFIG_COMPILER_OPTIMIZATION_DEFAULT OR CONFIG_COMPILER_OPTIMIZATION_NONE)
@@ -63,11 +67,29 @@ macro(chip_gn_arg_bool arg boolean)
     endif()
 endmacro()
 
+# ESP-IDF lets user set software version string by two ways:
+# 1. Project's CMakeLists.txt file and 2. Config option
+# It depends on CONFIG_APP_PROJECT_VER_FROM_CONFIG option
+# So, below makes the same provision for software version number
+if (CONFIG_APP_PROJECT_VER_FROM_CONFIG)
+    chip_gn_arg_append("chip_config_software_version_number" ${CONFIG_DEVICE_SOFTWARE_VERSION_NUMBER})
+elseif (DEFINED PROJECT_VER_NUMBER)
+    chip_gn_arg_append("chip_config_software_version_number" ${PROJECT_VER_NUMBER})
+else()
+    chip_gn_arg_append("chip_config_software_version_number" 0)
+endif()
+
 chip_gn_arg_append("esp32_ar"              "\"${CMAKE_AR}\"")
 chip_gn_arg_append("esp32_cc"              "\"${CMAKE_C_COMPILER}\"")
 chip_gn_arg_append("esp32_cxx"             "\"${CMAKE_CXX_COMPILER}\"")
 chip_gn_arg_append("esp32_cpu"             "\"esp32\"")
 chip_gn_arg_bool("is_debug"                ${is_debug})
+
+# Config the chip log level by IDF menuconfig
+chip_gn_arg_bool  ("chip_error_logging"        CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 1)
+chip_gn_arg_bool  ("chip_progress_logging"     CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 3)
+chip_gn_arg_bool  ("chip_detail_logging"       CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 4)
+chip_gn_arg_bool  ("chip_automation_logging"   CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 5)
 
 if(CONFIG_ENABLE_CHIPOBLE)
 chip_gn_arg_append("chip_config_network_layer_ble"           "true")
@@ -81,15 +103,16 @@ endif()
 
 if(CONFIG_ENABLE_PW_RPC)
     string(APPEND chip_gn_args "import(\"//build_overrides/pigweed.gni\")\n")
-    chip_gn_arg_append("remove_default_configs"             "[\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_build:cpp17\"]")
+    chip_gn_arg_append("remove_default_configs"             "[\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_build:toolchain_cpp_standard\"]")
     chip_gn_arg_append("chip_build_pw_rpc_lib"              "true")
     chip_gn_arg_append("chip_build_pw_trace_lib"            "true")
     chip_gn_arg_append("pw_log_BACKEND"                     "\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_log_basic\"")
-    chip_gn_arg_append("pw_assert_BACKEND"                  "\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_assert_log\"")
+    chip_gn_arg_append("pw_assert_BACKEND"                  "\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_assert_log:check_backend\"")
     chip_gn_arg_append("pw_sys_io_BACKEND"                  "\"//third_party/connectedhomeip/examples/platform/esp32/pw_sys_io:pw_sys_io_esp32\"")
     chip_gn_arg_append("pw_trace_BACKEND"                   "\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_trace_tokenized\"")
     chip_gn_arg_append("dir_pw_third_party_nanopb"          "\"//third_party/connectedhomeip/third_party/nanopb/repo\"")
     chip_gn_arg_append("pw_build_LINK_DEPS"                 "[\"\$dir_pw_assert:impl\", \"\$dir_pw_log:impl\"]")
+    chip_gn_arg_append("pw_rpc_CONFIG"                      "\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc:disable_global_mutex\"")
 endif()
 
 if (CONFIG_BUILD_CHIP_TESTS)
@@ -136,8 +159,31 @@ if (CONFIG_CHIP_ENABLE_EXTERNAL_PLATFORM)
     chip_gn_arg_append("chip_platform_target"   "\"//${CONFIG_CHIP_EXTERNAL_PLATFORM_DIR}\"")
 endif()
 
+# Set up CHIP project configuration file
+
+if (CONFIG_CHIP_PROJECT_CONFIG)
+    get_filename_component(CHIP_PROJECT_CONFIG
+        ${CONFIG_CHIP_PROJECT_CONFIG}
+        REALPATH
+        BASE_DIR ${CMAKE_SOURCE_DIR}
+    )
+    set(CHIP_PROJECT_CONFIG "<${CHIP_PROJECT_CONFIG}>")
+else()
+    set(CHIP_PROJECT_CONFIG "")
+endif()
+
+if (CHIP_PROJECT_CONFIG)
+    chip_gn_arg_append("chip_project_config_include" "\"${CHIP_PROJECT_CONFIG}\"")
+    chip_gn_arg_append("chip_system_project_config_include" "\"${CHIP_PROJECT_CONFIG}\"")
+endif()
+
 if (CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER)
     chip_gn_arg_append("chip_use_transitional_commissionable_data_provider" "false")
+    chip_gn_arg_append("chip_use_factory_data_provider"                     "true")
+endif()
+
+if (CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER)
+    chip_gn_arg_append("chip_use_device_info_provider"                     "true")
 endif()
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
@@ -240,7 +286,9 @@ if(CONFIG_BT_ENABLED)
         idf_component_get_property(bt_lib bt COMPONENT_LIB)
         idf_component_get_property(bt_dir bt COMPONENT_DIR)
         list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}>)
-        list(APPEND chip_libraries ${bt_dir}/controller/lib_esp32h2/esp32h2-bt-lib/libcontroller_5p0_seq.a)
+        if(CONFIG_IDF_TARGET_ESP32H2_BETA_VERSION_2)
+            list(APPEND chip_libraries ${bt_dir}/controller/lib_esp32h2/esp32h2-bt-lib/beta2/libble_app.a)
+        endif()
     else()
         idf_component_get_property(bt_lib bt COMPONENT_LIB)
         list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}> -lbtdm_app)
@@ -257,7 +305,7 @@ if(CONFIG_OPENTHREAD_ENABLED)
     list(APPEND chip_libraries $<TARGET_FILE:${openthread_lib}>)
 endif()
 
-if(NOT CONFIG_USE_MINIMAL_MDNS)
+if(NOT CONFIG_USE_MINIMAL_MDNS AND NOT CONFIG_IDF_TARGET_ESP32H2)
     idf_component_get_property(mdns_lib mdns COMPONENT_LIB)
     list(APPEND chip_libraries $<TARGET_FILE:${mdns_lib}>)
 endif()

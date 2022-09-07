@@ -32,7 +32,8 @@ limitations under the License.
   </enum>
   <struct name="BasicCommissioningInfo">
     <cluster code="0x0030"/>
-    <item name="FailSafeExpiryLengthSeconds" type="INT16U"/>
+    <item fieldId="0" name="FailSafeExpiryLengthSeconds" type="INT16U"/>
+    <item fieldId="1" name="MaxCumulativeFailsafeSeconds" type="INT16U"/>
   </struct>
   <cluster>
     <domain>General</domain>
@@ -73,7 +74,7 @@ limitations under the License.
       <arg name="errorCode" type="CommissioningError"/>
       <arg name="debugText" type="CHAR_STRING"/>
     </command>
-    <command source="client" code="0x04" name="CommissioningComplete" response="CommissioningCompleteResponse" optional="false" cli="chip fabric_commissioning commissioningcomplete">
+    <command source="client" code="0x04" name="CommissioningComplete" response="CommissioningCompleteResponse" isFabricScoped="true" optional="false" cli="chip fabric_commissioning commissioningcomplete">
       <description>Signals the Server that the Client has successfully completed all steps of Commissioning/Recofiguration needed during fail-safe period.</description>
       <access op="invoke" privilege="administer"/>
     </command>

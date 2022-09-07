@@ -41,7 +41,7 @@ enum LogModule
     kLogModule_ServiceDirectory,
     kLogModule_ServiceProvisioning,
     kLogModule_SoftwareUpdate,
-    kLogModule_TokenPairing,
+    kLogModule_FailSafe,
     kLogModule_TimeService,
     kLogModule_Heartbeat,
     kLogModule_chipSystemLayer,
@@ -56,7 +56,7 @@ enum LogModule
     kLogModule_Discovery,
     kLogModule_InteractionModel,
     kLogModule_Test,
-    kLogModule_OperationalDeviceProxy,
+    kLogModule_OperationalSessionSetup,
     kLogModule_Automation,
     kLogModule_CASESessionManager,
 

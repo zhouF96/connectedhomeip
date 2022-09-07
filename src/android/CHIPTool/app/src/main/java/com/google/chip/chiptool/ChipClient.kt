@@ -20,11 +20,13 @@ package com.google.chip.chiptool
 import android.content.Context
 import android.util.Log
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.ControllerParams
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback
 import chip.platform.AndroidBleManager
 import chip.platform.AndroidChipPlatform
 import chip.platform.ChipMdnsCallbackImpl
 import chip.platform.DiagnosticDataProviderImpl
+import chip.platform.NsdManagerServiceBrowser
 import chip.platform.NsdManagerServiceResolver
 import chip.platform.PreferencesConfigurationManager
 import chip.platform.PreferencesKeyValueStoreManager
@@ -37,12 +39,14 @@ object ChipClient {
   private const val TAG = "ChipClient"
   private lateinit var chipDeviceController: ChipDeviceController
   private lateinit var androidPlatform: AndroidChipPlatform
+  /* 0xFFF4 is a test vendor ID, replace with your assigned company ID */
+  private const val VENDOR_ID = 0xFFF4
 
   fun getDeviceController(context: Context): ChipDeviceController {
     getAndroidChipPlatform(context)
 
     if (!this::chipDeviceController.isInitialized) {
-      chipDeviceController = ChipDeviceController()
+      chipDeviceController = ChipDeviceController(ControllerParams.newBuilder().setControllerVendorId(VENDOR_ID).build())
     }
     return chipDeviceController
   }
@@ -51,7 +55,7 @@ object ChipClient {
     if (!this::androidPlatform.isInitialized && context != null) {
       //force ChipDeviceController load jni
       ChipDeviceController.loadJni()
-      androidPlatform = AndroidChipPlatform(AndroidBleManager(), PreferencesKeyValueStoreManager(context), PreferencesConfigurationManager(context), NsdManagerServiceResolver(context), ChipMdnsCallbackImpl(), DiagnosticDataProviderImpl(context))
+      androidPlatform = AndroidChipPlatform(AndroidBleManager(), PreferencesKeyValueStoreManager(context), PreferencesConfigurationManager(context), NsdManagerServiceResolver(context), NsdManagerServiceBrowser(context), ChipMdnsCallbackImpl(), DiagnosticDataProviderImpl(context))
     }
     return androidPlatform
   }
@@ -60,6 +64,10 @@ object ChipClient {
    * Wrapper around [ChipDeviceController.getConnectedDevicePointer] to return the value directly.
    */
   suspend fun getConnectedDevicePointer(context: Context, nodeId: Long): Long {
+    // TODO (#21539) This is a memory leak because we currently never call releaseConnectedDevicePointer
+    // once we are done with the returned device pointer. Memory leak was introduced since the refactor
+    // that introduced it was very large in order to fix a use after free, which was considered to be
+    // worse than the memory leak that was introduced.
     return suspendCoroutine { continuation ->
       getDeviceController(context).getConnectedDevicePointer(
         nodeId,

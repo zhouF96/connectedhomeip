@@ -17,6 +17,9 @@
 
 #include "LEDWidget.h"
 #include "ColorFormat.h"
+#include "led_strip.h"
+
+static const char * TAG = "LEDWidget";
 
 void LEDWidget::Init(void)
 {
@@ -24,6 +27,14 @@ void LEDWidget::Init(void)
     mBrightness = UINT8_MAX;
 
 #if CONFIG_LED_TYPE_RMT
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+    led_strip_config_t strip_config = {
+        .strip_gpio_num = CONFIG_LED_GPIO,
+        .max_leds       = 1,
+    };
+
+    led_strip_new_rmt_device(&strip_config, &mStrip);
+#else
     rmt_config_t config             = RMT_DEFAULT_CONFIG_TX((gpio_num_t) CONFIG_LED_GPIO, (rmt_channel_t) CONFIG_LED_RMT_CHANNEL);
     led_strip_config_t strip_config = LED_STRIP_DEFAULT_CONFIG(1, (led_strip_dev_t) config.channel);
 
@@ -31,7 +42,8 @@ void LEDWidget::Init(void)
     rmt_config(&config);
     rmt_driver_install(config.channel, 0, 0);
 
-    mStrip      = led_strip_new_rmt_ws2812(&strip_config);
+    mStrip = led_strip_new_rmt_ws2812(&strip_config);
+#endif
     mHue        = 0;
     mSaturation = 0;
 #else
@@ -59,6 +71,7 @@ void LEDWidget::Init(void)
 
 void LEDWidget::Set(bool state)
 {
+    ESP_LOGI(TAG, "Setting state to %d", state ? 1 : 0);
     if (state == mState)
         return;
 
@@ -67,14 +80,33 @@ void LEDWidget::Set(bool state)
     DoSet();
 }
 
+void LEDWidget::Toggle()
+{
+    ESP_LOGI(TAG, "Toggling state to %d", !mState);
+    mState = !mState;
+
+    DoSet();
+}
+
 void LEDWidget::SetBrightness(uint8_t brightness)
 {
+    ESP_LOGI(TAG, "Setting brightness to %d", brightness);
     if (brightness == mBrightness)
         return;
 
     mBrightness = brightness;
 
     DoSet();
+}
+
+uint8_t LEDWidget::GetLevel()
+{
+    return this->mBrightness;
+}
+
+bool LEDWidget::IsTurnedOn()
+{
+    return this->mState;
 }
 
 #if CONFIG_LED_TYPE_RMT
@@ -99,11 +131,16 @@ void LEDWidget::DoSet(void)
     {
         HsvColor_t hsv = { mHue, mSaturation, brightness };
         RgbColor_t rgb = HsvToRgb(hsv);
-
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+        led_strip_set_pixel(mStrip, 0, rgb.r, rgb.g, rgb.b);
+        led_strip_refresh(mStrip);
+#else
         mStrip->set_pixel(mStrip, 0, rgb.r, rgb.g, rgb.b);
         mStrip->refresh(mStrip, 100);
+#endif
     }
 #else
+    ESP_LOGI(TAG, "DoSet to GPIO number %d", mGPIONum);
     if (mGPIONum < GPIO_NUM_MAX)
     {
         ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, brightness);

@@ -70,8 +70,10 @@ enum ArgumentType
     Address,
     Complex,
     Custom,
+    VectorBool,
     Vector16,
     Vector32,
+    VectorCustom,
 };
 
 struct Argument
@@ -103,10 +105,11 @@ public:
         ::chip::Inet::InterfaceId interfaceId;
     };
 
-    Command(const char * commandName) : mName(commandName) {}
+    Command(const char * commandName, const char * helpText = nullptr) : mName(commandName), mHelpText(helpText) {}
     virtual ~Command() {}
 
     const char * GetName(void) const { return mName; }
+    const char * GetHelpText() const { return mHelpText; }
     const char * GetAttribute(void) const;
     const char * GetEvent(void) const;
     const char * GetArgumentName(size_t index) const;
@@ -178,6 +181,9 @@ public:
 
     size_t AddArgument(const char * name, int64_t min, uint64_t max, std::vector<uint16_t> * value, const char * desc = "");
     size_t AddArgument(const char * name, int64_t min, uint64_t max, std::vector<uint32_t> * value, const char * desc = "");
+    size_t AddArgument(const char * name, std::vector<CustomArgument *> * value, const char * desc = "");
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, chip::Optional<std::vector<bool>> * value,
+                       const char * desc = "");
     size_t AddArgument(const char * name, int64_t min, uint64_t max, chip::Optional<std::vector<uint32_t>> * value,
                        const char * desc = "");
 
@@ -192,6 +198,15 @@ public:
                        uint8_t flags = 0)
     {
         // This is a terrible hack that relies on BitFlags only having the one
+        // mValue member.
+        return AddArgument(name, min, max, reinterpret_cast<T *>(out), desc, flags);
+    }
+
+    template <typename T>
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, chip::BitMask<T> * out, const char * desc = "",
+                       uint8_t flags = 0)
+    {
+        // This is a terrible hack that relies on BitMask only having the one
         // mValue member.
         return AddArgument(name, min, max, reinterpret_cast<T *>(out), desc, flags);
     }
@@ -257,7 +272,8 @@ private:
      */
     size_t AddArgumentToList(Argument && argument);
 
-    const char * mName  = nullptr;
-    bool mIsInteractive = false;
+    const char * mName     = nullptr;
+    const char * mHelpText = nullptr;
+    bool mIsInteractive    = false;
     std::vector<Argument> mArgs;
 };

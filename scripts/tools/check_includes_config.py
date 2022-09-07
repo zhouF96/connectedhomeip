@@ -39,7 +39,8 @@ IGNORE: Set[str] = {
     '/darwin/',
     '/platform/Ameba/',
     '/platform/android/',
-    '/platform/CYW30739/',
+    '/platform/Beken/',
+    '/platform/Infineon/CYW30739/',
     '/platform/Darwin/',
     '/platform/EFR32/',
     '/platform/ESP32/',
@@ -47,7 +48,7 @@ IGNORE: Set[str] = {
     '/platform/Linux/',
     '/platform/nxp/',
     '/platform/Tizen/',
-    '/platform/P6/',
+    '/platform/Infineon/PSOC6/',
     '/platform/bouffalolab/BL602',
     '/platform/webos/',
     r'POSIX\.h$',
@@ -106,13 +107,12 @@ ALLOW: Dict[str, Set[str]] = {
     # Not intended for embedded clients (#11705).
     'src/app/ClusterStateCache.h': {'list', 'map', 'set', 'vector', 'queue'},
     'src/app/BufferedReadCallback.h': {'vector'},
+    'src/lib/support/IniEscaping.cpp': {'string'},
+    'src/lib/support/IniEscaping.h': {'string'},
 
     # Itself in DENY.
     'src/lib/support/CHIPListUtils.h': {'set'},
     'src/platform/DeviceSafeQueue.h': {'queue'},
-
-    # libevent itself is unsuitable for small platforms.
-    'src/system/SystemLayerImplLibevent.h': {'list', 'vector'},
 
     # Only uses <chrono> for zero-cost types.
     'src/system/SystemClock.h': {'chrono'},
@@ -147,4 +147,8 @@ ALLOW: Dict[str, Set[str]] = {
 
     # Uses platform-define to switch between list and array
     'src/lib/dnssd/minimal_mdns/ResponseSender.h': {'list'},
+
+    # Not really for embedded consumers; uses std::queue to keep track
+    # of a list of discovered things.
+    'src/controller/SetUpCodePairer.h': {'queue'},
 }

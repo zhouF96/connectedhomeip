@@ -644,15 +644,37 @@
 #endif // CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
 
 /**
- * @def CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
+ * @def CHIP_CONFIG_SECURE_SESSION_POOL_SIZE
  *
- * @brief Define the size of the pool used for tracking CHIP
- * Peer connections. This defines maximum number of concurrent
- * device connections across all supported transports.
+ * @brief Defines the size of the pool used for tracking the state of
+ * secure sessions. This controls the maximum number of concurrent
+ * established secure sessions across all supported transports.
+ *
+ * This is sized by default to cover the sum of the following:
+ *  - At least 3 CASE sessions / fabric (Spec Ref: 4.13.2.8)
+ *  - 1 reserved slot for CASEServer as a responder.
+ *  - 1 reserved slot for PASE.
+ *
+ *  NOTE: On heap-based platforms, there is no pre-allocation of the pool.
+ *  Due to the use of an LRU-scheme to manage sessions, the actual active
+ *  size of the pool will grow up to the value of this define,
+ *  after which, it will remain at or around this size indefinitely.
+ *
  */
-#ifndef CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
-#define CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE 16
-#endif // CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
+#ifndef CHIP_CONFIG_SECURE_SESSION_POOL_SIZE
+#define CHIP_CONFIG_SECURE_SESSION_POOL_SIZE (CHIP_CONFIG_MAX_FABRICS * 3 + 2)
+#endif // CHIP_CONFIG_SECURE_SESSION_POOL_SIZE
+
+/**
+ * @def CHIP_CONFIG_SECURE_SESSION_REFCOUNT_LOGGING
+ *
+ * @brief This enables logging of changes to the underlying reference count of
+ * SecureSession objects.
+ *
+ */
+#ifndef CHIP_CONFIG_SECURE_SESSION_REFCOUNT_LOGGING
+#define CHIP_CONFIG_SECURE_SESSION_REFCOUNT_LOGGING 0
+#endif
 
 /**
  *  @def CHIP_CONFIG_MAX_FABRICS
@@ -687,6 +709,17 @@
 #ifndef CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS
 #define CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS 2
 #endif // CHIP_CONFIG_MAX_GROUP_CONTROL_PEER
+
+/**
+ *  @def CHIP_CONFIG_SLOW_CRYPTO
+ *
+ *  @brief
+ *   When enabled, CASE and PASE setup will proactively send standalone acknowledgements
+ *   prior to engaging in crypto operations.
+ */
+#ifndef CHIP_CONFIG_SLOW_CRYPTO
+#define CHIP_CONFIG_SLOW_CRYPTO 1
+#endif // CHIP_CONFIG_SLOW_CRYPTO
 
 /**
  * @def CHIP_NON_PRODUCTION_MARKER
@@ -733,7 +766,10 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *    The following definitions sets the maximum number of corresponding interaction model object pool size.
  *
  *      * #CHIP_IM_MAX_NUM_COMMAND_HANDLER
- *      * #CHIP_IM_MAX_NUM_READ_HANDLER
+ *      * #CHIP_IM_MAX_NUM_READS
+ *      * #CHIP_IM_MAX_NUM_SUBSCRIPTIONS
+ *      * #CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS
+ *      * #CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS
  *      * #CHIP_IM_MAX_REPORTS_IN_FLIGHT
  *      * #CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
  *      * #CHIP_IM_SERVER_MAX_NUM_DIRTY_SET
@@ -754,17 +790,28 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_IM_MAX_NUM_READ_HANDLER
+ * @def CHIP_IM_MAX_NUM_SUBSCRIPTIONS
  *
- * @brief Defines the maximum number of ReadHandler, limits the number of active read transactions on server.
+ * @brief Defines the maximum number of ReadHandler for subscriptions, limits the number of active subscription transactions on
+ * server.
  *
- * The default value comes from 3sub per fabric * max number of fabrics, then reserve 1 read client for each fabric.
+ * The default value comes from 3sub per fabric * max number of fabrics.
  *
- * TODO: (#17085) Should be changed to (CHIP_CONFIG_MAX_FABRICS * 4) after we can hold more read handlers on more concise
- * devices.
  */
-#ifndef CHIP_IM_MAX_NUM_READ_HANDLER
-#define CHIP_IM_MAX_NUM_READ_HANDLER (CHIP_CONFIG_MAX_FABRICS * 3)
+#ifndef CHIP_IM_MAX_NUM_SUBSCRIPTIONS
+#define CHIP_IM_MAX_NUM_SUBSCRIPTIONS (CHIP_CONFIG_MAX_FABRICS * 3)
+#endif
+
+/**
+ * @def CHIP_IM_MAX_NUM_READS
+ *
+ * @brief Defines the maximum number of ReadHandler for read transactions, limits the number of active read transactions on
+ * server.
+ *
+ * The default value is one per fabric * max number of fabrics.
+ */
+#ifndef CHIP_IM_MAX_NUM_READS
+#define CHIP_IM_MAX_NUM_READS (CHIP_CONFIG_MAX_FABRICS)
 #endif
 
 /**
@@ -777,17 +824,21 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
+ * @def CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS
  *
- * @brief Defines the maximum number of path objects, limits the number of attributes being read or subscribed at the same time.
- *
- * The default value comes from 3path per subsctipion * 3sub per fabric * max number of fabrics, then reserve 1 read client with 9
- * paths for each fabric.
+ * @brief The maximum number of path objects for subscriptions, limits the number of attributes being subscribed at the same time.
  */
-#ifndef CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
-// #define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS (CHIP_CONFIG_MAX_FABRICS * 18)
-// TODO: (#17085) Should be 3 sub * 3 path + 9 path (for read) = 18
-#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS (CHIP_CONFIG_MAX_FABRICS * 13)
+#ifndef CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS
+#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS (CHIP_IM_MAX_NUM_SUBSCRIPTIONS * 3)
+#endif
+
+/**
+ * @def CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS
+ *
+ * @brief Defines the maximum number of path objects for read requests.
+ */
+#ifndef CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS
+#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS (CHIP_IM_MAX_NUM_READS * 9)
 #endif
 
 /**
@@ -828,13 +879,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CONFIG_IM_BUILD_FOR_UNIT_TEST
+ * @def CONFIG_BUILD_FOR_HOST_UNIT_TEST
  *
- * @brief Defines whether we're currently building the IM for unit testing, which enables a set of features
- *        that are only utilized in those tests.
+ * @brief Defines whether we're currently building for unit testing, which enables a set of features
+ *        that are only utilized in those tests. This flag should not be enabled on devices. If you have a test
+ *        that uses this flag, either appropriately conditionalize the entire test on this flag, or to exclude
+ *        the compliation of that test source file entirely.
  */
-#ifndef CONFIG_IM_BUILD_FOR_UNIT_TEST
-#define CONFIG_IM_BUILD_FOR_UNIT_TEST 0
+#ifndef CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#define CONFIG_BUILD_FOR_HOST_UNIT_TEST 0
 #endif
 
 /**
@@ -925,7 +978,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * Binds to number of KeySet entries to support per fabric (Need at least 1 for Identity Protection Key)
  */
 #ifndef CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC
-#define CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC 2
+#define CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC 3
 #endif
 
 #if CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC < 1
@@ -1229,6 +1282,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_SETUP_CODE_PAIRER_DISCOVERY_TIMEOUT_SECS 30
 #endif // CHIP_CONFIG_SETUP_CODE_PAIRER_DISCOVERY_TIMEOUT_SECS
 
+/**
+ * @def CHIP_CONFIG_NUM_CD_KEY_SLOTS
+ *
+ * @brief Number of custom CD signing keys supported by default CD keystore
+ *
+ */
+#ifndef CHIP_CONFIG_NUM_CD_KEY_SLOTS
+#define CHIP_CONFIG_NUM_CD_KEY_SLOTS 5
+#endif // CHIP_CONFIG_NUM_CD_KEY_SLOTS
 /**
  * @}
  */

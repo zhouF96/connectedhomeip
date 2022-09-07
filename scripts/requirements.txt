@@ -2,6 +2,7 @@ pip-tools
 virtualenv
 
 # esp-idf
+-c constraints.esp32.txt
 -r requirements.esp32.txt
 
 # mbed-os
@@ -46,6 +47,7 @@ anytree
 cxxfilt
 ghapi
 pandas ; platform_machine != 'aarch64' and platform_machine != 'arm64'
+tabulate
 
 # scripts/build
 click
@@ -58,3 +60,6 @@ cryptography
 
 # python unit tests
 colorama
+
+# update tornado for pw_watch
+tornado

@@ -23,34 +23,30 @@
 
 namespace chip {
 
-CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager)
+CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager, const ScopedNodeId & sessionEvictionHint)
 {
-    auto handle = sessionManager.AllocateSession(GetSecureSessionType());
+    auto handle = sessionManager.AllocateSession(GetSecureSessionType(), sessionEvictionHint);
     VerifyOrReturnError(handle.HasValue(), CHIP_ERROR_NO_MEMORY);
-    VerifyOrReturnError(mSecureSessionHolder.GrabPairing(handle.Value()), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mSecureSessionHolder.GrabPairingSession(handle.Value()), CHIP_ERROR_INTERNAL);
     mSessionManager = &sessionManager;
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PairingSession::ActivateSecureSession(const Transport::PeerAddress & peerAddress)
 {
-    // TODO(17568): Replace with proper expiry logic. This current method makes sure there
-    // are not multiple sessions established, until eventual exhaustion of the resources
-    // for CASE sessions. Current method is quick fix for #17698, cannot remain.
-    mSessionManager->ExpireAllPairingsForPeerExceptPending(GetPeer());
-
     // Prepare SecureSession fields, including key derivation, first, before activation
     Transport::SecureSession * secureSession = mSecureSessionHolder->AsSecureSession();
     ReturnErrorOnFailure(DeriveSecureSession(secureSession->GetCryptoContext()));
+
     uint16_t peerSessionId = GetPeerSessionId();
     secureSession->SetPeerAddress(peerAddress);
-    secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(LocalSessionMessageCounter::kInitialSyncValue);
+    secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(Transport::PeerMessageCounter::kInitialSyncValue);
 
     // Call Activate last, otherwise errors on anything after would lead to
     // a partially valid session.
     secureSession->Activate(GetLocalScopedNodeId(), GetPeer(), GetPeerCATs(), peerSessionId, mRemoteMRPConfig);
 
-    ChipLogDetail(Inet, "New secure session created for device " ChipLogFormatScopedNodeId ", LSID:%d PSID:%d!",
+    ChipLogDetail(Inet, "New secure session activated for device " ChipLogFormatScopedNodeId ", LSID:%d PSID:%d!",
                   ChipLogValueScopedNodeId(GetPeer()), secureSession->GetLocalSessionId(), peerSessionId);
 
     return CHIP_NO_ERROR;
@@ -67,11 +63,15 @@ void PairingSession::Finish()
     if (err == CHIP_NO_ERROR)
     {
         VerifyOrDie(mSecureSessionHolder);
-        mDelegate->OnSessionEstablished(mSecureSessionHolder.Get().Value());
+        // Make sure to null out mDelegate so we don't send it any other
+        // notifications.
+        auto * delegate = mDelegate;
+        mDelegate       = nullptr;
+        delegate->OnSessionEstablished(mSecureSessionHolder.Get().Value());
     }
     else
     {
-        mDelegate->OnSessionEstablishmentError(err);
+        NotifySessionEstablishmentError(err);
     }
 }
 
@@ -88,13 +88,13 @@ void PairingSession::DiscardExchange()
     }
 }
 
-CHIP_ERROR PairingSession::EncodeMRPParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpConfig,
+CHIP_ERROR PairingSession::EncodeMRPParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpLocalConfig,
                                                TLV::TLVWriter & tlvWriter)
 {
     TLV::TLVType mrpParamsContainer;
     ReturnErrorOnFailure(tlvWriter.StartContainer(tag, TLV::kTLVType_Structure, mrpParamsContainer));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), mrpConfig.mIdleRetransTimeout.count()));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), mrpConfig.mActiveRetransTimeout.count()));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), mrpLocalConfig.mIdleRetransTimeout.count()));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), mrpLocalConfig.mActiveRetransTimeout.count()));
     return tlvWriter.EndContainer(mrpParamsContainer);
 }
 
@@ -138,6 +138,17 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
     return tlvReader.ExitContainer(containerType);
 }
 
+bool PairingSession::IsSessionEstablishmentInProgress()
+{
+    if (!mSecureSessionHolder)
+    {
+        return false;
+    }
+
+    Transport::SecureSession * secureSession = mSecureSessionHolder->AsSecureSession();
+    return secureSession->IsEstablishing();
+}
+
 void PairingSession::Clear()
 {
     // Clear acts like the destructor if PairingSession, if it is call during
@@ -156,6 +167,19 @@ void PairingSession::Clear()
     mSecureSessionHolder.Release();
     mPeerSessionId.ClearValue();
     mSessionManager = nullptr;
+}
+
+void PairingSession::NotifySessionEstablishmentError(CHIP_ERROR error)
+{
+    if (mDelegate == nullptr)
+    {
+        // Already notified success or error.
+        return;
+    }
+
+    auto * delegate = mDelegate;
+    mDelegate       = nullptr;
+    delegate->OnSessionEstablishmentError(error);
 }
 
 } // namespace chip

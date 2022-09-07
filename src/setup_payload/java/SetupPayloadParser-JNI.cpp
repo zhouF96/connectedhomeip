@@ -106,10 +106,24 @@ jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload)
     env->SetIntField(setupPayload, vendorId, payload.vendorID);
     env->SetIntField(setupPayload, productId, payload.productID);
     env->SetIntField(setupPayload, commissioningFlow, static_cast<int>(payload.commissioningFlow));
-    env->SetIntField(setupPayload, discriminator, payload.discriminator);
+    // TODO: The API we have here does not handle short discriminators in any
+    // sane way.  Just do what we used to do, which is pretend that a short
+    // discriminator is actually a long discriminator with the low bits all 0.
+    uint16_t discriminatorValue;
+    if (payload.discriminator.IsShortDiscriminator())
+    {
+        discriminatorValue = static_cast<uint16_t>(payload.discriminator.GetShortValue())
+            << (SetupDiscriminator::kLongBits - SetupDiscriminator::kShortBits);
+    }
+    else
+    {
+        discriminatorValue = payload.discriminator.GetLongValue();
+    }
+    env->SetIntField(setupPayload, discriminator, discriminatorValue);
     env->SetLongField(setupPayload, setUpPinCode, payload.setUpPINCode);
 
-    env->SetObjectField(setupPayload, discoveryCapabilities, CreateCapabilitiesHashSet(env, payload.rendezvousInformation));
+    env->SetObjectField(setupPayload, discoveryCapabilities,
+                        CreateCapabilitiesHashSet(env, payload.rendezvousInformation.ValueOr(RendezvousInformationFlag::kNone)));
 
     jmethodID addOptionalInfoMid =
         env->GetMethodID(setupPayloadClass, "addOptionalQRCodeInfo", "(Lchip/setuppayload/OptionalQRCodeInfo;)V");
@@ -257,11 +271,12 @@ void TransformSetupPayloadFromJobject(JNIEnv * env, jobject jPayload, SetupPaylo
     payload.vendorID          = env->GetIntField(jPayload, vendorId);
     payload.productID         = env->GetIntField(jPayload, productId);
     payload.commissioningFlow = static_cast<CommissioningFlow>(env->GetIntField(jPayload, commissioningFlow));
-    payload.discriminator     = env->GetIntField(jPayload, discriminator);
-    payload.setUpPINCode      = env->GetLongField(jPayload, setUpPinCode);
+    payload.discriminator.SetLongValue(env->GetIntField(jPayload, discriminator));
+    payload.setUpPINCode = env->GetLongField(jPayload, setUpPinCode);
 
     jobject discoveryCapabilitiesObj = env->GetObjectField(jPayload, discoveryCapabilities);
-    CreateCapabilitiesFromHashSet(env, discoveryCapabilitiesObj, payload.rendezvousInformation);
+    CreateCapabilitiesFromHashSet(env, discoveryCapabilitiesObj,
+                                  payload.rendezvousInformation.Emplace(RendezvousInformationFlag::kNone));
 }
 
 void CreateCapabilitiesFromHashSet(JNIEnv * env, jobject discoveryCapabilitiesObj, RendezvousInformationFlags & flags)

@@ -27,6 +27,12 @@
 #include <hal_wifi.h>
 #include <wifi_mgmr_ext.h>
 
+#include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <platform/internal/GenericConnectivityManagerImpl_TCP.ipp>
+#endif
+
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -43,7 +49,6 @@
 #include <task.h>
 
 #include <lwip/netifapi.h>
-#include <mdns_server.h>
 #include <wifi_mgmr_ext.h>
 
 #include <FreeRTOS.h>
@@ -147,6 +152,17 @@ void ConnectivityManagerImpl::OnStationConnected()
 
     UpdateInternetConnectivityState();
 #endif
+}
+
+void ConnectivityManagerImpl::ChangeWiFiStationState(WiFiStationState newState)
+{
+    if (mWiFiStationState != newState)
+    {
+        ChipLogProgress(DeviceLayer, "WiFi station state change: %s -> %s", WiFiStationStateToStr(mWiFiStationState),
+                        WiFiStationStateToStr(newState));
+        mWiFiStationState = newState;
+        SystemLayer().ScheduleLambda([]() { NetworkCommissioning::BLWiFiDriver::GetInstance().OnNetworkStatusChange(); });
+    }
 }
 
 } // namespace DeviceLayer

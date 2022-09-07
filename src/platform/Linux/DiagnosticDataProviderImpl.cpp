@@ -303,13 +303,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
 
             strncpy(thread->NameBuf, entry->d_name, kMaxThreadNameLength);
             thread->NameBuf[kMaxThreadNameLength] = '\0';
-            thread->name                          = CharSpan::fromCharString(thread->NameBuf);
-            thread->id                            = atoi(entry->d_name);
+            thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
+            thread->id = atoi(entry->d_name);
 
-            // TODO: Get stack info of each thread
-            thread->stackFreeCurrent = 0;
-            thread->stackFreeMinimum = 0;
-            thread->stackSize        = 0;
+            // TODO: Get stack info of each thread: thread->stackFreeCurrent,
+            // thread->stackFreeMinimum, thread->stackSize.
 
             thread->Next = head;
             head         = thread;
@@ -827,6 +825,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(uint8_t & securityTyp
     return ConnectivityMgrImpl().GetWiFiSecurityType(securityType);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
+{
+    return DiagnosticDataProviderImpl::GetDefaultInstance();
+}
 
 } // namespace DeviceLayer
 } // namespace chip

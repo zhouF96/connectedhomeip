@@ -118,12 +118,13 @@ using DnssdBrowseCallback = void (*)(void * context, DnssdService * services, si
  * The callback function SHALL NOT take the ownership of the service pointer or
  * any pointer inside this structure.
  *
- * @param[in] context       The context passed to ChipDnssdPublish.
- * @param[in] type          The published type if no errors has occured, nullptr otherwise.
+ * @param[in] context       The context passed to ChipDnssdPublishService.
+ * @param[in] type          The published type if no errors have occured, nullptr otherwise.
+ * @param[in] instanceName  The published instance name if no errors have occured, nullptr otherwise.
  * @param[in] error         The error code.
  *
  */
-using DnssdPublishCallback = void (*)(void * context, const char * type, CHIP_ERROR error);
+using DnssdPublishCallback = void (*)(void * context, const char * type, const char * instanceName, CHIP_ERROR error);
 
 using DnssdAsyncReturnCallback = void (*)(void * context, CHIP_ERROR error);
 
@@ -142,12 +143,8 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturn
 
 /**
  * This function shuts down the mdns module
- *
- * @retval CHIP_NO_ERROR  The shutdown succeeds.
- * @retval Error code     The shutdown fails
- *
  */
-CHIP_ERROR ChipDnssdShutdown();
+void ChipDnssdShutdown();
 
 /**
  * Removes or marks all services being advertised for removal.

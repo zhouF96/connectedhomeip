@@ -23,6 +23,8 @@
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/dnssd/ServiceNaming.h>
+#include <lib/dnssd/minimal_mdns/AddressPolicy.h>
+#include <lib/dnssd/minimal_mdns/AddressPolicy_DefaultImpl.h>
 #include <lib/dnssd/minimal_mdns/QueryBuilder.h>
 #include <lib/dnssd/minimal_mdns/ResponseSender.h>
 #include <lib/dnssd/minimal_mdns/Server.h>
@@ -36,7 +38,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemPacketBuffer.h>
 
-#include "AllInterfaceListener.h"
 #include "PacketReporter.h"
 
 using namespace chip;
@@ -146,7 +147,7 @@ public:
 
     void OnQuery(const mdns::Minimal::QueryData & data) override
     {
-        if (mResponder->Respond(mMessageId, data, mCurrentSource) != CHIP_NO_ERROR)
+        if (mResponder->Respond(mMessageId, data, mCurrentSource, mdns::Minimal::ResponseConfiguration()) != CHIP_NO_ERROR)
         {
             printf("FAILED to respond!\n");
         }
@@ -166,6 +167,16 @@ private:
     const Inet::IPPacketInfo * mCurrentSource = nullptr;
     uint32_t mMessageId                       = 0;
 };
+
+mdns::Minimal::Server<10 /* endpoints */> gMdnsServer;
+
+void StopSignalHandler(int signal)
+{
+    gMdnsServer.Shutdown();
+
+    DeviceLayer::PlatformMgr().StopEventLoopTask();
+    DeviceLayer::PlatformMgr().Shutdown();
+}
 
 } // namespace
 
@@ -188,9 +199,10 @@ int main(int argc, char ** args)
         return 1;
     }
 
+    mdns::Minimal::SetDefaultAddressPolicy();
+
     printf("Running on port %d using %s...\n", gOptions.listenPort, gOptions.enableIpV4 ? "IPv4 AND IPv6" : "IPv6 ONLY");
 
-    mdns::Minimal::Server<10 /* endpoints */> mdnsServer;
     mdns::Minimal::QueryResponder<16 /* maxRecords */> queryResponder;
 
     mdns::Minimal::QNamePart tcpServiceName[]       = { Dnssd::kOperationalServiceName, Dnssd::kOperationalProtocol,
@@ -249,21 +261,24 @@ int main(int argc, char ** args)
         queryResponder.AddResponder(&ipv4Responder);
     }
 
-    mdns::Minimal::ResponseSender responseSender(&mdnsServer);
+    mdns::Minimal::ResponseSender responseSender(&gMdnsServer);
     responseSender.AddQueryResponder(&queryResponder);
 
     ReplyDelegate delegate(&responseSender);
-    mdnsServer.SetDelegate(&delegate);
+    gMdnsServer.SetDelegate(&delegate);
 
     {
-        MdnsExample::AllInterfaces allInterfaces(gOptions.enableIpV4);
+        auto endpoints = mdns::Minimal::GetAddressPolicy()->GetListenEndpoints();
 
-        if (mdnsServer.Listen(DeviceLayer::UDPEndPointManager(), &allInterfaces, gOptions.listenPort) != CHIP_NO_ERROR)
+        if (gMdnsServer.Listen(DeviceLayer::UDPEndPointManager(), endpoints.get(), gOptions.listenPort) != CHIP_NO_ERROR)
         {
             printf("Server failed to listen on all interfaces\n");
             return 1;
         }
     }
+
+    signal(SIGTERM, StopSignalHandler);
+    signal(SIGINT, StopSignalHandler);
 
     DeviceLayer::PlatformMgr().RunEventLoop();
 

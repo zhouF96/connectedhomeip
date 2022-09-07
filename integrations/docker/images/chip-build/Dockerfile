@@ -11,6 +11,7 @@ RUN set -x \
     automake \
     bison \
     bridge-utils \
+    ccache \
     clang \
     clang-format \
     clang-tidy \
@@ -27,14 +28,16 @@ RUN set -x \
     libcairo2-dev \
     libdbus-1-dev \
     libdbus-glib-1-dev \
+    libdmalloc-dev \
     libgif-dev \
     libglib2.0-dev \
     libical-dev \
     libjpeg-dev \
-    libdmalloc-dev \
     libmbedtls-dev \
     libncurses5-dev \
     libncursesw5-dev \
+    libnl-3-dev \
+    libnl-route-3-dev \
     libnspr4-dev \
     libpango1.0-dev \
     libpixman-1-dev \
@@ -60,8 +63,10 @@ RUN set -x \
     udev \
     unzip \
     wget \
+    git-lfs \
     zlib1g-dev \
     && rm -rf /var/lib/apt/lists/ \
+    && git lfs install \
     && : # last line
 
 # Cmake (Mbed OS requires >=3.19.0-rc3 version which is not available in Ubuntu 20.04 repository)

@@ -22,9 +22,9 @@
 #include "PigweedLoggerMutex.h"
 #include "pigweed/RpcService.h"
 #include "pw_sys_io_nrfconnect/init.h"
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 
-#include <kernel.h>
+#include <zephyr/kernel.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 
@@ -117,7 +117,7 @@ public:
 
 namespace {
 
-constexpr size_t kRpcTaskSize = 4096;
+constexpr size_t kRpcTaskSize = 5120;
 constexpr int kRpcPriority    = 5;
 
 K_THREAD_STACK_DEFINE(rpc_stack_area, kRpcTaskSize);

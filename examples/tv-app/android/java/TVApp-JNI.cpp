@@ -17,7 +17,6 @@
  */
 
 #include "TvApp-JNI.h"
-#include "AppImpl.h"
 #include "ChannelManager.h"
 #include "ContentLauncherManager.h"
 #include "DeviceCallbacks.h"
@@ -27,6 +26,7 @@
 #include "LowPowerManager.h"
 #include "MediaInputManager.h"
 #include "MediaPlaybackManager.h"
+#include "MyUserPrompter-JNI.h"
 #include "OnOffManager.h"
 #include "WakeOnLanManager.h"
 #include "credentials/DeviceAttestationCredsProvider.h"
@@ -42,12 +42,12 @@
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::AppPlatform;
 using namespace chip::Credentials;
 
-#define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_com_tcl_chip_tvapp_TvApp_##METHOD_NAME
+#define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_com_matter_tv_server_tvapp_TvApp_##METHOD_NAME
 
 TvAppJNI TvAppJNI::sInstance;
+JNIMyUserPrompter * userPrompter = nullptr;
 
 void TvAppJNI::InitializeWithObjects(jobject app)
 {
@@ -133,6 +133,11 @@ JNI_METHOD(void, setChannelManager)(JNIEnv *, jobject, jint endpoint, jobject ma
     ChannelManager::NewManager(endpoint, manager);
 }
 
+JNI_METHOD(void, setUserPrompter)(JNIEnv *, jobject, jobject prompter)
+{
+    userPrompter = new JNIMyUserPrompter(prompter);
+}
+
 JNI_METHOD(void, setDACProvider)(JNIEnv *, jobject, jobject provider)
 {
     if (!chip::Credentials::IsDeviceAttestationCredentialsProviderSet())
@@ -146,16 +151,12 @@ JNI_METHOD(void, preServerInit)(JNIEnv *, jobject app)
 {
     chip::DeviceLayer::StackLock lock;
     ChipLogProgress(Zcl, "TvAppJNI::preServerInit");
-
-    PreServerInit();
 }
 
-JNI_METHOD(void, postServerInit)(JNIEnv *, jobject app)
+JNI_METHOD(void, postServerInit)(JNIEnv *, jobject app, jobject contentAppEndpointManager)
 {
     chip::DeviceLayer::StackLock lock;
     ChipLogProgress(Zcl, "TvAppJNI::postServerInit");
-
-    InitVideoPlayerPlatform();
 }
 
 JNI_METHOD(void, setOnOffManager)(JNIEnv *, jobject, jint endpoint, jobject manager)
@@ -181,25 +182,4 @@ JNI_METHOD(jboolean, setCurrentLevel)(JNIEnv *, jobject, jint endpoint, jboolean
 JNI_METHOD(void, setChipDeviceEventProvider)(JNIEnv *, jobject, jobject provider)
 {
     DeviceCallbacks::NewManager(provider);
-}
-
-JNI_METHOD(jint, addContentApp)
-(JNIEnv *, jobject, jstring vendorName, jint vendorId, jstring appName, jint productId, jstring appVersion, jobject manager)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-
-    JniUtfString vName(env, vendorName);
-    JniUtfString aName(env, appName);
-    JniUtfString aVersion(env, appVersion);
-    EndpointId epId = AddContentApp(vName.c_str(), static_cast<uint16_t>(vendorId), aName.c_str(), static_cast<uint16_t>(productId),
-                                    aVersion.c_str(), manager);
-    return static_cast<uint16_t>(epId);
-}
-
-JNI_METHOD(void, sendTestMessage)(JNIEnv *, jobject, jint endpoint, jstring message)
-{
-    JNIEnv * env          = JniReferences::GetInstance().GetEnvForCurrentThread();
-    const char * nmessage = env->GetStringUTFChars(message, 0);
-    ChipLogProgress(Zcl, "TvApp-JNI SendTestMessage called with message %s", nmessage);
-    SendTestMessage(static_cast<EndpointId>(endpoint), nmessage);
 }

@@ -41,8 +41,10 @@ public:
 protected:
     CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr);
     DeviceCommissioner * GetCommissioner() { return mCommissioner; }
+    CHIP_ERROR PerformStep(CommissioningStage nextStage);
 
 private:
+    DeviceProxy * GetDeviceProxyForStep(CommissioningStage nextStage);
     void ReleaseDAC();
     void ReleasePAI();
 
@@ -53,15 +55,19 @@ private:
     ByteSpan GetPAI() const { return ByteSpan(mPAI, mPAILen); }
 
     CHIP_ERROR NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, AesCcm128KeySpan ipk, NodeId adminSubject);
-    Optional<System::Clock::Timeout> GetCommandTimeout(CommissioningStage stage) const;
+    /**
+     * The device argument to GetCommandTimeout is the device whose session will
+     * be used for sending the relevant command.
+     */
+    Optional<System::Clock::Timeout> GetCommandTimeout(DeviceProxy * device, CommissioningStage stage) const;
     EndpointId GetEndpoint(const CommissioningStage & stage) const;
     CommissioningStage GetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr);
 
     DeviceCommissioner * mCommissioner                               = nullptr;
     CommissioneeDeviceProxy * mCommissioneeDeviceProxy               = nullptr;
-    OperationalDeviceProxy * mOperationalDeviceProxy                 = nullptr;
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate = nullptr;
     CommissioningParameters mParams                                  = CommissioningParameters();
+    OperationalDeviceProxy mOperationalDeviceProxy;
     // Memory space for the commisisoning parameters that come in as ByteSpans - the caller is not guaranteed to retain this memory
     uint8_t mSsid[CommissioningParameters::kMaxSsidLen];
     uint8_t mCredentials[CommissioningParameters::kMaxCredentialsLen];

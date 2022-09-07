@@ -16,7 +16,8 @@ Semiconductor's nRF Connect SDK, and supports remote access and control of a
 simulated door lock over a low-power, 802.15.4 Thread network.
 
 The example behaves as a Matter accessory, that is a device that can be paired
-into an existing Matter network and can be controlled by this network.
+into an existing Matter network and can be controlled by this network. The
+device works as a Thread Sleepy End Device.
 
 <hr>
 
@@ -60,11 +61,6 @@ controller device over the Thread protocol. By default, the Matter device has
 Thread disabled, and it should be paired with Matter controller and get
 configuration from it. Some actions required before establishing full
 communication are described below.
-
-The example also comes with a test mode, which allows to start Thread with the
-default settings by pressing button manually. However, this mode does not
-guarantee that the device will be able to communicate with the Matter controller
-and other devices.
 
 The example can be configured to use the secure bootloader and utilize it for
 performing over-the-air Device Firmware Upgrade using Bluetooth LE.
@@ -226,9 +222,6 @@ states are possible:
 **Button 2** &mdash; Pressing the button once changes the lock state to the
 opposite one.
 
-**Button 3** &mdash; Pressing the button once starts the Thread networking in
-the test mode using the default configuration.
-
 **Button 4** &mdash; Pressing the button once starts the NFC tag emulation and
 enables Bluetooth LE advertising for the predefined period of time (15 minutes
 by default).
@@ -380,22 +373,6 @@ features like logs and command-line interface, run the following command:
 
 Remember to replace _build-target_ with the build target name of the Nordic
 Semiconductor's kit you own.
-
-### Building with low-power configuration
-
-You can build the example using the low-power configuration, which enables
-Thread's Sleepy End Device mode and disables debug features, such as the UART
-console or the **LED 1** usage.
-
-To build for the low-power configuration, run the following command with
-_build-target_ replaced with the build target name of the Nordic Semiconductor's
-kit you own (for example `nrf52840dk_nrf52840`):
-
-    $ west build -b build-target -- -DOVERLAY_CONFIG=overlay-low_power.conf
-
-For example, use the following command for `nrf52840dk_nrf52840`:
-
-    $ west build -b nrf52840dk_nrf52840 -- -DOVERLAY_CONFIG=overlay-low_power.conf
 
 ### Building with Device Firmware Upgrade support
 

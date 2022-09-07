@@ -26,9 +26,8 @@ _bootstrap_or_activate() {
 
     local _CONFIG_FILE="scripts/environment.json"
 
-    if [ "$_BOOTSTRAP_NAME" = "no_cipd_bootstrap.sh" ]; then
-        _CONFIG_FILE="scripts/environment_no_cipd.json"
-        _BOOTSTRAP_NAME="bootstrap.sh"
+    if [ ! -z "$PW_CONFIG_FILE" ]; then
+        _CONFIG_FILE="$PW_CONFIG_FILE"
     fi
 
     if [ "$_BOOTSTRAP_NAME" = "bootstrap.sh" ] ||
@@ -36,21 +35,8 @@ _bootstrap_or_activate() {
         git submodule update --init
     fi
 
-    local _CHIP_BANNER="$(
-        cat <<EOF
-           ░▓░
-           ▓█▓
-           ▓█▓                                                     ▒█     ▒█
-      ▒██▒▒▓██▒███▒                ░▒▓▒░  ░▒▓▒░       ░░▓█▒░ ░█  █████████████░    ░▒█▒░       ░░▒░
-       ░▓█████▓██░               ▒█▒░░▒▓██▓▒░░▒█▒   ░█▓▒░░▒████    █▓░    █▓░    ▒█▒░░░▒█▓░   ██▒░░
-    ▒█▒░         ░██▒           ░█░     █▓     ░█░ ░▓▒      ░▓█    █▓     █▓    ▒█░░    ░██  ▒▓
-    ░▓██▓░     ░██▓█░           ░█      ▓█      █░ ░█░       ██    █▓     █▓    ▓██████████  ▒█
-     ░▓███▒   ▒███▒░            ░█      ▓█      █░  ██░    ░███    █▓     █▓    ░█▒░         ▒█
- ░▒████████░ ░███▓▓█▓▓▒         ░█      ▒▒      █░   ░█▓██▓█░▒█    ░▓▓█░  ░▓▓█░   ▒▓▓██▓█░   ▒▓
- ░██▒░  ▒██▒ ▒██░  ░▒█▓
-         ░▓░ ░▓░
-EOF
-    )"
+    PW_BRANDING_BANNER="$_CHIP_ROOT/scripts/matter_banner.txt"
+    export PW_BRANDING_BANNER
 
     PW_PROJECT_ROOT="$_CHIP_ROOT"
     export PW_PROJECT_ROOT
@@ -58,16 +44,12 @@ EOF
     PW_ROOT="$_CHIP_ROOT/third_party/pigweed/repo"
     export PW_ROOT
 
-    # Do not force use Rosetta in Pigweed because Matter is using host toolchain
-    if [ -z "$PW_BOOTSTRAP_USE_ROSETTA" ]; then
-        export PW_BOOTSTRAP_USE_ROSETTA=false
-    fi
-
     . "$_CHIP_ROOT/third_party/pigweed/repo/pw_env_setup/util.sh"
 
     _chip_bootstrap_banner() {
         if [ -z "$PW_ENVSETUP_QUIET" ] && [ -z "$PW_ENVSETUP_NO_BANNER" ]; then
-            pw_bold_white "$_CHIP_BANNER\n"
+            cat "$PW_BRANDING_BANNER"
+            echo
         fi
     }
 

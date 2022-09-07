@@ -14,6 +14,9 @@
 
 name: 39.2.5. [TC-WNCV-2.5] EndProductType Attribute with server as DUT
 
+PICS:
+    - WNCV.S
+
 config:
     nodeId: 0x12344321
     cluster: "Window Covering"
@@ -28,12 +31,11 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Reads EndProductType attribute from DUT"
+    - label: "TH reads EndProductType attribute from DUT"
       command: "readAttribute"
       attribute: "EndProductType"
-      PICS: A_ENDPRODUCTTYPE
+      PICS: WNCV.S.A000d
       response:
-          value: 0
           constraints:
               type: enum8
               minValue: 0

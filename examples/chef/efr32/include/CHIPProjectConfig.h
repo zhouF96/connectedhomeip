@@ -70,17 +70,6 @@
 #define CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION 1
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
- *
- * A string identifying the software version running on the device.
- * CHIP service currently expects the software version to be in the format
- * {MAJOR_VERSION}.0d{MINOR_VERSION}
- */
-#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
-#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "0.1ALPHA"
-#endif
-
-/**
  * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
  *
  * A uint32_t identifying the software version running on the device.
@@ -128,7 +117,7 @@
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
 
 /**
- *  @def CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
+ *  @def CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
  *
  *  @brief
  *    Active retransmit interval, or time to wait before retransmission after
@@ -138,6 +127,6 @@
  *  needs (e.g. sleeping period) using Service Discovery TXT record CRA key.
  *
  */
-#define CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL (2000_ms32)
+#define CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL (2000_ms32)
 
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1

@@ -31,11 +31,12 @@ using namespace chip;
 
 static const char * TAG = "app-task";
 
+Button AppButton;
+
 namespace {
 
 QueueHandle_t sAppEventQueue;
 TaskHandle_t sAppTaskHandle;
-
 } // namespace
 
 AppTask AppTask::sAppTask;
@@ -58,6 +59,9 @@ CHIP_ERROR AppTask::StartAppTask()
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    AppButton.Init();
+    AppButton.SetButtonPressCallback(ButtonPressCallback);
 
     return err;
 }
@@ -132,15 +136,10 @@ void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::ButtonEventHandler(const uint8_t buttonHandle, uint8_t btnAction)
+void AppTask::ButtonPressCallback()
 {
-    AppEvent button_event           = {};
-    button_event.Type               = AppEvent::kEventType_Button;
-    button_event.ButtonEvent.Action = btnAction;
-
-    if (buttonHandle == APP_LIGHT_SWITCH && btnAction == BUTTON_PRESSED)
-    {
-        button_event.mHandler = SwitchActionEventHandler;
-        sAppTask.PostEvent(&button_event);
-    }
+    AppEvent button_event;
+    button_event.Type     = AppEvent::kEventType_Button;
+    button_event.mHandler = AppTask::SwitchActionEventHandler;
+    sAppTask.PostEvent(&button_event);
 }

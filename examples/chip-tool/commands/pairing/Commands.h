@@ -18,9 +18,11 @@
 
 #pragma once
 
-#include "CommissionedListCommand.h"
-#include "OpenCommissioningWindowCommand.h"
-#include "PairingCommand.h"
+#include "commands/common/Commands.h"
+#include "commands/pairing/CloseSessionCommand.h"
+#include "commands/pairing/CommissionedListCommand.h"
+#include "commands/pairing/OpenCommissioningWindowCommand.h"
+#include "commands/pairing/PairingCommand.h"
 
 #include <app/server/Dnssd.h>
 #include <commands/common/CredentialIssuerCommands.h>
@@ -218,6 +220,7 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
         //        make_unique<CommissionedListCommand>(),
         make_unique<StartUdcServerCommand>(credsIssuerConfig),
         make_unique<OpenCommissioningWindowCommand>(credsIssuerConfig),
+        make_unique<CloseSessionCommand>(credsIssuerConfig),
     };
 
     commands.Register(clusterName, clusterCommands);

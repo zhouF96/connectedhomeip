@@ -50,10 +50,10 @@ public:
 
     ~ReadAttribute() {}
 
-    CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId) override
     {
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPReadParams * params = [[CHIPReadParams alloc] init];
+        MTRReadParams * params = [[MTRReadParams alloc] init];
         params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
         [device
             readAttributeWithEndpointId:[NSNumber numberWithUnsignedShort:endpointId]
@@ -90,12 +90,7 @@ public:
     {
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
-        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
+        AddCommonArguments();
     }
 
     SubscribeAttribute(chip::ClusterId clusterId)
@@ -103,63 +98,76 @@ public:
         , mClusterId(clusterId)
     {
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
-        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
+        AddCommonArguments();
     }
 
     SubscribeAttribute(const char * _Nonnull attributeName)
         : ModelCommand("subscribe")
     {
         AddArgument("attr-name", attributeName);
+        AddCommonArguments();
+    }
+
+    void AddCommonArguments()
+    {
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("autoResubscribe", 0, 1, &mAutoResubscribe);
         ModelCommand::AddArguments();
     }
 
     ~SubscribeAttribute() {}
 
-    CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId) override
     {
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+
+        MTRSubscribeParams * params = [[MTRSubscribeParams alloc] init];
         params.keepPreviousSubscriptions
             = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.autoResubscribe = mAutoResubscribe.HasValue() ? [NSNumber numberWithBool:mAutoResubscribe.Value()] : nil;
+
         [device subscribeAttributeWithEndpointId:[NSNumber numberWithUnsignedShort:endpointId]
-                                       clusterId:[NSNumber numberWithUnsignedInteger:mClusterId]
-                                     attributeId:[NSNumber numberWithUnsignedInteger:mAttributeId]
-                                     minInterval:[NSNumber numberWithUnsignedInteger:mMinInterval]
-                                     maxInterval:[NSNumber numberWithUnsignedInteger:mMaxInterval]
-                                          params:params
-                                     clientQueue:callbackQueue
-                                   reportHandler:^(
-                                       NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                                       if (values) {
-                                           for (id item in values) {
-                                               NSLog(@"Response Item: %@", [item description]);
-                                           }
-                                       }
-                                       if (error || !mWait) {
-                                           SetCommandExitStatus(error);
-                                       }
-                                   }
-                         subscriptionEstablished:nil];
+            clusterId:[NSNumber numberWithUnsignedInteger:mClusterId]
+            attributeId:[NSNumber numberWithUnsignedInteger:mAttributeId]
+            minInterval:[NSNumber numberWithUnsignedInteger:mMinInterval]
+            maxInterval:[NSNumber numberWithUnsignedInteger:mMaxInterval]
+            params:params
+            clientQueue:callbackQueue
+            reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                if (values) {
+                    for (id item in values) {
+                        NSLog(@"Response Item: %@", [item description]);
+                    }
+                }
+                SetCommandExitStatus(error);
+            }
+            subscriptionEstablished:^() {
+                mSubscriptionEstablished = YES;
+            }];
 
         return CHIP_NO_ERROR;
     }
 
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(10); }
+
 protected:
     chip::Optional<bool> mKeepSubscriptions;
+    chip::Optional<bool> mAutoResubscribe;
     chip::Optional<bool> mFabricFiltered;
+    bool mSubscriptionEstablished = NO;
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    bool mWait;
+
+    void Shutdown() override
+    {
+        mSubscriptionEstablished = NO;
+        ModelCommand::Shutdown();
+    }
+
+    bool DeferInteractiveCleanup() override { return mSubscriptionEstablished; }
 
 private:
     chip::ClusterId mClusterId;
@@ -174,57 +182,55 @@ public:
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("autoResubscribe", 0, 1, &mAutoResubscribe);
         ModelCommand::AddArguments();
     }
 
     ~SubscribeEvent() {}
 
-    CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId) override
     {
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
 
-        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        MTRSubscribeParams * params = [[MTRSubscribeParams alloc] init];
         params.keepPreviousSubscriptions
             = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.autoResubscribe = mAutoResubscribe.HasValue() ? [NSNumber numberWithBool:mAutoResubscribe.Value()] : nil;
+
         [device subscribeWithQueue:callbackQueue
             minInterval:mMinInterval
             maxInterval:mMaxInterval
             params:params
             cacheContainer:nil
             attributeReportHandler:^(NSArray * value) {
-                if (!mWait) {
-                    SetCommandExitStatus(CHIP_NO_ERROR);
-                }
+                SetCommandExitStatus(CHIP_NO_ERROR);
             }
             eventReportHandler:^(NSArray * value) {
                 for (id item in value) {
                     NSLog(@"Response Item: %@", [item description]);
                 }
-                if (!mWait) {
-                    SetCommandExitStatus(CHIP_NO_ERROR);
-                }
+                SetCommandExitStatus(CHIP_NO_ERROR);
             }
             errorHandler:^(NSError * error) {
-                if (error && !mWait) {
-                    SetCommandExitStatus(error);
-                }
+                SetCommandExitStatus(error);
             }
             subscriptionEstablished:^() {
+                mSubscriptionEstablished = YES;
+            }
+            resubscriptionScheduled:^(NSError * error, NSNumber * resubscriptionDelay) {
+                NSLog(@"Subscription dropped with error %@.  Resubscription in %@ms", error, resubscriptionDelay);
             }];
 
         return CHIP_NO_ERROR;
     }
 
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(10); }
 
 protected:
     chip::Optional<bool> mKeepSubscriptions;
+    chip::Optional<bool> mAutoResubscribe;
     chip::Optional<chip::EventNumber> mEventNumber;
+    bool mSubscriptionEstablished = NO;
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    bool mWait;
 };

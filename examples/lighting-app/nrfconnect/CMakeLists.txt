@@ -61,8 +61,7 @@ target_sources(app PRIVATE
                ${GEN_DIR}/lighting-app/zap-generated/callback-stub.cpp
                ${GEN_DIR}/lighting-app/zap-generated/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
-               ${NRFCONNECT_COMMON}/util/PWMDevice.cpp
-               ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp)
+               ${NRFCONNECT_COMMON}/util/PWMDevice.cpp)
 
 chip_configure_data_model(app
     INCLUDE_SERVER
@@ -91,8 +90,10 @@ set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
 include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
 include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
 
+pw_set_module_config(pw_rpc_CONFIG pw_rpc.disable_global_mutex_config)
 pw_set_backend(pw_log pw_log_basic)
-pw_set_backend(pw_assert pw_assert_log)
+pw_set_backend(pw_assert.check pw_assert_log.check_backend)
+pw_set_backend(pw_assert.assert pw_assert.assert_compatibility_backend)
 pw_set_backend(pw_sys_io pw_sys_io.nrfconnect)
 pw_set_backend(pw_trace pw_trace_tokenized)
 set(dir_pw_third_party_nanopb "${CHIP_ROOT}/third_party/nanopb/repo" CACHE STRING "" FORCE)
@@ -111,7 +112,7 @@ pw_proto_library(attributes_service
   STRIP_PREFIX
     ${CHIP_ROOT}/examples/common/pigweed/protos
   DEPS
-    pw_protobuf.common_protos
+    pw_protobuf.common_proto
 )
 
 pw_proto_library(button_service
@@ -122,7 +123,7 @@ pw_proto_library(button_service
   STRIP_PREFIX
     ${CHIP_ROOT}/examples/common/pigweed/protos
   DEPS
-    pw_protobuf.common_protos
+    pw_protobuf.common_proto
 )
 
 pw_proto_library(descriptor_service
@@ -133,7 +134,7 @@ pw_proto_library(descriptor_service
   STRIP_PREFIX
     ${CHIP_ROOT}/examples/common/pigweed/protos
   DEPS
-    pw_protobuf.common_protos
+    pw_protobuf.common_proto
 )
 
 pw_proto_library(device_service
@@ -146,7 +147,7 @@ pw_proto_library(device_service
   STRIP_PREFIX
     ${CHIP_ROOT}/examples/common/pigweed/protos
   DEPS
-    pw_protobuf.common_protos
+    pw_protobuf.common_proto
 )
 
 pw_proto_library(lighting_service
@@ -157,7 +158,7 @@ pw_proto_library(lighting_service
   PREFIX
     lighting_service
   DEPS
-    pw_protobuf.common_protos
+    pw_protobuf.common_proto
 )
 
 pw_proto_library(ot_cli_service
@@ -170,7 +171,7 @@ pw_proto_library(ot_cli_service
   PREFIX
     ot_cli_service
   DEPS
-    pw_protobuf.common_protos
+    pw_protobuf.common_proto
 )
 
 pw_proto_library(thread_service
@@ -183,7 +184,7 @@ pw_proto_library(thread_service
   PREFIX
     thread_service
   DEPS
-    pw_protobuf.common_protos
+    pw_protobuf.common_proto
 )
 
 target_sources(app PRIVATE

@@ -27,7 +27,6 @@
 #include <lib/dnssd/platform/Dnssd.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -79,6 +78,7 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
         FillNodeDataFromTxt(key, val, nodeData.commissionData);
     }
 
+    nodeData.LogDetail();
     proxy->OnNodeDiscovered(nodeData);
     proxy->Release();
 }
@@ -277,7 +277,7 @@ CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const
         return CopyTextRecordValue(buffer, bufferLen, params.GetTcpSupported());
     case TxtFieldKey::kSleepyIdleInterval:
     case TxtFieldKey::kSleepyActiveInterval:
-        return CopyTextRecordValue(buffer, bufferLen, params.GetMRPConfig(), key == TxtFieldKey::kSleepyIdleInterval);
+        return CopyTextRecordValue(buffer, bufferLen, params.GetLocalMRPConfig(), key == TxtFieldKey::kSleepyIdleInterval);
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -375,13 +375,13 @@ void DiscoveryImplPlatform::HandleDnssdInit(void * context, CHIP_ERROR initError
         CHIP_ERROR error = chip::DeviceLayer::PlatformMgr().PostEvent(&event);
         if (error != CHIP_NO_ERROR)
         {
-            ChipLogError(Discovery, "Posting DNS-SD platform initialized event failed with %s", chip::ErrorStr(error));
+            ChipLogError(Discovery, "Posting DNS-SD platform initialized event failed with %" CHIP_ERROR_FORMAT, error.Format());
         }
 #endif
     }
     else
     {
-        ChipLogError(Discovery, "DNS-SD initialization failed with %s", chip::ErrorStr(initError));
+        ChipLogError(Discovery, "DNS-SD initialization failed with %" CHIP_ERROR_FORMAT, initError.Format());
         publisher->mDnssdInitialized = false;
     }
 }
@@ -410,7 +410,7 @@ void DiscoveryImplPlatform::HandleDnssdError(void * context, CHIP_ERROR error)
     }
     else
     {
-        ChipLogError(Discovery, "DNS-SD error: %s", chip::ErrorStr(error));
+        ChipLogError(Discovery, "DNS-SD error: %" CHIP_ERROR_FORMAT, error.Format());
     }
 }
 
@@ -433,15 +433,15 @@ CHIP_ERROR DiscoveryImplPlatform::UpdateCommissionableInstanceName()
     return CHIP_NO_ERROR;
 }
 
-void DiscoveryImplPlatform::HandleDnssdPublish(void * context, const char * type, CHIP_ERROR error)
+void DiscoveryImplPlatform::HandleDnssdPublish(void * context, const char * type, const char * instanceName, CHIP_ERROR error)
 {
     if (CHIP_NO_ERROR == error)
     {
-        ChipLogProgress(Discovery, "mDNS service published: %s", type);
+        ChipLogProgress(Discovery, "mDNS service published: %s; instance name: %s", type, instanceName);
     }
     else
     {
-        ChipLogError(Discovery, "mDNS service published error: %s", chip::ErrorStr(error));
+        ChipLogError(Discovery, "mDNS service published error: %" CHIP_ERROR_FORMAT, error.Format());
     }
 }
 
@@ -594,16 +594,16 @@ CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPA
     return mResolverProxy.ResolveNodeId(peerId, type);
 }
 
-CHIP_ERROR DiscoveryImplPlatform::FindCommissionableNodes(DiscoveryFilter filter)
+CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissionableNodes(DiscoveryFilter filter)
 {
     ReturnErrorOnFailure(InitImpl());
-    return mResolverProxy.FindCommissionableNodes(filter);
+    return mResolverProxy.DiscoverCommissionableNodes(filter);
 }
 
-CHIP_ERROR DiscoveryImplPlatform::FindCommissioners(DiscoveryFilter filter)
+CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissioners(DiscoveryFilter filter)
 {
     ReturnErrorOnFailure(InitImpl());
-    return mResolverProxy.FindCommissioners(filter);
+    return mResolverProxy.DiscoverCommissioners(filter);
 }
 
 DiscoveryImplPlatform & DiscoveryImplPlatform::GetInstance()
@@ -644,7 +644,7 @@ ResolverProxy::~ResolverProxy()
     Shutdown();
 }
 
-CHIP_ERROR ResolverProxy::FindCommissionableNodes(DiscoveryFilter filter)
+CHIP_ERROR ResolverProxy::DiscoverCommissionableNodes(DiscoveryFilter filter)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mDelegate->Retain();
@@ -668,7 +668,7 @@ CHIP_ERROR ResolverProxy::FindCommissionableNodes(DiscoveryFilter filter)
                            Inet::InterfaceId::Null(), HandleNodeBrowse, mDelegate);
 }
 
-CHIP_ERROR ResolverProxy::FindCommissioners(DiscoveryFilter filter)
+CHIP_ERROR ResolverProxy::DiscoverCommissioners(DiscoveryFilter filter)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mDelegate->Retain();

@@ -16,7 +16,7 @@
  *
  */
 
-#include "CHIPCommand.h"
+#include <commands/common/CHIPCommand.h>
 
 #include <core/CHIPBuildConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
@@ -41,11 +41,11 @@ void CHIPCommand::StartTracing()
 
     if (mTraceFile.HasValue())
     {
-        chip::trace::SetTraceStream(new chip::trace::TraceStreamFile(mTraceFile.Value()));
+        chip::trace::AddTraceStream(new chip::trace::TraceStreamFile(mTraceFile.Value()));
     }
     else if (mTraceLog.HasValue() && mTraceLog.Value())
     {
-        chip::trace::SetTraceStream(new chip::trace::TraceStreamLog());
+        chip::trace::AddTraceStream(new chip::trace::TraceStreamLog());
     }
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 }
@@ -82,4 +82,40 @@ CHIP_ERROR CHIPCommand::StartWaiting(chip::System::Clock::Timeout duration)
 void CHIPCommand::StopWaiting()
 {
     Shutdown();
+}
+
+chip::Controller::DeviceCommissioner & CHIPCommand::CurrentCommissioner()
+{
+    auto item = mCommissioners.find(GetIdentity());
+    return *item->second;
+}
+
+constexpr chip::FabricId kIdentityOtherFabricId = 4;
+std::map<std::string, std::unique_ptr<chip::Controller::DeviceCommissioner>> CHIPCommand::mCommissioners;
+
+std::string CHIPCommand::GetIdentity()
+{
+    std::string name = mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha;
+    if (name.compare(kIdentityAlpha) != 0 && name.compare(kIdentityBeta) != 0 && name.compare(kIdentityGamma) != 0 &&
+        name.compare(kIdentityNull) != 0)
+    {
+        chip::FabricId fabricId = strtoull(name.c_str(), nullptr, 0);
+        if (fabricId >= kIdentityOtherFabricId)
+        {
+            // normalize name since it is used in persistent storage
+
+            char s[24];
+            sprintf(s, "%" PRIu64, fabricId);
+
+            name = s;
+        }
+        else
+        {
+            ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s, 4, 5...]", name.c_str(),
+                         kIdentityAlpha, kIdentityBeta, kIdentityGamma);
+            chipDie();
+        }
+    }
+
+    return name;
 }

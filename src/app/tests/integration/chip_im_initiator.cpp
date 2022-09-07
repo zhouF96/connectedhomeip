@@ -145,6 +145,7 @@ public:
             }
         }
     }
+
     void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::TLV::TLVReader * aData,
                          const chip::app::StatusIB & status) override
     {}
@@ -703,9 +704,6 @@ int main(int argc, char * argv[])
     static_assert(gMessageInterval > gMessageTimeout, "Interval period too small");
 
     InitializeChip();
-
-    err = gFabricTable.Init(&gStorage);
-    SuccessOrExit(err);
 
     err = gTransportManager.Init(chip::Transport::UdpListenParameters(chip::DeviceLayer::UDPEndPointManager())
                                      .SetAddressType(chip::Inet::IPAddressType::kIPv6)

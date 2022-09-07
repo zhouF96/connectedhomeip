@@ -30,16 +30,16 @@ config("openthread_efr32_config") {
 
   include_dirs = [
     "${chip_root}/examples/platform/efr32",
-    "${efr32_sdk_root}/matter/efr32/${efr32_family}/${efr32_board}",
+    "${sdk_support_root}/matter/efr32/${efr32_family}/${efr32_board}",
     "${openthread_efr32_root}/src/src",
   ]
 }
 
 source_set("openthread_core_config_efr32") {
   sources = [
+    "${openthread_efr32_root}/openthread/src/cli/cli_config.h",
     "${openthread_efr32_root}/src/src/openthread-core-efr32-config-check.h",
     "${openthread_efr32_root}/src/src/openthread-core-efr32-config.h",
-    "${openthread_root}/src/cli/cli_config.h",
   ]
 
   public_deps = [ "${efr32_sdk_build_root}:efr32_sdk" ]
@@ -49,18 +49,21 @@ source_set("openthread_core_config_efr32") {
 
 source_set("libopenthread-efr32") {
   sources = [
+    "${openthread_efr32_root}/openthread/examples/apps/cli/cli_uart.cpp",
     "${openthread_efr32_root}/src/src/alarm.c",
+    "${openthread_efr32_root}/src/src/crypto.c",
     "${openthread_efr32_root}/src/src/entropy.c",
     "${openthread_efr32_root}/src/src/flash.c",
     "${openthread_efr32_root}/src/src/misc.c",
     "${openthread_efr32_root}/src/src/radio.c",
+    "${openthread_efr32_root}/src/src/security_manager.c",
+    "${openthread_efr32_root}/src/src/sleep.c",
     "${openthread_efr32_root}/src/src/system.c",
-    "${openthread_root}/examples/apps/cli/cli_uart.cpp",
   ]
 
   public_deps = [
     ":openthread_core_config_efr32",
-    "${openthread_root}/src/core:libopenthread_core_headers",
+    "${openthread_efr32_root}/openthread/src/core:libopenthread_core_headers",
     "..:libopenthread-platform",
     "..:libopenthread-platform-utils",
   ]

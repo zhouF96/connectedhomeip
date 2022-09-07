@@ -104,12 +104,6 @@ config CHIP_BUILD_TESTS
 	help
 	  This option enables building CHIP unit tests.
 
-config CHIP_DISABLE_CHIPOBLE_ADVERTISING_WHEN_PROVISIONED
-	bool "Disable CHIPoBLE advertising when device is fully provisioned"
-	default y
-	help
-	  Disable CHIPoBLE advertising when the device achieves a fully provisioned state.
-
 config CHIP_ENABLE_PAIRING_AUTOSTART
 	bool "Enable pairing autostart"
 	default n
@@ -138,6 +132,26 @@ config CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT
 	imply OPENTHREAD_MTD_SED
 	help
 	  Enables Thread Sleepy End Device support in Matter.
+
+if CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT
+
+config CHIP_SED_IDLE_INTERVAL
+	int "Sleepy End Device idle interval (ms)"
+	default 1000
+	help
+	  SED wake interval in milliseconds while the device is idle, meaning that
+	  there is no active exchange to or from the device, and its commissioning
+	  window is closed.
+
+config CHIP_SED_ACTIVE_INTERVAL
+	int "Sleepy End Device active interval (ms)"
+	default 200
+	help
+	  SED wake interval in milliseconds while the device is active, meaning that
+	  there is an active exchange to or from the device, or its commissioning
+	  window is open.
+
+endif # CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT
 
 config CHIP_THREAD_SSED
 	  bool "Enable Thread Synchronized Sleepy End Device support"
@@ -209,13 +223,6 @@ config CHIP_MALLOC_SYS_HEAP_SIZE
 
 endif
 
-config CHIP_FIRMWARE_BUILD_UNIX_TIME
-	bool "Make Unix time of compilation available in source code"
-	default y
-	help
-	  When enabled, the Unix time of the firmware build is exposed to the
-	  source code and used to initialize the last known UTC time.
-
 config APP_LINK_WITH_CHIP
 	bool "Link 'app' with Connected Home over IP"
 	default y
@@ -241,13 +248,6 @@ config CHIP_OTA_IMAGE_EXTRA_ARGS
 	help
 	  This option allows one to pass optional arguments to the ota_image_tool.py
 	  script, used for building OTA image.
-
-config CHIP_OTA_IMAGE_INCLUDE_MCUBOOT
-	bool "Include MCUBoot in OTA image"
-	depends on BOOTLOADER_MCUBOOT
-	help
-	  Include MCUBoot bootloader image in the generated Matter OTA image. This
-	  option can be enabled if the device supports the bootloader update.
 
 endif
 

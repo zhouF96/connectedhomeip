@@ -100,8 +100,8 @@ const char ModuleNames[] = "-\0\0" // None
                            "SD\0"  // ServiceDirectory
                            "SP\0"  // ServiceProvisioning
                            "SWU"   // SoftwareUpdate
-                           "TP\0"  // TokenPairing
-                           "TS\0"  // TimeServices
+                           "FS\0"  // FailSafe
+                           "TS\0"  // TimeService
                            "HB\0"  // Heartbeat
                            "CSL"   // chipSystemLayer
                            "EVL"   // Event Logging
@@ -115,7 +115,7 @@ const char ModuleNames[] = "-\0\0" // None
                            "DIS"   // Discovery
                            "IM\0"  // InteractionModel
                            "TST"   // Test
-                           "ODP"   // OperationalDeviceProxy
+                           "OSS"   // OperationalSessionSetup
                            "ATM"   // Automation
                            "CSM"   // CASESessionManager
     ;

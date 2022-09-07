@@ -22,10 +22,9 @@
  *      implementation.
  */
 
-#include "TestMessagingLayer.h"
-
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/UnitTestUtils.h>
 #include <messaging/ReliableMessageContext.h>
@@ -132,7 +131,7 @@ class MockSessionEstablishmentExchangeDispatch : public Messaging::ApplicationEx
 public:
     bool IsReliableTransmissionAllowed() const override { return mRetainMessageOnSend; }
 
-    bool MessagePermitted(uint16_t protocol, uint8_t type) override { return true; }
+    bool MessagePermitted(Protocols::Id protocol, uint8_t type) override { return true; }
 
     bool IsEncryptionRequired() const override { return mRequireEncryption; }
 
@@ -184,44 +183,86 @@ struct BackoffComplianceTestVector theBackoffComplianceTestVector[] = {
     {
         .sendCount   = 0,
         .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(300),
-        .backoffMax  = System::Clock::Timeout(375),
+        .backoffMin  = System::Clock::Timeout(330),
+        .backoffMax  = System::Clock::Timeout(413),
     },
     {
         .sendCount   = 1,
         .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(300),
-        .backoffMax  = System::Clock::Timeout(375),
+        .backoffMin  = System::Clock::Timeout(330),
+        .backoffMax  = System::Clock::Timeout(413),
     },
     {
         .sendCount   = 2,
         .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(480),
-        .backoffMax  = System::Clock::Timeout(600),
+        .backoffMin  = System::Clock::Timeout(528),
+        .backoffMax  = System::Clock::Timeout(660),
     },
     {
         .sendCount   = 3,
         .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(768),
-        .backoffMax  = System::Clock::Timeout(960),
+        .backoffMin  = System::Clock::Timeout(844),
+        .backoffMax  = System::Clock::Timeout(1057),
     },
     {
         .sendCount   = 4,
         .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(1228),
-        .backoffMax  = System::Clock::Timeout(1536),
+        .backoffMin  = System::Clock::Timeout(1351),
+        .backoffMax  = System::Clock::Timeout(1690),
     },
     {
         .sendCount   = 5,
         .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(1966),
-        .backoffMax  = System::Clock::Timeout(2458),
+        .backoffMin  = System::Clock::Timeout(2162),
+        .backoffMax  = System::Clock::Timeout(2704),
     },
     {
         .sendCount   = 6,
         .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(1966),
-        .backoffMax  = System::Clock::Timeout(2458),
+        .backoffMin  = System::Clock::Timeout(2162),
+        .backoffMax  = System::Clock::Timeout(2704),
+    },
+    {
+        .sendCount   = 0,
+        .backoffBase = System::Clock::Timeout(4000),
+        .backoffMin  = System::Clock::Timeout(4400),
+        .backoffMax  = System::Clock::Timeout(5500),
+    },
+    {
+        .sendCount   = 1,
+        .backoffBase = System::Clock::Timeout(4000),
+        .backoffMin  = System::Clock::Timeout(4400),
+        .backoffMax  = System::Clock::Timeout(5500),
+    },
+    {
+        .sendCount   = 2,
+        .backoffBase = System::Clock::Timeout(4000),
+        .backoffMin  = System::Clock::Timeout(7040),
+        .backoffMax  = System::Clock::Timeout(8800),
+    },
+    {
+        .sendCount   = 3,
+        .backoffBase = System::Clock::Timeout(4000),
+        .backoffMin  = System::Clock::Timeout(11264),
+        .backoffMax  = System::Clock::Timeout(14081),
+    },
+    {
+        .sendCount   = 4,
+        .backoffBase = System::Clock::Timeout(4000),
+        .backoffMin  = System::Clock::Timeout(18022),
+        .backoffMax  = System::Clock::Timeout(22529),
+    },
+    {
+        .sendCount   = 5,
+        .backoffBase = System::Clock::Timeout(4000),
+        .backoffMin  = System::Clock::Timeout(28835),
+        .backoffMax  = System::Clock::Timeout(36045),
+    },
+    {
+        .sendCount   = 6,
+        .backoffBase = System::Clock::Timeout(4000),
+        .backoffMin  = System::Clock::Timeout(28835),
+        .backoffMax  = System::Clock::Timeout(36045),
     },
 };
 
@@ -298,9 +339,9 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
 
-    exchange->GetSessionHandle()->AsSecureSession()->SetMRPConfig({
-        System::Clock::Timestamp(300), // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
-        System::Clock::Timestamp(300), // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteMRPConfig({
+        System::Clock::Timestamp(300), // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        System::Clock::Timestamp(300), // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
     });
 
     // Let's drop the initial message
@@ -324,7 +365,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, loopback.mDroppedMessageCount == 1);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
-    // Wait for the initial message to fail (should take 300-375ms)
+    // Wait for the initial message to fail (should take 330-413ms)
     ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 2; });
     now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
@@ -341,7 +382,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, loopback.mDroppedMessageCount == 2);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
-    // Wait for the 1st retry to fail (should take 300-375ms)
+    // Wait for the 1st retry to fail (should take 330-413ms)
     ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 3; });
     now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
@@ -358,7 +399,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, loopback.mDroppedMessageCount == 3);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
-    // Wait for the 2nd retry to fail (should take 480-600msms)
+    // Wait for the 2nd retry to fail (should take 528-660ms)
     ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 4; });
     now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
@@ -375,8 +416,8 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, loopback.mDroppedMessageCount == 4);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
-    // Wait for the 3rd retry to fail (should take 768-960ms)
-    ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 5; });
+    // Wait for the 3rd retry to fail (should take 845-1056ms)
+    ctx.GetIOContext().DriveIOUntil(1500_ms32, [&] { return loopback.mSentMessageCount >= 5; });
     now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
     ChipLogProgress(Test, "Attempt #4  Timeout : %d ms", timeoutTime.count());
@@ -411,9 +452,9 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
     ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
 
-    exchange->GetSessionHandle()->AsSecureSession()->SetMRPConfig({
-        64_ms32, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
-        64_ms32, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteMRPConfig({
+        64_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        64_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
     });
 
     // Let's drop the initial message
@@ -470,9 +511,9 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
     ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
 
-    exchange->GetSessionHandle()->AsSecureSession()->SetMRPConfig({
-        64_ms32, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
-        64_ms32, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteMRPConfig({
+        64_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        64_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
     });
 
     mockSender.mMessageDispatch.mRetainMessageOnSend = false;
@@ -560,9 +601,9 @@ void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void *
     ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
 
-    exchange->GetSessionHandle()->AsSecureSession()->SetMRPConfig({
-        64_ms32, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
-        64_ms32, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteMRPConfig({
+        64_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        64_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
     });
 
     // Let's drop the initial message
@@ -622,7 +663,7 @@ void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext
     ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
 
-    exchange->GetSessionHandle()->AsSecureSession()->SetMRPConfig({
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteMRPConfig({
         64_ms32, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
         64_ms32, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
@@ -689,7 +730,7 @@ void CheckDuplicateOldMessageClosedExchange(nlTestSuite * inSuite, void * inCont
     ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
 
-    exchange->GetSessionHandle()->AsSecureSession()->SetMRPConfig({
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteMRPConfig({
         64_ms32, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
         64_ms32, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
@@ -794,9 +835,9 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
 
-    exchange->GetSessionHandle()->AsUnauthenticatedSession()->SetMRPConfig({
-        64_ms32, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
-        64_ms32, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
+    exchange->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteMRPConfig({
+        64_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        64_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
     });
 
     // Let's drop the initial message
@@ -858,7 +899,7 @@ void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
     ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
 
-    exchange->GetSessionHandle()->AsSecureSession()->SetMRPConfig({
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteMRPConfig({
         64_ms32, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
         64_ms32, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
@@ -1360,9 +1401,9 @@ void CheckLostResponseWithPiggyback(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
     // Make sure that we resend our message before the other side does.
-    exchange->GetSessionHandle()->AsSecureSession()->SetMRPConfig({
-        64_ms32, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
-        64_ms32, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteMRPConfig({
+        64_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        64_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
     });
 
     // We send a message, the other side sends an application-level response
@@ -1398,9 +1439,9 @@ void CheckLostResponseWithPiggyback(nlTestSuite * inSuite, void * inContext)
     // Make sure receiver resends after sender does, and there's enough of a gap
     // that we are very unlikely to actually trigger the resends on the receiver
     // when we trigger the resends on the sender.
-    mockReceiver.mExchange->GetSessionHandle()->AsSecureSession()->SetMRPConfig({
-        256_ms32, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
-        256_ms32, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
+    mockReceiver.mExchange->GetSessionHandle()->AsSecureSession()->SetRemoteMRPConfig({
+        256_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        256_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
     });
 
     // Now send a message from the other side, but drop it.
@@ -1570,6 +1611,9 @@ void CheckLostStandaloneAck(nlTestSuite * inSuite, void * inContext)
     // We now have just the received message waiting for an ack.
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
+    // And receiver still has no ack pending.
+    NL_TEST_ASSERT(inSuite, !receiverRc->IsAckPending());
+
     // Reset various state so we can measure things again.
     mockReceiver.IsOnMessageReceivedCalled = false;
     mockReceiver.mReceivedPiggybackAck     = false;
@@ -1595,8 +1639,8 @@ void CheckLostStandaloneAck(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, mockReceiver.IsOnMessageReceivedCalled);
     NL_TEST_ASSERT(inSuite, mockReceiver.mReceivedPiggybackAck);
 
-    // And that receiver has no ack pending.
-    NL_TEST_ASSERT(inSuite, !receiverRc->IsAckPending());
+    // At this point all our exchanges and reliable message contexts should be
+    // dead, so we can't test anything about their state.
 
     // And that there are no un-acked messages left.
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
@@ -1611,7 +1655,8 @@ void CheckGetBackoff(nlTestSuite * inSuite, void * inContext)
         {
             struct BackoffComplianceTestVector * test = &theBackoffComplianceTestVector[i];
             System::Clock::Timeout backoff            = ReliableMessageMgr::GetBackoff(test->backoffBase, test->sendCount);
-            ChipLogProgress(Test, "Backoff # %d: %" PRIu32, test->sendCount, (uint32_t) backoff.count());
+            ChipLogProgress(Test, "Backoff base %" PRIu32 " # %d: %" PRIu32, test->backoffBase.count(), test->sendCount,
+                            backoff.count());
 
             NL_TEST_ASSERT(inSuite, backoff >= test->backoffMin);
             NL_TEST_ASSERT(inSuite, backoff <= test->backoffMax);
@@ -1622,8 +1667,8 @@ void CheckGetBackoff(nlTestSuite * inSuite, void * inContext)
 int InitializeTestCase(void * inContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(inContext);
-    ctx.GetSessionAliceToBob()->AsSecureSession()->SetMRPConfig(GetLocalMRPConfig());
-    ctx.GetSessionBobToAlice()->AsSecureSession()->SetMRPConfig(GetLocalMRPConfig());
+    ctx.GetSessionAliceToBob()->AsSecureSession()->SetRemoteMRPConfig(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
+    ctx.GetSessionBobToAlice()->AsSecureSession()->SetRemoteMRPConfig(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
     return SUCCESS;
 }
 
@@ -1689,12 +1734,7 @@ nlTestSuite sSuite =
  */
 int TestReliableMessageProtocol()
 {
-    TestContext sContext;
-
-    // Run test suit against one context
-    nlTestRunner(&sSuite, &sContext);
-
-    return (nlTestRunnerStats(&sSuite));
+    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestReliableMessageProtocol)

@@ -17,16 +17,22 @@ name:
     3.1.10. [TC-DD-1.10] NFC Onboarding Payload Verification [DUT -
     Commissioner]
 
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+    - MCORE.DD.SCAN_NFC
+
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
 tests:
-    - label: "Power up the TH Device and put the TH Device in pairing mode"
+    - label:
+          "Power up the TH Device and put the TH Device in commissioning mode"
       verification: |
-          sudo ./chip-all-clusters-app
-
+          1. Launch TH that has NFC tag
+          $ sudo ./chip-all-clusters-app
+          ...
           [1646286638.375844][11651:11651] CHIP:DL: Device Configuration:
           [1646286638.375960][11651:11651] CHIP:DL:   Serial Number: TEST_SN
           [1646286638.376016][11651:11651] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
@@ -45,5 +51,5 @@ tests:
 
     - label: "Bring the DUT close to the NFC tag for the TH Device"
       verification: |
-          Vendor specific field testcase
+          Vendor specific field testcase as chip-all-clusters-app does not have an NFC tag to scan
       disabled: true

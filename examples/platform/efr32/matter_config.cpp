@@ -27,7 +27,7 @@
 
 #ifdef SL_WIFI
 #include "wfx_host_events.h"
-#endif /* RS911X_WIFI */
+#endif /* SL_WIFI */
 
 #if PW_RPC_ENABLED
 #include "Rpc.h"
@@ -44,6 +44,14 @@
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
+
+#include <crypto/CHIPCryptoPAL.h>
+// If building with the EFR32-provided crypto backend, we can use the
+// opaque keystore
+#if CHIP_CRYPTO_PLATFORM
+#include <platform/EFR32/Efr32PsaOperationalKeystore.h>
+static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeystore;
+#endif
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <inet/EndPointStateOpenThread.h>
@@ -95,6 +103,25 @@ CHIP_ERROR EFR32MatterConfig::InitOpenThread(void)
 }
 #endif // CHIP_ENABLE_OPENTHREAD
 
+void EFR32MatterConfig::InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
+{
+    OTAConfig::Init();
+}
+
+void EFR32MatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event, intptr_t arg)
+{
+    // Initialize OTA only when Thread or WiFi connectivity is established
+    if (((event->Type == DeviceEventType::kThreadConnectivityChange) &&
+         (event->ThreadConnectivityChange.Result == kConnectivity_Established)) ||
+        ((event->Type == DeviceEventType::kInternetConnectivityChange) &&
+         (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)))
+    {
+        EFR32_LOG("Scheduling OTA Requestor initialization")
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
+                                                    InitOTARequestorHandler, nullptr);
+    }
+}
+
 CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
 {
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
@@ -116,7 +143,7 @@ CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
     //==============================================
     EFR32_LOG("Init CHIP Stack");
     // Init Chip memory management before the stack
-    chip::Platform::MemoryInit();
+    ReturnErrorOnFailure(chip::Platform::MemoryInit());
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);
@@ -125,19 +152,37 @@ CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
     ReturnErrorOnFailure(InitOpenThread());
 #endif
 
-    // Init Matter Server and Start Event Loop
+    // Stop Matter event handling while setting up resources
     chip::DeviceLayer::PlatformMgr().LockChipStack();
+
+    // Create initParams with SDK example defaults here
     static chip::CommonCaseDeviceServerInitParams initParams;
+
+#if CHIP_CRYPTO_PLATFORM
+    // When building with EFR32 crypto, use the opaque key store
+    // instead of the default (insecure) one.
+    gOperationalKeystore.Init();
+    initParams.operationalKeystore = &gOperationalKeystore;
+#endif
+
+    // Initialize the remaining (not overridden) providers to the SDK example defaults
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+
 #if CHIP_ENABLE_OPENTHREAD
+    // Set up OpenThread configuration when OpenThread is included
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
     nativeParams.lockCb                = LockOpenThreadTask;
     nativeParams.unlockCb              = UnlockOpenThreadTask;
     nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
 #endif
+
+    // Init Matter Server and Start Event Loop
     chip::Server::GetInstance().Init(initParams);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+    // OTA Requestor initialization will be triggered by the connectivity events
+    PlatformMgr().AddEventHandler(ConnectivityEventCallback, reinterpret_cast<intptr_t>(nullptr));
 
     EFR32_LOG("Starting Platform Manager Event Loop");
     ReturnErrorOnFailure(PlatformMgr().StartEventLoopTask());
@@ -145,10 +190,6 @@ CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
 #ifdef SL_WIFI
     InitWiFi();
 #endif
-    // Init Matter OTA
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    OTAConfig::Init();
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
 #ifdef ENABLE_CHIP_SHELL
     chip::startShellTask();

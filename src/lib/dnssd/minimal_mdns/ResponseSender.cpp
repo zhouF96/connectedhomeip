@@ -100,7 +100,8 @@ bool ResponseSender::HasQueryResponders() const
     return false;
 }
 
-CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * querySource)
+CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * querySource,
+                                   const ResponseConfiguration & configuration)
 {
     mSendState.Reset(messageId, query, querySource);
 
@@ -142,7 +143,7 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
             }
             for (auto it = (*responder)->begin(&responseFilter); it != (*responder)->end(); it++)
             {
-                it->responder->AddAllResponses(querySource, this);
+                it->responder->AddAllResponses(querySource, this, configuration);
                 ReturnErrorOnFailure(mSendState.GetError());
 
                 (*responder)->MarkAdditionalRepliesFor(it);
@@ -175,7 +176,7 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
             }
             for (auto it = (*responder)->begin(&responseFilter); it != (*responder)->end(); it++)
             {
-                it->responder->AddAllResponses(querySource, this);
+                it->responder->AddAllResponses(querySource, this, configuration);
                 ReturnErrorOnFailure(mSendState.GetError());
             }
         }
@@ -195,14 +196,18 @@ CHIP_ERROR ResponseSender::FlushReply()
 
         if (mSendState.SendUnicast())
         {
+#if CHIP_MINMDNS_HIGH_VERBOSITY
             ChipLogDetail(Discovery, "Directly sending mDns reply to peer %s on port %d", srcAddressString,
                           mSendState.GetSourcePort());
+#endif
             ReturnErrorOnFailure(mServer->DirectSend(mResponseBuilder.ReleasePacket(), mSendState.GetSourceAddress(),
                                                      mSendState.GetSourcePort(), mSendState.GetSourceInterfaceId()));
         }
         else
         {
+#if CHIP_MINMDNS_HIGH_VERBOSITY
             ChipLogDetail(Discovery, "Broadcasting mDns reply for query from %s", srcAddressString);
+#endif
             ReturnErrorOnFailure(mServer->BroadcastSend(mResponseBuilder.ReleasePacket(), kMdnsStandardPort,
                                                         mSendState.GetSourceInterfaceId(), mSendState.GetSourceAddress().Type()));
         }

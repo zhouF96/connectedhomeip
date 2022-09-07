@@ -16,7 +16,7 @@
  *
  */
 
-#include "ModelCommand.h"
+#include <commands/clusters/ModelCommand.h>
 
 #include <CastingServer.h>
 #include <app/InteractionModelEngine.h>
@@ -28,50 +28,43 @@ CHIP_ERROR ModelCommand::RunCommand()
 {
     FabricIndex fabricIndex = CastingServer::GetInstance()->CurrentFabricIndex();
 
-    if (mNodeId == 0)
+    if (mDestinationId == 0)
     {
         ChipLogProgress(chipTool, "nodeId set to 0, using default for fabric %d", fabricIndex);
-        mNodeId = CastingServer::GetInstance()->GetVideoPlayerNodeForFabricIndex(fabricIndex);
+        mDestinationId = CastingServer::GetInstance()->GetVideoPlayerNodeForFabricIndex(fabricIndex);
     }
     else
     {
         // potentially change fabric index if this is not the right one for the given nodeId
-        fabricIndex = CastingServer::GetInstance()->GetVideoPlayerFabricIndexForNode(mNodeId);
+        fabricIndex = CastingServer::GetInstance()->GetVideoPlayerFabricIndexForNode(mDestinationId);
     }
-    ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mNodeId);
+    ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mDestinationId);
 
-    if (IsGroupId(mNodeId))
+    if (IsGroupId(mDestinationId))
     {
-        ChipLogProgress(chipTool, "Sending command to group 0x%x", GroupIdFromNodeId(mNodeId));
+        ChipLogProgress(chipTool, "Sending command to group 0x%x", GroupIdFromNodeId(mDestinationId));
 
-        return SendGroupCommand(GroupIdFromNodeId(mNodeId), fabricIndex);
+        return SendGroupCommand(GroupIdFromNodeId(mDestinationId), fabricIndex);
     }
 
-    Server * server           = &(chip::Server::GetInstance());
-    chip::FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(fabricIndex);
-    if (fabric == nullptr)
-    {
-        ChipLogError(AppServer, "Did not find fabric for index %d", fabricIndex);
-        return CHIP_ERROR_INVALID_FABRIC_INDEX;
-    }
-
-    PeerId peerID = fabric->GetPeerIdForNode(mNodeId);
-    server->GetCASESessionManager()->FindOrEstablishSession(peerID, &mOnDeviceConnectedCallback,
+    Server * server = &(chip::Server::GetInstance());
+    server->GetCASESessionManager()->FindOrEstablishSession(ScopedNodeId(mDestinationId, fabricIndex), &mOnDeviceConnectedCallback,
                                                             &mOnDeviceConnectionFailureCallback);
     return CHIP_NO_ERROR;
 }
 
-void ModelCommand::OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device)
+void ModelCommand::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
 {
     ChipLogProgress(chipTool, "ModelCommand::OnDeviceConnectedFn");
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectedFn: context is null"));
 
-    CHIP_ERROR err = command->SendCommand(device, command->mEndPointId);
+    OperationalDeviceProxy device(&exchangeMgr, sessionHandle);
+    CHIP_ERROR err = command->SendCommand(&device, command->mEndPointId);
     VerifyOrReturn(CHIP_NO_ERROR == err, command->SetCommandExitStatus(err));
 }
 
-void ModelCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR err)
+void ModelCommand::OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR err)
 {
     ChipLogProgress(chipTool, "ModelCommand::OnDeviceConnectionFailureFn");
     LogErrorOnFailure(err);
